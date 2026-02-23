@@ -1,0 +1,9 @@
+# Java
+/bin/
+/out/
+/target/
+
+# Python
+__pycache__/
+*.pyc
+/venv/
