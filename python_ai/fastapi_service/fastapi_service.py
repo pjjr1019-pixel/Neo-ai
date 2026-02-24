@@ -35,11 +35,15 @@ def predict(features: FeatureInput):
     """
     try:
         logging.info(f"Received /predict request: {features}")
-        # Dummy logic for demonstration
         risk = 0.1
         result = PredictionOutput(action=action, confidence=confidence, risk=risk)
             logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
         return result
+    # Dummy logic for demonstration
+    risk = 0.1
+    result = PredictionOutput(action=action, confidence=confidence, risk=risk)
+    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
+    return result
     except Exception as e:
     action = "buy" if features.price > 100 else "hold"
     risk = 0.1
