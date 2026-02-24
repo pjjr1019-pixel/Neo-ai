@@ -9,7 +9,6 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
-
 app = FastAPI()
 logging.basicConfig(filename='fastapi_service.log', level=logging.INFO)
 

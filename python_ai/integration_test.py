@@ -30,7 +30,8 @@ def log_result(name, success, details=""):
 
 # 1. Test PostgreSQL connection
 try:
-    conn = psycopg2.connect(dbname='neoai_db', user='neoai', password='neoai123', host='localhost', port=5432)
+    conn = psycopg2.connect(
+        dbname='neoai_db', user='neoai', password='neoai123', host='localhost', port=5432)
     log_result("PostgreSQL connection", True)
     conn.close()
 except Exception as e:
@@ -75,7 +76,7 @@ try:
     log_result(
         "Java client execution",
         result.returncode == 0,
-        result.stdout + result.stderr
+        (result.stdout + result.stderr)
     )
 except Exception as e:
     log_result("Java client execution", False, str(e))
@@ -90,4 +91,6 @@ with open(results_path, "w") as f:
     for line in RESULTS:
         f.write(line + "\n")
 
-print("Integration test complete. Results logged in docs/phase-5.5-integration-test-results.md.")
+print(
+    "Integration test complete. Results logged in docs/phase-5.5-integration-test-results.md."
+)
