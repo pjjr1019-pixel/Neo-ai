@@ -72,8 +72,12 @@ except Exception as e:
         str(response.json())
 try:
     response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-        response.status_code == 200,
     )
+        str(response.json())
+    )
+try:
+    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
+        response.status_code == 200,
         str(response.json())
     )
 try:

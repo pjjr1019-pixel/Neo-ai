@@ -34,11 +34,16 @@ async def main():
     ]
         for _ in range(CONCURRENCY)
     ]
-        worker(client, REQUESTS // CONCURRENCY)
         for _ in range(CONCURRENCY)
         for _ in range(CONCURRENCY)
     ]
         await asyncio.gather(*tasks)
+    elapsed = time.perf_counter() - start
+    tasks = [
+        worker(client, REQUESTS // CONCURRENCY)
+        for _ in range(CONCURRENCY)
+    ]
+    await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
     tasks = [
         worker(client, REQUESTS // CONCURRENCY)
