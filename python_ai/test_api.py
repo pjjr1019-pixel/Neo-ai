@@ -1,8 +1,9 @@
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from fastapi.testclient import TestClient
 from python_ai.fastapi_service.fastapi_service import app
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 client = TestClient(app)
 
