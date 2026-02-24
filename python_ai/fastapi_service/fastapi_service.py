@@ -54,12 +54,19 @@ def predict(features: FeatureInput):
     logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
     return result
     # Dummy logic for demonstration
-    risk = 0.1
     logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
     return result
     except Exception as e:
     action = "buy" if features.price > 100 else "hold"
     risk = 0.1
+    try:
+        action = "buy" if features.price > 100 else "hold"
+        risk = 0.1
+        result = PredictionOutput(action=action, confidence=confidence, risk=risk)
+        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
+        return result
+    except Exception as e:
+        logging.error(f"Error in /predict: {e}")
     try:
         action = "buy" if features.price > 100 else "hold"
         risk = 0.1
