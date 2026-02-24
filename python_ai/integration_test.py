@@ -25,7 +25,8 @@ def log_result(name, success, details=""):
     """
     result = (
         f"{name}: {'PASS' if success else 'FAIL'} "
-        f"{details[:75]}{'...' if len(details) > 75 else ''}"
+        f"{details[:75]}"
+        f"{'...' if len(details) > 75 else ''}"
     )
     print(result)
     RESULTS.append(result)
