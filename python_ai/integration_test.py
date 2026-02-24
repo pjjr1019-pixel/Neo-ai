@@ -5,8 +5,8 @@ Tests end-to-end connectivity and workflow between Java client, Python AI, Postg
 Logs results and updates documentation.
 """
 
+
 import subprocess
-import sys
 import psycopg2
 import redis
 from fastapi.testclient import TestClient
@@ -22,9 +22,9 @@ def log_result(name, success, details=""):
         success (bool): Whether the test passed.
         details (str): Additional details.
     """
-    RESULT = f"{name}: {'PASS' if success else 'FAIL'} {details}"
-    print(RESULT)
-    RESULTS.append(RESULT)
+    result = f"{name}: {'PASS' if success else 'FAIL'} {details}"
+    print(result)
+    RESULTS.append(result)
 
 # 1. Test PostgreSQL connection
 try:
@@ -52,21 +52,21 @@ except Exception as e:
     log_result("FastAPI /predict endpoint", False, str(e))
 
 try:
-    response = client.post("/learn", json={"features": [1,2,3], "target": 1})
+    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
     log_result("FastAPI /learn endpoint", response.status_code == 200, str(response.json()))
 except Exception as e:
     log_result("FastAPI /learn endpoint", False, str(e))
 
 # 4. Test Java client (simulate call)
 try:
-    result = subprocess.run(["java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"], capture_output=True, text=True, timeout=10)
+    result = subprocess.run([
+        "java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"
+    ], capture_output=True, text=True, timeout=10)
     log_result("Java client execution", result.returncode == 0, result.stdout + result.stderr)
 except Exception as e:
     log_result("Java client execution", False, str(e))
 
 # 5. Log results to docs
-
-# Use pathlib for cross-platform file path handling
 results_path = Path(__file__).parent.parent / 'docs' / 'phase-5.5-integration-test-results.md'
 with open(results_path, "w") as f:
     f.write("# NEO Hybrid AI - Phase 5.5 Integration Test Results\n\n")

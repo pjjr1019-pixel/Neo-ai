@@ -1,11 +1,8 @@
+
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 import logging
-
-
-app = FastAPI()
-logging.basicConfig(filename='fastapi_service.log', level=logging.INFO)
 
 app = FastAPI()
 logging.basicConfig(filename='fastapi_service.log', level=logging.INFO)
@@ -20,8 +17,6 @@ class PredictionOutput(BaseModel):
     confidence: float
     risk: Optional[float]
 
-
-@app.post("/predict", response_model=PredictionOutput)
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(features: FeatureInput):
@@ -44,8 +39,6 @@ def predict(features: FeatureInput):
         logging.error(f"Error in /predict: {e}")
         return {"error": str(e)}
 
-
-@app.post("/learn")
 
 @app.post("/learn")
 async def learn(request: Request):
