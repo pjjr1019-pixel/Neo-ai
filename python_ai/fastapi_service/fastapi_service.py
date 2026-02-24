@@ -40,7 +40,7 @@ def predict(features: FeatureInput):
         confidence = 0.85
         risk = 0.1
         result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-        logging.info(f"Prediction result: {result}")
+            logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
         return result
     except Exception as e:
         logging.error(f"Error in /predict: {e}")

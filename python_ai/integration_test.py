@@ -31,7 +31,8 @@ def log_result(name, success, details=""):
 # 1. Test PostgreSQL connection
 try:
     conn = psycopg2.connect(
-        dbname='neoai_db', user='neoai', password='neoai123', host='localhost', port=5432)
+        dbname='neoai_db', user='neoai', password='neoai123',
+        host='localhost', port=5432)
     log_result("PostgreSQL connection", True)
     conn.close()
 except Exception as e:
