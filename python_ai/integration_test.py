@@ -33,14 +33,21 @@ def log_result(name, success, details=""):
 
 
 @pytest.mark.integration
-@pytest.mark.skipif(os.environ.get('RUN_FULL_INTEGRATION') != '1', reason="Full integration test skipped: RUN_FULL_INTEGRATION env var not set.")
+@pytest.mark.skipif(
+    os.environ.get('RUN_FULL_INTEGRATION') != '1',
+    reason="Full integration test skipped: RUN_FULL_INTEGRATION env var not set."
+)
 def test_full_integration():
     """Run the full integration workflow and assert all steps pass."""
     # 1. Test PostgreSQL connection
     try:
         conn = psycopg2.connect(
-            dbname='neoai_db', user='neoai', password='neoai123',
-            host='localhost', port=5432)
+            dbname='neoai_db',
+            user='neoai',
+            password='neoai123',
+            host='localhost',
+            port=5432
+        )
         log_result("PostgreSQL connection", True)
         conn.close()
     except Exception as e:
@@ -99,7 +106,12 @@ def test_full_integration():
     # 5. Test Java client (simulate call)
     try:
         result = subprocess.run(
-            ["java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"],
+            [
+                "java",
+                "-cp",
+                "java_core",
+                "data_ingestion.RealTimeDataFetcher"
+            ],
             capture_output=True,
             text=True,
             timeout=10
@@ -109,7 +121,9 @@ def test_full_integration():
             result.returncode == 0,
             (result.stdout + result.stderr)[:75]
             + (
-                '...' if len(result.stdout + result.stderr) > 75 else ''
+                '...'
+                if len(result.stdout + result.stderr) > 75
+                else ''
             )
         )
         assert result.returncode == 0, (
