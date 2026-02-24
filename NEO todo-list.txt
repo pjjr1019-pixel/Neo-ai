@@ -1,13 +1,14 @@
-# NEO Hybrid AI — Master TODO List (with Next-Level Enhancements)
+
+
 
 ---
 
 ## PHASE 0 — FOUNDATION & ARCHITECTURE
-
 1. **Define Modular Microservices Architecture**
    - Decompose system into services: data ingestion, AI engine, risk management, dashboard, etc.
    - Document APIs (REST/gRPC) for each service.
    - **Success:** Architecture diagram, API docs, modular repo structure.
+
 
 2. **Set Up Automated CI/CD Pipeline**
    - Integrate CI/CD (GitHub Actions, GitLab CI, Jenkins) for all services.
@@ -41,9 +42,14 @@
 9. Install Python & libraries: PyTorch, FastAPI, Pandas, NumPy, Scikit-learn, ONNX
    - **Success:** Python env created, dependencies installed, requirements.txt updated.
 10. Setup database: PostgreSQL for historical/log data
-    - **Success:** DB running, connection tested, schema documented.
+    - **Success:** DB running, connection tested, schema documented. (Docker: neo-postgres, user: neoai, db: neoai_db)
 11. Setup Redis: real-time caching
     - **Success:** Redis running, connection tested, usage documented.
+
+[extra1] Integration test: Python/Java connectivity to PostgreSQL & Redis
+    - **Success:** Sample connection code documented in /docs, connectivity verified.
+[extra2] Basic logging for all services (database logs, service logs)
+    - **Success:** Logging setup and documented.
 
 ---
 
@@ -61,6 +67,16 @@
 16. Integrate advanced observability: tracing, explainability (LIME, SHAP), dashboards
     - **Success:** Real-time monitoring, feature importances visible.
 
+[extra4] Automated Feature Engineering
+    - Add scripts to generate new features (e.g., rolling averages, percent changes, lagged values).
+    - Document feature engineering logic and impact.
+
+    [extra5] Data Versioning & Lineage
+    - Keep a record of every dataset you bring in or create (like saving different versions of a file).
+    - Use tools (like DVC) or a database table to note when and how each dataset was made or changed.
+    - Write down where the data came from and what steps were taken to process it.
+    - This helps you always know which data was used, and makes it easy to repeat or check your work later.
+
 ---
 
 ## PHASE 4 — PYTHON AI ENGINE
@@ -77,6 +93,10 @@
 21. Add automated data/model lineage tracking (MLflow/DVC)
     - **Success:** All model/data changes tracked and reproducible.
 
+[extra6] Unit & Integration Tests for FastAPI
+    - Add automated tests for /predict and /learn endpoints.
+    - Validate input/output schemas and edge cases.
+
 ---
 
 ## PHASE 5 — MODEL TRAINING & SELECTION
@@ -90,9 +110,33 @@
     - **Success:** Selection logic implemented, results logged.
 25. Save models → PyTorch/ONNX for Java inference
     - Use pruning/distillation for efficiency.
-    - **Success:** Models saved, loadable, and versioned.
 
----
+[extra7] Automated Test Scripts
+    - Write unit tests for backtesting, metric calculations, and model selection logic.
+    - Use pytest or unittest to ensure all functions work as expected.
+
+---## PHASE 5.5 — SYSTEM HARDENING & VALIDATION EXTRAS
+
+[extra8] Run Full Integration Tests
+    - Test all components (Java, Python, DB, Redis) together to catch hidden issues.
+
+[extra9] Review and Refactor Code
+    - Clean up code, remove unused files, and ensure modularity.
+
+[extra10] Update and Validate Documentation
+    - Make sure all docs are current, clear, and cover edge cases.
+
+[extra11] Backup Everything
+    - Backup code, data, and configs before major changes.
+
+[extra12] Security Audit
+    - Check for hardcoded secrets, validate access controls, and run vulnerability scans.
+
+[extra13] Performance Benchmarking
+    - Measure latency, throughput, and resource usage for all services.
+
+[extra14] CI/CD Pipeline Review
+    - Ensure automated tests, linting, and deployment scripts are working and up-to-date.
 
 ## PHASE 6 — JAVA ORCHESTRATOR CORE
 
@@ -105,9 +149,29 @@
     - **Success:** Loop runs end-to-end, logs all steps.
 29. Optional dashboard / GUI → real-time signals, strategy visualization, model version
     - Visualize learned patterns and feature importances.
+
     - **Success:** Dashboard live, displays real-time data.
 
----
+[extra8] Run Full Integration Tests
+    - Test all components (Java, Python, DB, Redis) together to catch hidden issues.
+
+[extra9] Review and Refactor Code
+    - Clean up code, remove unused files, and ensure modularity.
+
+[extra10] Update and Validate Documentation
+    - Make sure all docs are current, clear, and cover edge cases.
+
+[extra11] Backup Everything
+    - Backup code, data, and configs before major changes.
+
+[extra12] Security Audit
+    - Check for hardcoded secrets, validate access controls, and run vulnerability scans.
+
+[extra13] Performance Benchmarking
+    - Measure latency, throughput, and resource usage for all services.
+
+[extra14] CI/CD Pipeline Review
+    - Ensure automated tests, linting, and deployment scripts are working and up-to-date.
 
 ## PHASE 7 — STRATEGY EVOLUTION & META-LEARNING
 

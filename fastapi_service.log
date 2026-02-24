@@ -1,0 +1,29 @@
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 422 Unprocessable Entity"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 422 Unprocessable Entity"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 422 Unprocessable Entity"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:root:Received /predict request: price=123.45 volume=1000.0
+INFO:root:Prediction result: action='buy' confidence=0.85 risk=0.1
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 200 OK"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:root:Received /predict request: price=123.45 volume=1000.0
+INFO:root:Prediction result: action='buy' confidence=0.85 risk=0.1
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 200 OK"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:root:Received /predict request: price=123.45 volume=1000.0
+INFO:root:Prediction result: action='buy' confidence=0.85 risk=0.1
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 200 OK"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
+INFO:root:Received /predict request: price=123.45 volume=1000.0
+INFO:root:Prediction result: action='buy' confidence=0.85 risk=0.1
+INFO:httpx:HTTP Request: POST http://testserver/predict "HTTP/1.1 200 OK"
+INFO:root:Received /learn request: {'features': [1, 2, 3], 'target': 1}
+INFO:httpx:HTTP Request: POST http://testserver/learn "HTTP/1.1 200 OK"
