@@ -62,12 +62,19 @@ try:
     result = subprocess.run([
         "java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"
     ], capture_output=True, text=True, timeout=10)
-    log_result("Java client execution", result.returncode == 0, result.stdout + result.stderr)
+    log_result(
+        "Java client execution",
+        result.returncode == 0,
+        result.stdout + result.stderr
+    )
 except Exception as e:
     log_result("Java client execution", False, str(e))
 
 # 5. Log results to docs
-results_path = Path(__file__).parent.parent / 'docs' / 'phase-5.5-integration-test-results.md'
+
+results_path = (
+    Path(__file__).parent.parent / 'docs' / 'phase-5.5-integration-test-results.md'
+)
 with open(results_path, "w") as f:
     f.write("# NEO Hybrid AI - Phase 5.5 Integration Test Results\n\n")
     for line in RESULTS:
