@@ -69,7 +69,9 @@ def test_full_integration():
                 '...' if len(str(response.json())) > 75 else ''
             )
         )
-        assert response.status_code == 200, f"/predict failed: {response.text}"
+        assert response.status_code == 200, (
+            f"/predict failed: {response.text}"
+        )
     except Exception as e:
         log_result("FastAPI /predict endpoint", False, str(e))
         assert False, f"FastAPI /predict endpoint failed: {e}"
