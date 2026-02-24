@@ -35,9 +35,11 @@ def predict(features: FeatureInput):
     """
     try:
         logging.info(f"Received /predict request: {features}")
-        risk = 0.1
             logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
         return result
+    risk = 0.1
+    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
+    return result
     result = PredictionOutput(action=action, confidence=confidence, risk=risk)
     logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
     return result
