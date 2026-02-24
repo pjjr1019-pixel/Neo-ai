@@ -73,9 +73,14 @@ except Exception as e:
     )
 try:
     response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result(
         response.status_code == 200,
     )
+        str(response.json())
+    )
+client = TestClient(app)
+    log_result(
+        "FastAPI /predict endpoint",
+        response.status_code == 200,
         str(response.json())
     )
 client = TestClient(app)

@@ -23,9 +23,12 @@ async def worker(client, n):
 
 async def main():
     tasks = [
-    tasks = [
         worker(client, REQUESTS // CONCURRENCY)
     tasks = [
+    tasks = [
+        worker(client, REQUESTS // CONCURRENCY)
+        for _ in range(CONCURRENCY)
+    ]
         worker(client, REQUESTS // CONCURRENCY)
         for _ in range(CONCURRENCY)
     ]
