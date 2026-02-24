@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 from python_ai.fastapi_service.fastapi_service import app
 from pathlib import Path
 import pytest
+import os
 
 RESULTS = []
 
@@ -31,6 +32,7 @@ def log_result(name, success, details=""):
 
 
 @pytest.mark.integration
+@pytest.mark.skipif(os.environ.get('RUN_FULL_INTEGRATION') != '1', reason="Full integration test skipped: RUN_FULL_INTEGRATION env var not set.")
 def test_full_integration():
     """Run the full integration workflow and assert all steps pass."""
     # 1. Test PostgreSQL connection
