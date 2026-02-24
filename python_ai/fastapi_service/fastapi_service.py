@@ -4,13 +4,16 @@ from pydantic import BaseModel
 from typing import Optional
 import logging
 
+
 app = FastAPI()
 logging.basicConfig(filename='fastapi_service.log', level=logging.INFO)
+
 
 class FeatureInput(BaseModel):
     price: float
     volume: float
     # Add more features as needed
+
 
 class PredictionOutput(BaseModel):
     action: str
@@ -32,7 +35,9 @@ def predict(features: FeatureInput):
         action = "buy" if features.price > 100 else "hold"
         confidence = 0.85
         risk = 0.1
-        result = PredictionOutput(action=action, confidence=confidence, risk=risk)
+        result = PredictionOutput(
+            action=action, confidence=confidence, risk=risk
+        )
         logging.info(f"Prediction result: {result}")
         return result
     except Exception as e:

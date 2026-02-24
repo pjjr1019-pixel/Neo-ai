@@ -6,6 +6,7 @@ Logs results and updates documentation.
 """
 
 
+
 import subprocess
 import psycopg2
 import redis
@@ -14,6 +15,7 @@ from fastapi_service.fastapi_service import app
 from pathlib import Path
 
 RESULTS = []
+
 
 def log_result(name, success, details=""):
     """Log the result of a test step.
@@ -47,13 +49,21 @@ except Exception as e:
 client = TestClient(app)
 try:
     response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result("FastAPI /predict endpoint", response.status_code == 200, str(response.json()))
+    log_result(
+        "FastAPI /predict endpoint",
+        response.status_code == 200,
+        str(response.json())
+    )
 except Exception as e:
     log_result("FastAPI /predict endpoint", False, str(e))
 
 try:
     response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
-    log_result("FastAPI /learn endpoint", response.status_code == 200, str(response.json()))
+    log_result(
+        "FastAPI /learn endpoint",
+        response.status_code == 200,
+        str(response.json())
+    )
 except Exception as e:
     log_result("FastAPI /learn endpoint", False, str(e))
 

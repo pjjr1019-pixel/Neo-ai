@@ -2,7 +2,7 @@
 FastAPI HTTP Endpoint Benchmark Script
 
 This script benchmarks the /predict endpoint using httpx and asyncio.
-Run this script while your FastAPI server is running (default: http://127.0.0.1:8000).
+Run this script while your FastAPI server is running.
 """
 import asyncio
 import httpx
@@ -27,9 +27,12 @@ async def main():
         tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]
         await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
-    print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
-    print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
-
+    print(
+        f"Sent {REQUESTS} requests in {elapsed:.2f} seconds."
+    )
+    print(
+        f"Throughput: {REQUESTS / elapsed:.2f} req/sec"
+    )
 
 
 if __name__ == "__main__":
