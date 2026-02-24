@@ -76,8 +76,10 @@ try:
     log_result(
         "FastAPI /predict endpoint",
         response.status_code == 200,
+    )
         str(response.json())
     )
+client = TestClient(app)
         str(response.json())
     )
 client = TestClient(app)
