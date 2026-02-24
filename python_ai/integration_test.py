@@ -1,11 +1,10 @@
+
 """
 NEO Hybrid AI Full Integration Test
 
 Tests end-to-end connectivity and workflow between Java client, Python AI, PostgreSQL, and Redis.
 Logs results and updates documentation.
 """
-
-
 
 import subprocess
 import psycopg2
@@ -27,6 +26,7 @@ def log_result(name, success, details=""):
     result = f"{name}: {'PASS' if success else 'FAIL'} {details}"
     print(result)
     RESULTS.append(result)
+
 
 # 1. Test PostgreSQL connection
 try:

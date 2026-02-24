@@ -2,6 +2,11 @@
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from typing import Optional
+
+
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from typing import Optional
 import logging
 
 
@@ -35,14 +40,12 @@ def predict(features: FeatureInput):
         action = "buy" if features.price > 100 else "hold"
         confidence = 0.85
         risk = 0.1
-        result = PredictionOutput(
-            action=action, confidence=confidence, risk=risk
-        )
+        result = PredictionOutput(action=action, confidence=confidence, risk=risk)
         logging.info(f"Prediction result: {result}")
         return result
     except Exception as e:
         logging.error(f"Error in /predict: {e}")
-        return {"error": str(e)}
+        return PredictionOutput(action="error", confidence=0.0, risk=None)
 
 
 @app.post("/learn")

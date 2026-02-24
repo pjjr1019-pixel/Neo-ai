@@ -27,12 +27,8 @@ async def main():
         tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]
         await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
-    print(
-        f"Sent {REQUESTS} requests in {elapsed:.2f} seconds."
-    )
-    print(
-        f"Throughput: {REQUESTS / elapsed:.2f} req/sec"
-    )
+    print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
+    print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
 
 
 if __name__ == "__main__":
