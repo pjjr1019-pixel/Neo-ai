@@ -53,8 +53,13 @@ except Exception as e:
     log_result("Redis connection", False, str(e))
 
 # 3. Test FastAPI endpoints
-        response.status_code == 200,
     response = client.post("/predict", json={"price": 123.45, "volume": 1000})
+    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
+    log_result(
+        "FastAPI /predict endpoint",
+        response.status_code == 200,
+        str(response.json())
+    )
     log_result(
         "FastAPI /predict endpoint",
         response.status_code == 200,
