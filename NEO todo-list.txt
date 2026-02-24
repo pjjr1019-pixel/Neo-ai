@@ -99,7 +99,7 @@
 
 ---
 
-## PHASE 5 — MODEL TRAINING & SELECTION
+## PHASE 5 — MODEL TRAINING & SELECTIONff
 
 22. Implement backtesting simulator → simulate past X years
     - **Success:** Simulator runs, results logged.

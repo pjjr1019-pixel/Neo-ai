@@ -32,70 +32,20 @@ def predict(features: FeatureInput):
         features (FeatureInput): Input features for prediction.
     Returns:
         PredictionOutput: Predicted action, confidence, and risk.
-    try:
-        return result
-    logging.info(f"Received /predict request: {features}")
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
     """
     try:
         logging.info(f"Received /predict request: {features}")
-        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-        return result
-    except Exception as e:
-        logging.error(f"Error in /predict: {e}")
-    logging.info(f"Received /predict request: {features}")
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-    risk = 0.1
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-    result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-    except Exception as e:
-    action = "buy" if features.price > 100 else "hold"
-    risk = 0.1
-    try:
+        # Example prediction logic
         action = "buy" if features.price > 100 else "hold"
+        confidence = 0.95
         risk = 0.1
         result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
+        logging.info(f"Prediction result: {result}")
         return result
-    except Exception as e:
-        logging.error(f"Error in /predict: {e}")
-    try:
-        action = "buy" if features.price > 100 else "hold"
-        risk = 0.1
-        result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-        return result
-    except Exception as e:
-        logging.error(f"Error in /predict: {e}")
-    try:
-        action = "buy" if features.price > 100 else "hold"
-        risk = 0.1
-        result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-        return result
-    except Exception as e:
-        logging.error(f"Error in /predict: {e}")
-    result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-except Exception as e:
-        logging.error(f"Error in /predict: {e}")
-    confidence = 0.85
-    risk = 0.1
-    result = PredictionOutput(action=action, confidence=confidence, risk=risk)
-    logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
-    return result
-except Exception as e:
-    logging.error(f"Error in /predict: {e}")
-        return PredictionOutput(action="error", confidence=0.0, risk=None)
 
+    except Exception as e:
+        logging.error(f"Error in /predict: {e}")
+        return PredictionOutput(action="error", confidence=0.0, risk=None)
 
 @app.post("/learn")
 async def learn(request: Request):

@@ -23,8 +23,6 @@ def log_result(name, success, details=""):
         success (bool): Whether the test passed.
         details (str): Additional details.
     """
-    print(result)
-    RESULTS.append(result)
     result = (
         f"{name}: {'PASS' if success else 'FAIL'} "
         f"{details[:75]}{'...' if len(details) > 75 else ''}"
@@ -52,64 +50,10 @@ try:
 except Exception as e:
     log_result("Redis connection", False, str(e))
 
-# 3. Test FastAPI endpoints
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
+    # 3. Test FastAPI /predict endpoint
 try:
+    client = TestClient(app)
     response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    )
-        str(response.json())
-    )
-try:
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-        response.status_code == 200,
-        str(response.json())
-    )
-try:
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
-    )
-client = TestClient(app)
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
-client = TestClient(app)
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
-client = TestClient(app)
-        str(response.json())
-    )
-client = TestClient(app)
-try:
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
-    log_result(
-        "FastAPI /predict endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
     log_result(
         "FastAPI /predict endpoint",
         response.status_code == 200,
@@ -118,12 +62,9 @@ try:
 except Exception as e:
     log_result("FastAPI /predict endpoint", False, str(e))
 
+
 try:
     response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
-        "FastAPI /learn endpoint",
-        response.status_code == 200,
-        str(response.json())
-    )
     log_result(
         "FastAPI /learn endpoint",
         response.status_code == 200,
@@ -137,10 +78,6 @@ try:
     result = subprocess.run([
         "java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"
     ], capture_output=True, text=True, timeout=10)
-        "Java client execution",
-        result.returncode == 0,
-        (result.stdout + result.stderr)
-    )
     log_result(
         "Java client execution",
         result.returncode == 0,
