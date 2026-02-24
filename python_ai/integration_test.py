@@ -89,7 +89,9 @@ def test_full_integration():
                 '...' if len(str(response.json())) > 75 else ''
             )
         )
-        assert response.status_code == 200, f"/learn failed: {response.text}"
+        assert response.status_code == 200, (
+            f"/learn failed: {response.text}"
+        )
     except Exception as e:
         log_result("FastAPI /learn endpoint", False, str(e))
         assert False, f"FastAPI /learn endpoint failed: {e}"
@@ -110,7 +112,9 @@ def test_full_integration():
                 '...' if len(result.stdout + result.stderr) > 75 else ''
             )
         )
-        assert result.returncode == 0, f"Java client failed: {result.stderr}"
+        assert result.returncode == 0, (
+            f"Java client failed: {result.stderr}"
+        )
     except Exception as e:
         log_result("Java client execution", False, str(e))
         assert False, f"Java client execution failed: {e}"
