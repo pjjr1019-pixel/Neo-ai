@@ -32,12 +32,18 @@ def predict(features: FeatureInput):
         features (FeatureInput): Input features for prediction.
     Returns:
         PredictionOutput: Predicted action, confidence, and risk.
-    """
     try:
         return result
     logging.info(f"Received /predict request: {features}")
     logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
     return result
+    """
+    try:
+        logging.info(f"Received /predict request: {features}")
+        logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
+        return result
+    except Exception as e:
+        logging.error(f"Error in /predict: {e}")
     logging.info(f"Received /predict request: {features}")
     logging.info(f"Prediction result: {result}")  # Ensure this line is properly indented
     return result

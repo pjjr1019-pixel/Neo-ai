@@ -33,11 +33,16 @@ async def main():
     ]
         worker(client, REQUESTS // CONCURRENCY)
         for _ in range(CONCURRENCY)
-    ]
         worker(client, REQUESTS // CONCURRENCY)
         for _ in range(CONCURRENCY)
     ]
         await asyncio.gather(*tasks)
+    elapsed = time.perf_counter() - start
+    tasks = [
+        worker(client, REQUESTS // CONCURRENCY)
+        for _ in range(CONCURRENCY)
+    ]
+    await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
     async with httpx.AsyncClient(timeout=10) as client:
         tasks = [
