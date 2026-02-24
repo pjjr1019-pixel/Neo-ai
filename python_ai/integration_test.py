@@ -1,9 +1,10 @@
 
+
 """
 NEO Hybrid AI Full Integration Test
 
-Tests end-to-end connectivity and workflow between Java client, Python AI, PostgreSQL, and Redis.
-Logs results and updates documentation.
+Tests end-to-end connectivity and workflow between Java client, Python AI,
+PostgreSQL, and Redis. Logs results and updates documentation.
 """
 
 import subprocess
@@ -53,35 +54,49 @@ except Exception as e:
     # 3. Test FastAPI /predict endpoint
 try:
     client = TestClient(app)
-    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
+    response = client.post(
+        "/predict", json={"price": 123.45, "volume": 1000}
+    )
     log_result(
         "FastAPI /predict endpoint",
         response.status_code == 200,
-        str(response.json())[:75] + ('...' if len(str(response.json())) > 75 else '')
+        str(response.json())[:75] + (
+            '...' if len(str(response.json())) > 75 else ''
+        )
     )
 except Exception as e:
     log_result("FastAPI /predict endpoint", False, str(e))
 
 
 try:
-    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
+    response = client.post(
+        "/learn", json={"features": [1, 2, 3], "target": 1}
+    )
     log_result(
         "FastAPI /learn endpoint",
         response.status_code == 200,
-        str(response.json())[:75] + ('...' if len(str(response.json())) > 75 else '')
+        str(response.json())[:75] + (
+            '...' if len(str(response.json())) > 75 else ''
+        )
     )
 except Exception as e:
     log_result("FastAPI /learn endpoint", False, str(e))
 
 # 4. Test Java client (simulate call)
 try:
-    result = subprocess.run([
-        "java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"
-    ], capture_output=True, text=True, timeout=10)
+    result = subprocess.run(
+        ["java", "-cp", "java_core", "data_ingestion.RealTimeDataFetcher"],
+        capture_output=True,
+        text=True,
+        timeout=10
+    )
     log_result(
         "Java client execution",
         result.returncode == 0,
-        (result.stdout + result.stderr)[:75] + ('...' if len(result.stdout + result.stderr) > 75 else '')
+        (result.stdout + result.stderr)[:75]
+        + (
+            '...' if len(result.stdout + result.stderr) > 75 else ''
+        )
     )
 except Exception as e:
     log_result("Java client execution", False, str(e))
@@ -89,7 +104,9 @@ except Exception as e:
 # 5. Log results to docs
 
 results_path = (
-    Path(__file__).parent.parent / 'docs' / 'phase-5.5-integration-test-results.md'
+    Path(__file__).parent.parent /
+    'docs' /
+    'phase-5.5-integration-test-results.md'
 )
 with open(results_path, "w") as f:
     f.write("# NEO Hybrid AI - Phase 5.5 Integration Test Results\n\n")
@@ -97,5 +114,6 @@ with open(results_path, "w") as f:
         f.write(line + "\n")
 
 print(
-    "Integration test complete. Results logged in docs/phase-5.5-integration-test-results.md."
+    "Integration test complete. Results logged in "
+    "docs/phase-5.5-integration-test-results.md."
 )

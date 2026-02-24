@@ -22,48 +22,6 @@ async def worker(client, n):
 
 
 async def main():
-    tasks = [
-        worker(client, REQUESTS // CONCURRENCY)
-    tasks = [
-    tasks = [
-        worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-        worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-        for _ in range(CONCURRENCY)
-    ]
-        for _ in range(CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-        await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
-    tasks = [
-        worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-    await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
-    tasks = [
-        worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-    await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
-    tasks = [
-        worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-    await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
-    async with httpx.AsyncClient(timeout=10) as client:
-        tasks = [
-            worker(client, REQUESTS // CONCURRENCY)
-            for _ in range(CONCURRENCY)
-        ]
-        await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
     start = time.perf_counter()
     async with httpx.AsyncClient(timeout=10) as client:
         tasks = [
@@ -71,13 +29,6 @@ async def main():
             for _ in range(CONCURRENCY)
         ]
         await asyncio.gather(*tasks)
-    elapsed = time.perf_counter() - start
-    print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
-    print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
-            worker(client, REQUESTS // CONCURRENCY)
-        for _ in range(CONCURRENCY)
-    ]
-    await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
     print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
     print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
