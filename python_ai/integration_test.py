@@ -51,7 +51,11 @@ def test_full_integration():
         log_result("PostgreSQL connection", True)
         conn.close()
     except Exception as e:
-        log_result("PostgreSQL connection", False, str(e))
+        log_result(
+            "PostgreSQL connection",
+            False,
+            str(e)
+        )
         assert False, f"PostgreSQL connection failed: {e}"
 
     # 2. Test Redis connection
