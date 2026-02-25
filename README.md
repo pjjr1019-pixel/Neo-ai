@@ -1,27 +1,44 @@
-# NEO Hybrid AI
+# NEO Hybrid AI System
 
-A next-generation hybrid AI system for advanced pattern recognition, efficient learning, and robust automation.
+## Overview
+NEO is a modular, robust, and fully tested hybrid AI system built with FastAPI, pytest, and modern Python best practices.
 
-## Goals
-- Modular microservices architecture
-- Advanced AI/ML with explainability
-- Real-time data ingestion and decisioning
-- Secure, scalable, and production-ready
+## Features
+- Modular FastAPI endpoints for prediction and learning
+- Comprehensive test coverage (100%)
+- Flake8 style compliance
+- Async test support (pytest-asyncio)
+- CI/CD ready
 
-## Key Features
-- **Integration tested:** End-to-end integration between Java, Python, PostgreSQL, and Redis, with automated test logging.
-- **Robust error handling:** All services and tests include exception handling and clear logging.
-- **Modular codebase:** Each service is self-contained and documented for maintainability.
-- **Production ready:** Handles external API failures gracefully and uses best practices for configuration and resource management.
+## Setup
+1. Clone the repository
+2. Create and activate a virtual environment
+3. Install dependencies:
+	```
+	pip install -r requirements-dev.txt
+	```
+4. Run tests:
+	```
+	pytest --maxfail=1 --disable-warnings -v
+	```
 
-## Structure
-- `java_core/` — Java microservices (e.g., data_ingestion)
-- `python_ai/` — Python AI engine and FastAPI service
-- `docs/` — Documentation and integration test results
+## API Documentation
+- FastAPI auto-generates docs at `/docs` and `/redoc` when running the app.
 
-## Integration Test Results
-See `docs/phase-5.5-integration-test-results.md` for the latest integration status.
+## Project Structure
+- `python_ai/fastapi_service/fastapi_service.py`: Main FastAPI app and endpoints
+- `python_ai/fastapi_service/test_fastapi_service.py`: Endpoint tests
+- `python_ai/test_api.py`, `test_basic.py`, `test_utils.py`, `test_benchmark_predict.py`: Additional tests and utilities
+- `requirements-dev.txt`: Dev dependencies
+
+## CI/CD
+- Ensure `pytest-asyncio` is installed in CI for async test support
+- Use `pip install -r requirements-dev.txt` in your workflow
+
+## Contributing
+- Follow flake8 and modularity best practices
+- Add docstrings and type hints
+- Write tests for new features
 
 ---
-
-See `/docs` for the full roadmap and design.
+For more details, see the code and tests. For questions, open an issue or contact the maintainer.

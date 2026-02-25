@@ -1,2 +1,5 @@
 pytest
 pytest-asyncio
+fastapi
+httpx
+numpy
