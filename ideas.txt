@@ -1,0 +1,21 @@
+paper trading
+portfolio management
+real-time broker API integration
+order book simulation
+position and risk management
+performance analytics dashboard
+automated trade logging
+slippage and transaction cost modeling
+multi-asset portfolio support
+strategy backtesting framework
+reinforcement learning agent integration
+live data feed abstraction
+event-driven trading loop
+alerting and notification system
+user-configurable trading rules
+modular strategy plug-ins
+cloud-based model retraining
+integration with external research APIs
+mobile/web monitoring interface
+compliance and audit logging
+automated reporting and summaries
