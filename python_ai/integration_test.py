@@ -4,6 +4,12 @@ NEO Hybrid AI Full Integration Test
 Tests end-to-end connectivity and workflow between Java client, Python AI,
 PostgreSQL, and Redis. Logs results and updates documentation.
 """
+"""
+NEO Hybrid AI Full Integration Test
+
+Tests end-to-end connectivity and workflow between Java client, Python AI,
+PostgreSQL, and Redis. Logs results and updates documentation.
+"""
 import subprocess
 import psycopg2
 import redis
@@ -15,7 +21,7 @@ import os
 
 RESULTS = []
     # ...existing code...
-def log_result(name, success, details=""):
+def log_result(name, success, details=""): 
     """Log the result of a test step.
     Args:
         name (str): Name of the test step.
@@ -51,7 +57,7 @@ def test_full_integration():
 
 
     # 4. Test FastAPI /learn endpoint
-    test_fastapi_learn()
+    def test_full_integration(): 
 
 
     # 5. Test Java client (simulate call)
