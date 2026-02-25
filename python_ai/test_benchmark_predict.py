@@ -1,12 +1,15 @@
-# ...existing code...
-
+"""
+Unit tests for benchmark_predict.py using pytest and unittest.mock.
+Ensures async worker and main logic are robust and flake8-compliant.
+"""
 
 import pytest
 import python_ai.benchmark_predict as bp
 import httpx
+from unittest.mock import patch, AsyncMock
 
 
-import pytest
+def test_worker_success(monkeypatch):
     class MockResponse:
         status_code = 200
 
@@ -22,7 +25,7 @@ import pytest
     asyncio.run(bp.worker(MockClient(), 1))
 
 
-from unittest.mock import patch, AsyncMock
+def test_worker_failure(monkeypatch):
     class MockResponse:
         status_code = 500
 
@@ -39,22 +42,21 @@ from unittest.mock import patch, AsyncMock
         asyncio.run(bp.worker(MockClient(), 1))
 
 
-import python_ai.benchmark_predict as bp
+def test_main_patch(monkeypatch):
     async def fake_worker(client, n):
         return None
     monkeypatch.setattr(bp, "worker", fake_worker)
     import asyncio
     asyncio.run(bp.main())
 
+
 @pytest.mark.asyncio
 async def test_main_runs(monkeypatch):
-    # Patch httpx.AsyncClient to always return a mock response
     mock_response = AsyncMock()
     mock_response.status_code = 200
     mock_client = AsyncMock()
     mock_client.post.return_value = mock_response
 
-    # Patch AsyncClient context manager
     mock_acm = AsyncMock()
     mock_acm.__aenter__.return_value = mock_client
 
@@ -63,9 +65,6 @@ async def test_main_runs(monkeypatch):
 
 
 def test_benchmark_predict():
-    # ...existing code...
     output = {"action": "buy", "confidence": 0.95}
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0
-
-

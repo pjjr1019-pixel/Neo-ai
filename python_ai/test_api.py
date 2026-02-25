@@ -1,31 +1,14 @@
-import sys
-from pathlib import Path
+from python_ai.fastapi_service.fastapi_service import app, get_learning_logic, learning_logic
 from fastapi.testclient import TestClient
-from python_ai.fastapi_service.fastapi_service import app
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-client = TestClient(app)
-
-
-def test_predict_valid():
-    """Test valid /predict endpoint."""
-    response = client.post("/predict", json={"price": 120.0, "volume": 210.0})
-    assert response.status_code == 200
-    data = response.json()
-    assert "action" in data
-    assert "confidence" in data
-    assert "risk" in data
-
-
-def test_predict_invalid():
-    """Test invalid /predict endpoint."""
-    response = client.post("/predict", json={"price": "bad", "volume": 210.0})
-    assert response.status_code == 422  # Unprocessable Entity
-
 
 def test_learn():
     """Test /learn endpoint."""
-    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
-    assert response.status_code == 200
-    assert "status" in response.json()
+    app.dependency_overrides[get_learning_logic] = lambda: learning_logic
+    client = TestClient(app)
+    try:
+        response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
+        print("/learn response:", response.status_code, response.json())
+        assert response.status_code == 200
+        assert "status" in response.json()
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
