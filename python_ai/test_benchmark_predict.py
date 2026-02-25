@@ -9,36 +9,40 @@ import httpx
 from unittest.mock import patch, AsyncMock
 
 
-def test_worker_success(monkeypatch):
+
+import asyncio
+
+import pytest
+
+@pytest.mark.parametrize("status_code,should_raise", [
+    (200, False),
+    (500, True),
+])
+def test_worker_status(monkeypatch, status_code, should_raise):
     class MockResponse:
-        status_code = 200
+        def __init__(self, code):
+            self.status_code = code
 
     async def mock_post(*args, **kwargs):
-        return MockResponse()
+        return MockResponse(status_code)
 
     class MockClient:
         async def post(self, *args, **kwargs):
             return await mock_post()
 
     monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
-    import asyncio
-    asyncio.run(bp.worker(MockClient(), 1))
+    if should_raise:
+        with pytest.raises(AssertionError):
+            asyncio.run(bp.worker(MockClient(), 1))
+    else:
+        asyncio.run(bp.worker(MockClient(), 1))
 
 
-def test_worker_failure(monkeypatch):
-    class MockResponse:
-        status_code = 500
-
-    async def mock_post(*args, **kwargs):
-        return MockResponse()
-
+def test_worker_edge_cases(monkeypatch):
+    # Edge: No post method
     class MockClient:
-        async def post(self, *args, **kwargs):
-            return await mock_post()
-
-    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
-    import asyncio
-    with pytest.raises(AssertionError):
+        pass
+    with pytest.raises(AttributeError):
         asyncio.run(bp.worker(MockClient(), 1))
 
 
@@ -46,14 +50,14 @@ def test_main_patch(monkeypatch):
     async def fake_worker(client, n):
         return None
     monkeypatch.setattr(bp, "worker", fake_worker)
-    import asyncio
     asyncio.run(bp.main())
 
 
 @pytest.mark.asyncio
-async def test_main_runs(monkeypatch):
+@pytest.mark.parametrize("status_code,should_raise", [(200, False), (500, True)])
+async def test_main_runs(monkeypatch, status_code, should_raise):
     mock_response = AsyncMock()
-    mock_response.status_code = 200
+    mock_response.status_code = status_code
     mock_client = AsyncMock()
     mock_client.post.return_value = mock_response
 
@@ -61,10 +65,20 @@ async def test_main_runs(monkeypatch):
     mock_acm.__aenter__.return_value = mock_client
 
     with patch('httpx.AsyncClient', return_value=mock_acm):
-        await bp.main()
+        if should_raise:
+            import pytest
+            with pytest.raises(AssertionError):
+                await bp.main()
+        else:
+            await bp.main()
 
 
-def test_benchmark_predict():
-    output = {"action": "buy", "confidence": 0.95}
+@pytest.mark.parametrize("output", [
+    {"action": "buy", "confidence": 0.95},
+    {"action": "hold", "confidence": 0.5},
+    {"action": "sell", "confidence": 0.0},
+    {"action": "buy", "confidence": 1.0},
+])
+def test_benchmark_predict(output):
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0
