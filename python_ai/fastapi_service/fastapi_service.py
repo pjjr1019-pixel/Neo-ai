@@ -10,10 +10,16 @@ logging.basicConfig(
 )
 
 
+
 class FeatureInput(BaseModel):
     price: float
     volume: float
     # Add more features as needed
+
+
+class LearnInput(BaseModel):
+    features: list
+    target: float
 
 
 class PredictionOutput(BaseModel):
@@ -51,21 +57,17 @@ def predict(features: FeatureInput):
         return PredictionOutput(action="error", confidence=0.0, risk=None)
 
 
+
 @app.post("/learn")
-async def learn(request: Request):
+async def learn(data: LearnInput):
     """Trigger learning process with provided data.
     Args:
-        request (Request): FastAPI request object containing JSON data.
+        data (LearnInput): Learning data.
     Returns:
         dict: Status and received data.
     """
-    try:
-        data = await request.json()
-        logging.info(f"Received /learn request: {data}")
-        # Dummy learning logic
-        return {"status": "learning triggered", "received": data}
-    except Exception as e:
-        logging.error(f"Error in /learn: {e}")
-        return {"error": str(e)}
+    logging.info(f"Received /learn request: {data}")
+    # Dummy learning logic
+    return {"status": "learning triggered", "received": data.dict()}
 
 # To run: uvicorn fastapi_service:app --reload

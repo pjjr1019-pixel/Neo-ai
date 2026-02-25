@@ -43,72 +43,20 @@ def log_result(name, success, details=""):
 def test_full_integration():
     """Run the full integration workflow and assert all steps pass."""
     # 1. Test PostgreSQL connection
-    try:
-        conn = psycopg2.connect(
-            dbname='neoai_db',
-            user='neoai',
-            password='neoai123',
-            host='localhost',
-            port=5432
-        )
-        log_result("PostgreSQL connection", True)
-        conn.close()
-    except Exception as e:
-        log_result(
-            "PostgreSQL connection",
-            False,
-            str(e)
-        )
-        assert False, f"PostgreSQL connection failed: {e}"
+    test_postgres_connection()
+
 
     # 2. Test Redis connection
-    try:
-        r = redis.Redis(host='localhost', port=6379)
-        r.ping()
-        log_result("Redis connection", True)
-        r.close()
-    except Exception as e:
-        log_result("Redis connection", False, str(e))
-        assert False, f"Redis connection failed: {e}"
+    test_redis_connection()
+
 
     # 3. Test FastAPI /predict endpoint
-    try:
-        client = TestClient(app)
-        response = client.post(
-            "/predict", json={"price": 123.45, "volume": 1000}
-        )
-        log_result(
-            "FastAPI /predict endpoint",
-            response.status_code == 200,
-            str(response.json())[:75] + (
-                '...' if len(str(response.json())) > 75 else ''
-            )
-        )
-        assert response.status_code == 200, (
-            f"/predict failed: {response.text}"
-        )
-    except Exception as e:
-        log_result("FastAPI /predict endpoint", False, str(e))
-        assert False, f"FastAPI /predict endpoint failed: {e}"
+    test_fastapi_predict()
+
 
     # 4. Test FastAPI /learn endpoint
-    try:
-        response = client.post(
-            "/learn", json={"features": [1, 2, 3], "target": 1}
-        )
-        log_result(
-            "FastAPI /learn endpoint",
-            response.status_code == 200,
-            str(response.json())[:75] + (
-                '...' if len(str(response.json())) > 75 else ''
-            )
-        )
-        assert response.status_code == 200, (
-            f"/learn failed: {response.text}"
-        )
-    except Exception as e:
-        log_result("FastAPI /learn endpoint", False, str(e))
-        assert False, f"FastAPI /learn endpoint failed: {e}"
+    test_fastapi_learn()
+
 
     # 5. Test Java client (simulate call)
     try:
@@ -155,3 +103,63 @@ def test_full_integration():
         "Integration test complete. Results logged in "
         "docs/phase-5.5-integration-test-results.md."
     )
+
+
+def test_postgres_connection():
+    """Test PostgreSQL connection with valid credentials."""
+    conn = psycopg2.connect(
+        dbname='neoai_db', user='neoai', password='neoai123', host='localhost', port=5432
+    )
+    conn.close()
+
+
+def test_postgres_connection_fail():
+    """Test PostgreSQL connection with invalid credentials (should fail)."""
+    with pytest.raises(Exception):
+        psycopg2.connect(
+            dbname='neoai_db', user='wrong', password='wrong', host='localhost', port=5432
+        )
+
+
+def test_redis_connection():
+    """Test Redis connection."""
+    r = redis.Redis(host='localhost', port=6379)
+    assert r.ping() is True
+    r.close()
+
+
+def test_redis_connection_fail():
+    """Test Redis connection with wrong port (should fail)."""
+    with pytest.raises(Exception):
+        r = redis.Redis(host='localhost', port=9999)
+        r.ping()
+
+
+def test_fastapi_predict():
+    """Test FastAPI /predict endpoint with valid input."""
+    client = TestClient(app)
+    response = client.post("/predict", json={"price": 123.45, "volume": 1000})
+    assert response.status_code == 200
+    data = response.json()
+    assert "action" in data and "confidence" in data
+
+
+def test_fastapi_predict_invalid():
+    """Test FastAPI /predict endpoint with invalid input (should fail)."""
+    client = TestClient(app)
+    response = client.post("/predict", json={"foo": "bar"})
+    assert response.status_code != 200
+
+
+def test_fastapi_learn():
+    """Test FastAPI /learn endpoint with valid input."""
+    client = TestClient(app)
+    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
+    assert response.status_code == 200
+
+
+def test_fastapi_learn_invalid():
+    """Test FastAPI /learn endpoint with invalid input (should fail)."""
+    client = TestClient(app)
+    response = client.post("/learn", json={"foo": "bar"})
+    assert response.status_code != 200
