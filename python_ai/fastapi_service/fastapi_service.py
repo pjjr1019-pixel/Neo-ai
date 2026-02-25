@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 import logging
@@ -8,9 +8,7 @@ logging.basicConfig(
     filename='fastapi_service.log',
     level=logging.INFO
 )
-
-
-
+    # ...existing code...
 class FeatureInput(BaseModel):
     price: float
     volume: float
@@ -55,9 +53,7 @@ def predict(features: FeatureInput):
     except Exception as e:
         logging.error(f"Error in /predict: {e}")
         return PredictionOutput(action="error", confidence=0.0, risk=None)
-
-
-
+    # ...existing code...
 @app.post("/learn")
 async def learn(data: LearnInput):
     """Trigger learning process with provided data.

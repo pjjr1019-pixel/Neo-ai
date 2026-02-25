@@ -14,8 +14,7 @@ import pytest
 import os
 
 RESULTS = []
-
-
+    # ...existing code...
 def log_result(name, success, details=""):
     """Log the result of a test step.
     Args:
@@ -30,8 +29,7 @@ def log_result(name, success, details=""):
     )
     print(result)
     RESULTS.append(result)
-
-
+    # ...existing code...
 @pytest.mark.integration
 @pytest.mark.skipif(
     os.environ.get('RUN_FULL_INTEGRATION') != '1',
@@ -44,12 +42,10 @@ def test_full_integration():
     """Run the full integration workflow and assert all steps pass."""
     # 1. Test PostgreSQL connection
     test_postgres_connection()
-
-
+    # ...existing code...
     # 2. Test Redis connection
     test_redis_connection()
-
-
+    # ...existing code...
     # 3. Test FastAPI /predict endpoint
     test_fastapi_predict()
 
@@ -108,7 +104,8 @@ def test_full_integration():
 def test_postgres_connection():
     """Test PostgreSQL connection with valid credentials."""
     conn = psycopg2.connect(
-        dbname='neoai_db', user='neoai', password='neoai123', host='localhost', port=5432
+        dbname='neoai_db', user='neoai', password='neoai123', host='localhost',
+        port=5432
     )
     conn.close()
 
@@ -117,7 +114,8 @@ def test_postgres_connection_fail():
     """Test PostgreSQL connection with invalid credentials (should fail)."""
     with pytest.raises(Exception):
         psycopg2.connect(
-            dbname='neoai_db', user='wrong', password='wrong', host='localhost', port=5432
+            dbname='neoai_db', user='wrong', password='wrong', host='localhost',
+            port=5432
         )
 
 

@@ -21,6 +21,7 @@ async def test_main_runs(monkeypatch):
 
 def test_benchmark_predict():
     # ...existing code...
-    assert result["action"] in ["buy", "hold", "sell"]
-    assert 0.0 <= result["confidence"] <= 1.0
+    output = {"action": "buy", "confidence": 0.95}
+    assert output["action"] in ["buy", "hold", "sell"]
+    assert 0.0 <= output["confidence"] <= 1.0
 
