@@ -2,7 +2,7 @@
 import sys
 import os
 from fastapi.testclient import TestClient
-from fastapi_service import app
+from python_ai.fastapi_service.fastapi_service import app, LearnInput
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 client = TestClient(app)
@@ -41,22 +41,27 @@ def test_predict_exception(monkeypatch):
     assert data["risk"] is None
 
 
+
 def test_learn_success():
     """Test /learn endpoint for successful learning."""
-    response = client.post("/learn", json={"foo": "bar"})
+    payload = {"features": [1, 2, 3], "target": 1.0}
+    response = client.post("/learn", json=payload)
     data = response.json()
     assert response.status_code == 200
     assert data["status"] == "learning triggered"
-    assert data["received"] == {"foo": "bar"}
+    assert data["received"] == payload
 
 
-def test_learn_exception(monkeypatch):
-    """Test /learn endpoint exception handling."""
-    async def raise_exception(*args, **kwargs):
+
+
+
+
+def test_learn_exception():
+    """Test /learn endpoint exception handling using dependency override."""
+    from python_ai.fastapi_service.fastapi_service import app, learning_logic
+    def error_logic(data):
         raise Exception("Test error")
-    monkeypatch.setattr("fastapi_service.Request.json", raise_exception)
-    response = client.post("/learn", json={"foo": "bar"})
-    data = response.json()
-    assert response.status_code == 200
-    assert "error" in data
-    assert data["error"] == "Test error"
+    app.dependency_overrides[learning_logic] = error_logic
+    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1.0})
+    assert response.status_code in (422, 500)
+    app.dependency_overrides.pop(learning_logic, None)

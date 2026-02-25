@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import Optional
 import logging
@@ -58,16 +58,20 @@ def predict(features: FeatureInput):
         logging.error(f"Error in /predict: {e}")
         return PredictionOutput(action="error", confidence=0.0, risk=None)
     # ...existing code...
+
+def learning_logic(data: LearnInput):
+    logging.info(f"Received /learn request: {data}")
+    # Dummy learning logic
+    return {"status": "learning triggered", "received": data.model_dump()}
+
 @app.post("/learn")
-async def learn(data: LearnInput):
+async def learn(data: LearnInput, logic=Depends(learning_logic)):
     """Trigger learning process with provided data.
     Args:
         data (LearnInput): Learning data.
     Returns:
         dict: Status and received data.
     """
-    logging.info(f"Received /learn request: {data}")
-    # Dummy learning logic
-    return {"status": "learning triggered", "received": data.dict()}
+    return logic
 
 # To run: uvicorn fastapi_service:app --reload
