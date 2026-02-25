@@ -5,7 +5,7 @@ from python_ai.fastapi_service.fastapi_service import (
     get_learning_logic,
     learning_logic
 )
-import psutil
+
 
 
 @pytest.mark.parametrize(
@@ -15,11 +15,7 @@ import psutil
         ({"features": [], "target": 0}, 200, "status"),  # edge: empty features
         ({"features": [1, 2, 3]}, 422, None),  # missing target
         ({}, 422, None),  # missing all fields
-        (
-            {"features": [1, 2, 3], "target": "badtype"},
-            422,
-            None
-        ),  # wrong type
+        ( {"features": [1, 2, 3], "target": "badtype"}, 422, None),  # wrong type
     ]
 )
 def test_learn_cases(payload, expected_status, expected_key):
@@ -37,6 +33,8 @@ def test_learn_cases(payload, expected_status, expected_key):
     finally:
         app.dependency_overrides.pop(get_learning_logic, None)
 
+
+
 def test_metrics_endpoint():
     client = TestClient(app)
     response = client.get("/metrics")
@@ -46,6 +44,8 @@ def test_metrics_endpoint():
     assert "throughput" in data
     assert "memory_mb" in data
     assert "cpu_percent" in data
+
+
 
 def test_predict_headers():
     client = TestClient(app)

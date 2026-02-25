@@ -59,14 +59,19 @@ def learning_logic(data: LearnInput) -> dict:
 def get_learning_logic() -> Callable[[LearnInput], dict]:
     return learning_logic
 
+
 # --- Metrics and resource monitoring ---
+
 import time
 import psutil
+
+
 class Metrics:
     latency = []
     throughput = 0
     start_time = time.perf_counter()
     request_count = 0
+
 
 def resource_usage():
     process = psutil.Process()
@@ -121,6 +126,7 @@ async def metrics_middleware(request, call_next):
     response.headers["X-Latency"] = str(elapsed)
     response.headers["X-Throughput"] = str(Metrics.throughput)
     usage = resource_usage()
+
     response.headers["X-Memory-MB"] = str(usage['memory_mb'])
     response.headers["X-CPU-Percent"] = str(usage['cpu_percent'])
     return response
@@ -129,7 +135,10 @@ async def metrics_middleware(request, call_next):
 def get_metrics():
     usage = resource_usage()
     return {
-        "avg_latency": sum(Metrics.latency) / len(Metrics.latency) if Metrics.latency else 0,
+        "avg_latency": (
+            sum(Metrics.latency) / len(Metrics.latency)
+            if Metrics.latency else 0
+        ),
         "throughput": Metrics.throughput,
         "memory_mb": usage['memory_mb'],
         "cpu_percent": usage['cpu_percent']
