@@ -9,6 +9,8 @@ logging.basicConfig(
     level=logging.INFO
 )
     # ...existing code...
+
+
 class FeatureInput(BaseModel):
     price: float
     volume: float
@@ -18,6 +20,8 @@ class FeatureInput(BaseModel):
 class LearnInput(BaseModel):
     features: list
     target: float
+
+
 
 
 class PredictionOutput(BaseModel):

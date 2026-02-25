@@ -25,3 +25,4 @@ def test_benchmark_predict():
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0
 
+
