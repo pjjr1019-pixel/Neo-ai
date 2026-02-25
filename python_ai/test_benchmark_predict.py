@@ -1,3 +1,40 @@
+# ...existing code...
+
+import pytest
+import python_ai.benchmark_predict as bp
+import httpx
+
+def test_worker_success(monkeypatch):
+    class MockResponse:
+        status_code = 200
+    async def mock_post(*args, **kwargs):
+        return MockResponse()
+    class MockClient:
+        async def post(self, *args, **kwargs):
+            return await mock_post()
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+    import asyncio
+    asyncio.run(bp.worker(MockClient(), 1))
+
+def test_worker_failure(monkeypatch):
+    class MockResponse:
+        status_code = 500
+    async def mock_post(*args, **kwargs):
+        return MockResponse()
+    class MockClient:
+        async def post(self, *args, **kwargs):
+            return await mock_post()
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+    import asyncio
+    with pytest.raises(AssertionError):
+        asyncio.run(bp.worker(MockClient(), 1))
+
+def test_main(monkeypatch):
+    async def fake_worker(client, n):
+        return None
+    monkeypatch.setattr(bp, "worker", fake_worker)
+    import asyncio
+    asyncio.run(bp.main())
 
 import pytest
 from unittest.mock import patch, AsyncMock
