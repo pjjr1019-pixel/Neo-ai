@@ -1,6 +1,7 @@
 import pytest
 
-@pytest.mark.parametrize("a,b,expected", [
+
+@pytest.mark.parametrize("a, b, expected", [
     (1, 1, 2),
     (0, 0, 0),
     (-1, 1, 0),
@@ -10,6 +11,7 @@ import pytest
 def test_sample_math(a, b, expected):
     """Parametrized math test: checks addition for edge and normal cases."""
     assert a + b == expected
+
 
 def test_division_by_zero():
     with pytest.raises(ZeroDivisionError):

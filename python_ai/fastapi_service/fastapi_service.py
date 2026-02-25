@@ -41,12 +41,10 @@ def predict(features: FeatureInput):
             confidence=confidence,
             risk=risk
         )
-        logging.info(f"Prediction result: {result}")
         return result
     except Exception as e:
         logging.error(f"Error in /predict: {e}")
         return PredictionOutput(action="error", confidence=0.0, risk=None)
-
 
 
 def learning_logic(data: LearnInput) -> dict:
@@ -60,6 +58,7 @@ def learning_logic(data: LearnInput) -> dict:
 
 def get_learning_logic() -> Callable[[LearnInput], dict]:
     return learning_logic
+
 
 @app.post("/learn")
 def learn(
@@ -78,15 +77,19 @@ def learn(
             raise TypeError("Injected learning logic is not callable")
         result = logic(data)
         if callable(result):
-            raise TypeError("Learning logic returned a function instead of a result")
+            raise TypeError(
+                "Learning logic returned a function instead of a result"
+            )
         logging.info(f"Learning result: {result}")
         if not isinstance(result, dict):
             raise TypeError("Learning logic did not return a dict")
         return result
     except Exception as e:
         logging.error(f"Error in /learn: {e}")
-        try:
-            received = data.model_dump()
-        except Exception:
-            received = None
-        return {"status": "error", "received": received}
+        return {
+            "status": "error",
+            "received": (
+                data.model_dump() if hasattr(data, 'model_dump')
+                else str(data)
+            )
+        }

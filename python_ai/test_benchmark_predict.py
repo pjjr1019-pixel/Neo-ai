@@ -7,14 +7,10 @@ import pytest
 import python_ai.benchmark_predict as bp
 import httpx
 from unittest.mock import patch, AsyncMock
-
-
-
 import asyncio
 
-import pytest
 
-@pytest.mark.parametrize("status_code,should_raise", [
+@pytest.mark.parametrize("status_code, should_raise", [
     (200, False),
     (500, True),
 ])
@@ -54,7 +50,13 @@ def test_main_patch(monkeypatch):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("status_code,should_raise", [(200, False), (500, True)])
+@pytest.mark.parametrize(
+    "status_code, should_raise",
+    [
+        (200, False),
+        (500, True),
+    ]
+)
 async def test_main_runs(monkeypatch, status_code, should_raise):
     mock_response = AsyncMock()
     mock_response.status_code = status_code
@@ -66,19 +68,21 @@ async def test_main_runs(monkeypatch, status_code, should_raise):
 
     with patch('httpx.AsyncClient', return_value=mock_acm):
         if should_raise:
-            import pytest
             with pytest.raises(AssertionError):
                 await bp.main()
         else:
             await bp.main()
 
 
-@pytest.mark.parametrize("output", [
-    {"action": "buy", "confidence": 0.95},
-    {"action": "hold", "confidence": 0.5},
-    {"action": "sell", "confidence": 0.0},
-    {"action": "buy", "confidence": 1.0},
-])
+@pytest.mark.parametrize(
+    "output",
+    [
+        {"action": "buy", "confidence": 0.95},
+        {"action": "hold", "confidence": 0.5},
+        {"action": "sell", "confidence": 0.0},
+        {"action": "buy", "confidence": 1.0},
+    ]
+)
 def test_benchmark_predict(output):
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0
