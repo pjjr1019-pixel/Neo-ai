@@ -59,6 +59,21 @@ def learning_logic(data: LearnInput) -> dict:
 def get_learning_logic() -> Callable[[LearnInput], dict]:
     return learning_logic
 
+# --- Metrics and resource monitoring ---
+import time
+import psutil
+class Metrics:
+    latency = []
+    throughput = 0
+    start_time = time.perf_counter()
+    request_count = 0
+
+def resource_usage():
+    process = psutil.Process()
+    mem = process.memory_info().rss / 1024 ** 2
+    cpu = process.cpu_percent(interval=0.1)
+    return {'memory_mb': mem, 'cpu_percent': cpu}
+
 
 @app.post("/learn")
 def learn(
@@ -93,3 +108,29 @@ def learn(
                 else str(data)
             )
         }
+
+
+@app.middleware("http")
+async def metrics_middleware(request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    elapsed = time.perf_counter() - start
+    Metrics.latency.append(elapsed)
+    Metrics.request_count += 1
+    Metrics.throughput = Metrics.request_count / (time.perf_counter() - Metrics.start_time)
+    response.headers["X-Latency"] = str(elapsed)
+    response.headers["X-Throughput"] = str(Metrics.throughput)
+    usage = resource_usage()
+    response.headers["X-Memory-MB"] = str(usage['memory_mb'])
+    response.headers["X-CPU-Percent"] = str(usage['cpu_percent'])
+    return response
+
+@app.get("/metrics")
+def get_metrics():
+    usage = resource_usage()
+    return {
+        "avg_latency": sum(Metrics.latency) / len(Metrics.latency) if Metrics.latency else 0,
+        "throughput": Metrics.throughput,
+        "memory_mb": usage['memory_mb'],
+        "cpu_percent": usage['cpu_percent']
+    }

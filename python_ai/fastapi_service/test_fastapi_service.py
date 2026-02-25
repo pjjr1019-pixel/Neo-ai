@@ -5,6 +5,7 @@ from python_ai.fastapi_service.fastapi_service import (
     get_learning_logic,
     learning_logic
 )
+import psutil
 
 
 @pytest.mark.parametrize(
@@ -35,3 +36,23 @@ def test_learn_cases(payload, expected_status, expected_key):
             assert expected_key in response.json()
     finally:
         app.dependency_overrides.pop(get_learning_logic, None)
+
+def test_metrics_endpoint():
+    client = TestClient(app)
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    data = response.json()
+    assert "avg_latency" in data
+    assert "throughput" in data
+    assert "memory_mb" in data
+    assert "cpu_percent" in data
+
+def test_predict_headers():
+    client = TestClient(app)
+    payload = {"price": 123.45, "volume": 1000}
+    response = client.post("/predict", json=payload)
+    assert response.status_code == 200
+    assert "X-Latency" in response.headers
+    assert "X-Throughput" in response.headers
+    assert "X-Memory-MB" in response.headers
+    assert "X-CPU-Percent" in response.headers
