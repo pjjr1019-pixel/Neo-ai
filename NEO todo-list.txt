@@ -36,8 +36,19 @@
 
 8. Install JDK 17+ and Maven/Gradle for Java
    - **Success:** Java tools installed, version check logged.
+
+---
+
+## BUILD/TEST SPEEDUP BEST PRACTICES
+- Use pytest-xdist for parallel test execution: `pytest -n auto`
+- Use pytest --lf or --last-failed for incremental testing
+- Cache pip and .pytest_cache in CI (e.g., GitHub Actions)
+- Run linting and tests locally before pushing
+- Split tests: fast unit tests vs. slow integration tests
+- Only install new dependencies, avoid full environment rebuilds
+
 9. Install Python & libraries: PyTorch, FastAPI, Pandas, NumPy, Scikit-learn, ONNX
-   - **Success:** Python env created, dependencies installed, requirements.txt updated.
+    - **Success:** Python env created, dependencies installed, requirements.txt updated.
 10. Setup database: PostgreSQL for historical/log data
     - **Success:** DB running, connection tested, schema documented. (Docker: neo-postgres, user: neoai, db: neoai_db)
 11. Setup Redis: real-time caching
@@ -245,7 +256,7 @@
     - **Success:** Build passes, deployment scripts tested, documentation finalized.
 
 ---
-
+## BEST PRACTICE CODING/TESTING HABITS
 # Notes
 - Each phase includes verification: unit/integration tests, linting, static analysis, performance/security checks.
 - All documentation in `/docs` (Markdown, Javadoc, Sphinx/docstrings).
@@ -255,7 +266,7 @@
 
 ---
 
-## BEST PRACTICE CODING/TESTING HABITS
+
 
 - [ ] Add tests for benchmark_predict.py
     - [ ] Cover all branches, including exceptions and edge cases
