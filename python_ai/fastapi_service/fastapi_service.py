@@ -44,7 +44,11 @@ def predict(features: FeatureInput):
         return result
     except Exception as e:
         logging.error(f"Error in /predict: {e}")
-        return PredictionOutput(action="error", confidence=0.0, risk=None)
+        try:
+            return PredictionOutput(action="error", confidence=0.0, risk=None)
+        except Exception:
+            # Fallback: always return a dict if even PredictionOutput fails
+            return {"action": "error", "confidence": 0.0, "risk": None}
 
 
 def learning_logic(data: LearnInput) -> dict:
