@@ -1,37 +1,97 @@
+# Metrics tracker for middleware and /metrics endpoint
+class Metrics:
+	latency = []
+	request_count = 0
+	throughput = 0.0
+	start_time = None
+
+def reset_metrics():
+	Metrics.latency = []
+	Metrics.request_count = 0
+	Metrics.throughput = 0.0
+	Metrics.start_time = time.perf_counter()
+
+
+
 """
 FastAPI service for NEO Hybrid AI system.
 Includes endpoints for learning, prediction, and resource monitoring.
 Flake8 and best-practice compliant.
 """
 
-from fastapi import FastAPI, Depends
-from typing import Callable, List
-from pydantic import BaseModel
 import logging
 import time
 import psutil
+from fastapi import FastAPI, Depends
+from typing import Callable, List
+from pydantic import BaseModel
+
 
 app = FastAPI()
+
+
+class PredictInput(BaseModel):
+	"""Input model for /predict endpoint."""
+	price: float
+	volume: int
+
+
+
+class PredictionOutput(BaseModel):
+	"""Output model for /predict endpoint."""
+	action: str
+	confidence: float
+	risk: float
+
+def predict_logic(data: PredictInput) -> PredictionOutput:
+	"""Dummy prediction logic for demonstration."""
+	return PredictionOutput(
+		action="buy",
+		confidence=0.95,
+		risk=0.05
+	)
+
+@app.post("/predict")
+def predict(data: PredictInput) -> dict:
+	"""
+	Predict endpoint for NEO Hybrid AI system.
+	Returns action, confidence, and risk.
+	Always returns a serializable dict, even if logic fails.
+	"""
+	try:
+		result = predict_logic(data)
+		return result.model_dump()
+	except Exception as e:
+		import traceback
+		logging.error(f"Error in /predict: {e}\n{traceback.format_exc()}")
+		return {
+			"action": "error",
+			"confidence": 0.0,
+			"risk": 1.0,
+			"detail": str(e)
+		}
+
 
 class LearnInput(BaseModel):
 	"""Input model for /learn endpoint."""
 	features: List[float]
 	target: float
 
+
 def learning_logic(data: LearnInput) -> dict:
 	"""Dummy learning logic for demonstration."""
 	return {"status": "learning triggered", "received": data.model_dump()}
+
 
 def get_learning_logic() -> Callable[[LearnInput], dict]:
 	"""Dependency injector for learning logic."""
 	return learning_logic
 
-class Metrics:
-	"""Tracks request metrics for monitoring endpoints."""
-	latency = []
-	throughput = 0
-	start_time = time.perf_counter()
-	request_count = 0
+
+
+
+
+
 
 def resource_usage() -> dict:
 	"""Returns current process memory and CPU usage."""
@@ -76,13 +136,15 @@ def learn(
 
 @app.middleware("http")
 async def metrics_middleware(request, call_next):
+	if Metrics.start_time is None:
+		Metrics.start_time = time.perf_counter()
 	start = time.perf_counter()
 	response = await call_next(request)
 	elapsed = time.perf_counter() - start
 	Metrics.latency.append(elapsed)
 	Metrics.request_count += 1
 	Metrics.throughput = Metrics.request_count / (
-		time.perf_counter() - Metrics.start_time
+		max(time.perf_counter() - Metrics.start_time, 1e-6)
 	)
 	response.headers["X-Latency"] = str(elapsed)
 	response.headers["X-Throughput"] = str(Metrics.throughput)
