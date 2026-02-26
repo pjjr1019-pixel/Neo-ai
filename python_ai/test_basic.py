@@ -2,6 +2,7 @@ import pkgutil
 import pytest
 import glob
 import traceback
+import subprocess
 from python_ai.test_fun_compliance import (
     test_flake8_compliance,
     test_all_functions_have_docstrings,
@@ -88,3 +89,34 @@ def test_import_all_modules():
             )
             errors.append(error_msg)
     assert not errors, "Module import errors:\n" + "\n".join(errors)
+
+
+def test_git_environment():
+    """Check git status, config, and submodule for errors or warnings."""
+    commands = [
+        ["git", "status"],
+        ["git", "config", "--global", "--list"],
+        ["git", "config", "--local", "--list"],
+        ["git", "submodule", "status"],
+    ]
+    error_keywords = [
+        "unsafe", "error", "fatal", "not found", "missing", "failed", "warning"
+    ]
+    errors = []
+    for cmd in commands:
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            output = result.stdout.lower() + result.stderr.lower()
+            for keyword in error_keywords:
+                if keyword in output:
+                    error_msg = (
+                        f"{' '.join(cmd)}: {keyword} found\n"
+                        f"{output}"
+                    )
+                    errors.append(error_msg)
+        except Exception as e:
+            error_msg = (
+                f"{' '.join(cmd)}: Exception {type(e).__name__}: {e}"
+            )
+            errors.append(error_msg)
+    assert not errors, "Git environment errors:\n" + "\n".join(errors)

@@ -136,3 +136,51 @@ def test_benchmark_predict(output):
     """Test benchmark_predict output action and confidence range."""
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0
+
+
+def test_main_print(monkeypatch, capsys):
+    """Test main print statements for coverage."""
+    async def fake_worker(client, n):
+        return None
+    monkeypatch.setattr(bp, "worker", fake_worker)
+    monkeypatch.setattr(bp, "REQUESTS", 10)
+    monkeypatch.setattr(bp, "CONCURRENCY", 2)
+    monkeypatch.setattr(bp, "URL", "http://127.0.0.1:8000/predict")
+    monkeypatch.setattr(bp, "PAYLOAD", {"price": 1, "volume": 1})
+    # Patch time.perf_counter to return predictable values
+    monkeypatch.setattr(bp.time, "perf_counter", lambda: 1.0)
+    asyncio.run(bp.main())
+    out = capsys.readouterr().out
+    assert "Sent" in out and "Throughput" in out
+
+
+def test_worker_status_invalid(monkeypatch):
+    """Test worker with invalid status code (not 200 or 500)."""
+    class MockResponse:
+        def __init__(self, code):
+            """Initialize MockResponse with status code."""
+            self.status_code = code
+
+    async def mock_post(*args, **kwargs):
+        return MockResponse(404)
+
+    class MockClient:
+        async def post(self, *args, **kwargs):
+            return await mock_post()
+
+    monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+    with pytest.raises(AssertionError):
+        asyncio.run(bp.worker(MockClient(), 1))
+
+
+def test_main_runs_invalid(monkeypatch):
+    """Test main with invalid status code for coverage."""
+    mock_response = AsyncMock()
+    mock_response.status_code = 404
+    mock_client = AsyncMock()
+    mock_client.post.return_value = mock_response
+    mock_acm = AsyncMock()
+    mock_acm.__aenter__.return_value = mock_client
+    with patch("httpx.AsyncClient", return_value=mock_acm):
+        with pytest.raises(AssertionError):
+            asyncio.run(bp.main())

@@ -31,7 +31,10 @@ async def main():
         await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
     print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
-    print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
+    if elapsed > 0:
+        print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
+    else:
+        print("Throughput: N/A (elapsed time is zero)")
 
 
 if __name__ == "__main__":

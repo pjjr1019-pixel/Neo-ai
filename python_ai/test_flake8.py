@@ -27,7 +27,19 @@ def test_flake8_error_print(monkeypatch, capsys):
     monkeypatch.setattr('subprocess.run', lambda *a, **k: FakeResult())
     try:
         test_flake8_compliance()
-    except AssertionError:
-        pass
+    except AssertionError as e:
+        # Check assertion error message
+        assert 'Flake8 errors found' in str(e)
     out = capsys.readouterr().out
     assert 'E999 syntax error' in out
+
+
+def test_flake8_pass_print(monkeypatch, capsys):
+    """Test print output when flake8 passes (no errors)."""
+    class FakeResult:
+        returncode = 0
+        stdout = ''
+    monkeypatch.setattr('subprocess.run', lambda *a, **k: FakeResult())
+    test_flake8_compliance()
+    out = capsys.readouterr().out
+    assert out == ''

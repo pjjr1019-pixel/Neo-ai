@@ -24,6 +24,16 @@ def test_predict_invalid():
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
+def test_predict_valid():
+    """Test predict endpoint with valid input."""
+    client = TestClient(app)
+    response = client.post("/predict", json={"input": "test"})
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "output" in data
+    assert "Predicted value" in data["output"]
+
+
 def test_metrics_endpoint():
     """Test metrics endpoint returns request count."""
     client = TestClient(app)

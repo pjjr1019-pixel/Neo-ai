@@ -70,3 +70,30 @@ def test_learn_error_handling():
     response = client.post("/learn", json=payload)
     assert response.status_code == 422
     app.dependency_overrides.pop(get_learning_logic, None)
+
+
+def test_learn_invalid_type():
+    """Test /learn endpoint with completely invalid types."""
+    app.dependency_overrides[get_learning_logic] = lambda: learning_logic
+    client = TestClient(app)
+    response = client.post("/learn", json={"features": 123, "target": "abc"})
+    assert response.status_code == 422
+    app.dependency_overrides.pop(get_learning_logic, None)
+
+
+def test_learn_non_dict_payload():
+    """Test learning_logic with non-dict payload (should return error)."""
+    app.dependency_overrides[get_learning_logic] = lambda: learning_logic
+    client = TestClient(app)
+    response = client.post("/learn", json=None)
+    assert response.status_code == 422
+    app.dependency_overrides.pop(get_learning_logic, None)
+
+
+def test_learn_missing_features_and_target():
+    """Test /learn endpoint with missing features and target."""
+    app.dependency_overrides[get_learning_logic] = lambda: learning_logic
+    client = TestClient(app)
+    response = client.post("/learn", json={})
+    assert response.status_code == 422
+    app.dependency_overrides.pop(get_learning_logic, None)
