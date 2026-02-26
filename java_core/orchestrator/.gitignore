@@ -1,0 +1,6 @@
+# Ignore compiled class files
+*.class
+# Ignore IDE/project files
+*.iml
+.idea/
+*.log
