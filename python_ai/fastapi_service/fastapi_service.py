@@ -18,21 +18,24 @@ class PredictInput(BaseModel):
 
 @app.get("/")
 def root():
+    """Root endpoint returns service status message."""
     return {"message": "NEO Hybrid AI Service is running."}
 
 
 @app.post("/predict")
 def predict(payload: PredictInput):
+    """Predict endpoint for model inference."""
     return {"output": f"Predicted value for '{payload.input}'"}
 
 
 # Dependency and learning logic for /learn endpoint
 def get_learning_logic():
+    """Get learning logic dependency for /learn endpoint."""
     return learning_logic
 
 
 def learning_logic(data):
-    # Dummy learning logic for demonstration
+    """Dummy learning logic for demonstration."""
     if not isinstance(data, dict):
         return {"status": "error"}
     features = data.get("features")
@@ -49,6 +52,7 @@ class LearnInput(BaseModel):
 
 @app.post("/learn")
 def learn(payload: LearnInput):
+    """Learn endpoint for model training."""
     logic = get_learning_logic()
     result = logic(payload.model_dump())
     return result
@@ -56,4 +60,19 @@ def learn(payload: LearnInput):
 
 @app.get("/metrics")
 def metrics():
+    """Metrics endpoint returns request count."""
     return {"request_count": 0}
+
+
+@app.get("/explain")
+def explain():
+    """Return dummy feature importance for explainability."""
+    # In a real system, this would return model-specific feature importances
+    return {
+        "feature_importance": {
+            "feature1": 0.5,
+            "feature2": 0.3,
+            "feature3": 0.2
+        },
+        "explanation": "Feature importance is illustrative."
+    }

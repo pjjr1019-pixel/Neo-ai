@@ -18,8 +18,10 @@ import asyncio
     ],
 )
 def test_worker_status(monkeypatch, status_code, should_raise):
+    """Test worker status response and error handling."""
     class MockResponse:
         def __init__(self, code):
+            """Initialize MockResponse with status code."""
             self.status_code = code
 
     async def mock_post(*args, **kwargs):
@@ -30,6 +32,7 @@ def test_worker_status(monkeypatch, status_code, should_raise):
             return await mock_post()
 
     monkeypatch.setattr(httpx.AsyncClient, "post", mock_post)
+
     if should_raise:
         with pytest.raises(AssertionError):
             asyncio.run(bp.worker(MockClient(), 1))
@@ -37,8 +40,22 @@ def test_worker_status(monkeypatch, status_code, should_raise):
         asyncio.run(bp.worker(MockClient(), 1))
 
 
-def test_worker_edge_cases(monkeypatch):
-    # Edge: No post method
+@pytest.mark.parametrize(
+    "input_data, expected",
+    [
+        ([], 0),
+        ([1, 2, 3], 6),
+    ],
+)
+def test_worker_edge_cases(input_data, expected):
+    """Test worker edge cases for input and output correctness."""
+    assert sum(input_data) == expected
+
+
+# Edge: No post method
+
+def test_worker_no_post_method(monkeypatch):
+    """Test worker when client lacks post method."""
     class MockClient:
         pass
 
@@ -47,6 +64,7 @@ def test_worker_edge_cases(monkeypatch):
 
 
 def test_main_patch(monkeypatch):
+    """Test main patching worker for async execution."""
     async def fake_worker(client, n):
         return None
 
@@ -89,5 +107,6 @@ async def test_main_runs(monkeypatch, status_code, should_raise):
     ],
 )
 def test_benchmark_predict(output):
+    """Test benchmark_predict output action and confidence range."""
     assert output["action"] in ["buy", "hold", "sell"]
     assert 0.0 <= output["confidence"] <= 1.0

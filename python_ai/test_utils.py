@@ -3,6 +3,7 @@ import pytest
 
 
 def simulate_trading(prices, signals):
+    """Simulate trading and return capital."""
     capital = 1000
     for price, signal in zip(prices, signals):
         if signal == "buy":
@@ -13,6 +14,7 @@ def simulate_trading(prices, signals):
 
 
 def sharpe_ratio(returns):
+    """Calculate Sharpe ratio for returns."""
     std = np.std(returns)
     if std == 0:
         return np.inf
@@ -20,6 +22,7 @@ def sharpe_ratio(returns):
 
 
 def select_best_model(metrics):
+    """Select model with highest score from metrics."""
     return max(metrics, key=lambda x: x["score"])
 
 
@@ -38,6 +41,7 @@ def select_best_model(metrics):
     ],
 )
 def test_simulate_trading(prices, signals, expected):
+    """Test simulate_trading returns expected capital."""
     result = simulate_trading(prices, signals)
     assert result == expected
 
@@ -51,6 +55,7 @@ def test_simulate_trading(prices, signals, expected):
     ],
 )
 def test_sharpe_ratio(returns, expected_type):
+    """Test sharpe_ratio returns correct type."""
     ratio = sharpe_ratio(returns)
     assert isinstance(ratio, expected_type)
 
@@ -64,12 +69,13 @@ def test_sharpe_ratio(returns, expected_type):
     ],
 )
 def test_select_best_model(metrics, expected_score):
+    """Test select_best_model returns correct score."""
     best = select_best_model(metrics)
     assert best["score"] == expected_score
 
 
 def test_sharpe_ratio_zero_division():
-    # Edge: std is zero, should return inf (no warning expected)
+    """Test sharpe_ratio returns inf when std is zero."""
     import numpy as np
 
     result = sharpe_ratio(np.array([1, 1, 1]))
