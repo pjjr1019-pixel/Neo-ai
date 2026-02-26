@@ -1,6 +1,8 @@
 import pytest
 from python_ai.fastapi_service.fastapi_service import (
-    app, get_learning_logic, learning_logic
+    app,
+    get_learning_logic,
+    learning_logic,
 )
 from fastapi.testclient import TestClient
 
@@ -33,17 +35,14 @@ from fastapi.testclient import TestClient
             422,
             None,
         ),  # wrong type
-    ]
+    ],
 )
 def test_learn(payload, expected_status, expected_key):
     """Comprehensive /learn endpoint test: valid, edge, and error cases."""
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
     try:
-        response = client.post(
-            "/learn",
-            json=payload
-        )
+        response = client.post("/learn", json=payload)
         assert response.status_code == expected_status
         if expected_key:
             assert expected_key in response.json()

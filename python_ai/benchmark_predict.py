@@ -4,10 +4,10 @@ FastAPI HTTP Endpoint Benchmark Script
 This script benchmarks the /predict endpoint using httpx and asyncio.
 Run this script while your FastAPI server is running.
 """
+
 import asyncio
 import httpx
 import time
-
 
 URL = "http://127.0.0.1:8000/predict"
 PAYLOAD = {"price": 123.45, "volume": 1000}

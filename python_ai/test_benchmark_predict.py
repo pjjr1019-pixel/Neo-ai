@@ -10,10 +10,13 @@ from unittest.mock import patch, AsyncMock
 import asyncio
 
 
-@pytest.mark.parametrize("status_code, should_raise", [
-    (200, False),
-    (500, True),
-])
+@pytest.mark.parametrize(
+    "status_code, should_raise",
+    [
+        (200, False),
+        (500, True),
+    ],
+)
 def test_worker_status(monkeypatch, status_code, should_raise):
     class MockResponse:
         def __init__(self, code):
@@ -38,6 +41,7 @@ def test_worker_edge_cases(monkeypatch):
     # Edge: No post method
     class MockClient:
         pass
+
     with pytest.raises(AttributeError):
         asyncio.run(bp.worker(MockClient(), 1))
 
@@ -45,6 +49,7 @@ def test_worker_edge_cases(monkeypatch):
 def test_main_patch(monkeypatch):
     async def fake_worker(client, n):
         return None
+
     monkeypatch.setattr(bp, "worker", fake_worker)
     asyncio.run(bp.main())
 
@@ -55,7 +60,7 @@ def test_main_patch(monkeypatch):
     [
         (200, False),
         (500, True),
-    ]
+    ],
 )
 async def test_main_runs(monkeypatch, status_code, should_raise):
     mock_response = AsyncMock()
@@ -66,7 +71,7 @@ async def test_main_runs(monkeypatch, status_code, should_raise):
     mock_acm = AsyncMock()
     mock_acm.__aenter__.return_value = mock_client
 
-    with patch('httpx.AsyncClient', return_value=mock_acm):
+    with patch("httpx.AsyncClient", return_value=mock_acm):
         if should_raise:
             with pytest.raises(AssertionError):
                 await bp.main()
@@ -81,7 +86,7 @@ async def test_main_runs(monkeypatch, status_code, should_raise):
         {"action": "hold", "confidence": 0.5},
         {"action": "sell", "confidence": 0.0},
         {"action": "buy", "confidence": 1.0},
-    ]
+    ],
 )
 def test_benchmark_predict(output):
     assert output["action"] in ["buy", "hold", "sell"]

@@ -5,9 +5,9 @@ import pytest
 def simulate_trading(prices, signals):
     capital = 1000
     for price, signal in zip(prices, signals):
-        if signal == 'buy':
+        if signal == "buy":
             capital += price * 0.01
-        elif signal == 'sell':
+        elif signal == "sell":
             capital -= price * 0.01
     return capital
 
@@ -20,18 +20,22 @@ def sharpe_ratio(returns):
 
 
 def select_best_model(metrics):
-    return max(metrics, key=lambda x: x['score'])
+    return max(metrics, key=lambda x: x["score"])
 
 
 @pytest.mark.parametrize(
     "prices, signals, expected",
     [
-        ([100, 110, 120], ['buy', 'hold', 'sell'], 1000 + 100*0.01 - 120*0.01),
-        ([0, 0, 0], ['buy', 'sell', 'buy'], 1000),  # edge: zero prices
-        ([100], ['buy'], 1000 + 1),  # single buy
-        ([100], ['sell'], 1000 - 1),  # single sell
+        (
+            [100, 110, 120],
+            ["buy", "hold", "sell"],
+            1000 + 100 * 0.01 - 120 * 0.01,
+        ),
+        ([0, 0, 0], ["buy", "sell", "buy"], 1000),  # edge: zero prices
+        ([100], ["buy"], 1000 + 1),  # single buy
+        ([100], ["sell"], 1000 - 1),  # single sell
         ([], [], 1000),  # edge: empty input
-    ]
+    ],
 )
 def test_simulate_trading(prices, signals, expected):
     result = simulate_trading(prices, signals)
@@ -44,7 +48,7 @@ def test_simulate_trading(prices, signals, expected):
         (np.array([0.01, -0.02, 0.03]), float),
         (np.array([0.0, 0.0, 0.0]), float),  # edge: zero returns
         (np.array([1e6, -1e6]), float),  # large values
-    ]
+    ],
 )
 def test_sharpe_ratio(returns, expected_type):
     ratio = sharpe_ratio(returns)
@@ -54,18 +58,19 @@ def test_sharpe_ratio(returns, expected_type):
 @pytest.mark.parametrize(
     "metrics, expected_score",
     [
-        ([{'score': 0.8}, {'score': 0.9}, {'score': 0.85}], 0.9),
-        ([{'score': -1}, {'score': 0}], 0),  # edge: negative score
-        ([{'score': 1}], 1),  # single model
-    ]
+        ([{"score": 0.8}, {"score": 0.9}, {"score": 0.85}], 0.9),
+        ([{"score": -1}, {"score": 0}], 0),  # edge: negative score
+        ([{"score": 1}], 1),  # single model
+    ],
 )
 def test_select_best_model(metrics, expected_score):
     best = select_best_model(metrics)
-    assert best['score'] == expected_score
+    assert best["score"] == expected_score
 
 
 def test_sharpe_ratio_zero_division():
     # Edge: std is zero, should return inf (no warning expected)
     import numpy as np
+
     result = sharpe_ratio(np.array([1, 1, 1]))
     assert np.isinf(result)

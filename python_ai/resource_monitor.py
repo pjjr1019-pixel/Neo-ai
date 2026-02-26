@@ -1,5 +1,3 @@
-
-
 """
 Resource Monitoring Script for NEO FastAPI Service
 
@@ -25,7 +23,7 @@ def log_resource_usage() -> NoReturn:
     process = psutil.Process(os.getpid())
     with open(LOG_FILE, "a") as f:
         while True:
-            mem = process.memory_info().rss / 1024 ** 2  # Memory in MB
+            mem = process.memory_info().rss / 1024**2  # Memory in MB
             cpu = process.cpu_percent(interval=0.1)  # CPU percent
             # Write timestamped resource usage to log
             f.write(

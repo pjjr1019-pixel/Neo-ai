@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from python_ai.fastapi_service.fastapi_service import app
 
@@ -10,7 +9,6 @@ def test_predict_and_learn_integration_v2() -> None:
     Integration test for /predict and /learn endpoints using FastAPI's
     TestClient. Verifies end-to-end behavior and response structure.
     """
-    client = TestClient(app)
     # Test /predict endpoint
     predict_payload = {"input": "test input"}
     predict_resp = client.post("/predict", json=predict_payload)
@@ -28,8 +26,3 @@ def test_predict_and_learn_integration_v2() -> None:
     assert metrics_resp.status_code == 200
     metrics_data = metrics_resp.json()
     assert "request_count" in metrics_data
-from fastapi import status
-from fastapi.testclient import TestClient
-from python_ai.fastapi_service.fastapi_service import app
-
-
