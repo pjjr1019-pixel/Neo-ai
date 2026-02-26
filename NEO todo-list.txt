@@ -191,9 +191,42 @@
     - **Success:** Backtests run, results logged.
 32. Replace weak strategies automatically
     - **Success:** Replacement logic works, logs changes.
+
 33. Log metrics → performance, reward, confidence, trade outcomes
     - Integrate explainability tools (LIME, SHAP).
     - **Success:** All metrics logged and visualized.
+
+# --- PHASE 7 EXTRAS ---
+
+[extra7-1] Automated Hyperparameter Evolution
+    - Use genetic algorithms or Bayesian optimization to evolve strategies and model hyperparameters.
+
+[extra7-2] Meta-Learning with Cross-Validation
+    - Implement meta-learning loops using k-fold cross-validation for strategy selection.
+
+[extra7-3] Strategy Diversity Metrics
+    - Track and enforce diversity among strategies to avoid overfitting.
+
+[extra7-4] Online Adaptation & Lifelong Learning
+    - Enable live adaptation of strategies based on feedback and performance drift.
+
+[extra7-5] Explainability for Strategy Changes
+    - Log and visualize why a strategy was replaced or mutated (e.g., SHAP/LIME explanations).
+
+[extra7-6] Automated Rollback
+    - Automatically revert to previous best strategies if new ones underperform.
+
+[extra7-7] Ensemble & Stacking Framework
+    - Allow multiple strategies to vote/blend predictions, with meta-models for combination.
+
+[extra7-8] Simulation of Adversarial/Market Regimes
+    - Test strategies against simulated regime shifts or adversarial conditions.
+
+[extra7-9] Self-Play or Co-Evolution
+    - Let strategies compete or cooperate in simulated environments.
+
+[extra7-10] Automated Reporting & Alerts
+    - Generate periodic reports and alerts for strategy evolution, performance, and risk.
 
 ---
 
