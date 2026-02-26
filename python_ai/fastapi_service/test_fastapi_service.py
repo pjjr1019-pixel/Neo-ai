@@ -43,3 +43,30 @@ def test_explain_endpoint():
     assert "feature_importance" in data
     assert "explanation" in data
     assert isinstance(data["feature_importance"], dict)
+
+
+def test_learn_invalid_missing_features():
+    """Test /learn endpoint with missing features."""
+    client = TestClient(app)
+    response = client.post("/learn", json={"target": 1})
+    assert response.status_code == 422
+
+
+def test_learn_invalid_wrong_type():
+    """Test /learn endpoint with wrong type for features."""
+    client = TestClient(app)
+    response = client.post(
+        "/learn",
+        json={"features": "notalist", "target": 1},
+    )
+    assert response.status_code == 422
+
+
+def test_learn_invalid_missing_target():
+    """Test /learn endpoint with missing target."""
+    client = TestClient(app)
+    response = client.post(
+        "/learn",
+        json={"features": [1, 2, 3]},
+    )
+    assert response.status_code == 422

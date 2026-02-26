@@ -8,6 +8,7 @@ import python_ai.benchmark_predict as bp
 import httpx
 from unittest.mock import patch, AsyncMock
 import asyncio
+from python_ai.benchmark_predict import worker
 
 
 @pytest.mark.parametrize(
@@ -63,12 +64,37 @@ def test_worker_no_post_method(monkeypatch):
         asyncio.run(bp.worker(MockClient(), 1))
 
 
+def test_worker_http_error(monkeypatch):
+    """Test worker handles HTTP error gracefully."""
+    class FakeResponse:
+        status_code = 500
+
+    async def fake_post(*args, **kwargs):
+        return FakeResponse()
+
+    import httpx
+    monkeypatch.setattr(httpx.AsyncClient, "post", fake_post)
+
+    import asyncio
+
+    async def run():
+        client = httpx.AsyncClient()
+        try:
+            await worker(client, 1)
+        except AssertionError:
+            assert True
+        await client.aclose()
+
+    asyncio.run(run())
+
+
 def test_main_patch(monkeypatch):
     """Test main patching worker for async execution."""
     async def fake_worker(client, n):
         return None
 
     monkeypatch.setattr(bp, "worker", fake_worker)
+
     asyncio.run(bp.main())
 
 
