@@ -2,3 +2,4 @@ type: specs.openrewrite.org/v1beta/recipe
 name: upgrade-to-java-21
 recipeList:
   - org.openrewrite.java.migrate.UpgradeToJava21
+  - org.openrewrite.java.migrate.UseJavaUtilBase64
