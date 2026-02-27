@@ -1250,6 +1250,213 @@
 				"$pytest"
 			],
 			"group": "test"
+		},
+		{
+			"label": "Run all tests in suite to error_logs/Errorlog_6.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_6.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run all tests in suite to error_logs/Errorlog_7.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_7.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run all tests in suite to error_logs/Errorlog_8.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_8.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_9.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_9.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_10.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_10.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_11.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_11.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_12.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_12.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_13.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_13.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_14.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_14.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_15.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_15.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_16.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_16.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_17.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_17.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_18.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_18.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_19.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_19.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_20.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_20.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_21.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_21.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_22.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_22.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_23.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_23.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_24.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_24.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_25.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_25.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_26.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_26.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_27.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_27.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Rerun pytest and flake8 to error_logs/Errorlog_28.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_28.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
 		}
 	]
 }

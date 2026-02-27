@@ -20,6 +20,7 @@ class Strategy:
         """
         self.params: Dict[str, Any] = params.copy()
         self.performance = None
+
     def mutate(self) -> 'Strategy':
         """
         Mutate strategy parameters slightly.
@@ -32,7 +33,6 @@ class Strategy:
             if isinstance(v, (int, float)):
                 new_params[k] += random.uniform(-0.1, 0.1) * v
         return Strategy(new_params)
-
 
     def evaluate(self, data) -> float:
         """
@@ -48,7 +48,6 @@ class Strategy:
 
 
 class EvolutionEngine:
-
     def explainable_evolution_report(self, previous_population=None) -> str:
         """
         Generate a human-readable report of the evolution process and
@@ -413,16 +412,15 @@ class EvolutionEngine:
                 best_perf: float = perf
         self.population: List[None | Strategy] = [best]
 
- 
-# Example usage
-if __name__ == "__main__":
-    base: List[Strategy] = [
-        Strategy({'threshold': 0.5, 'stop_loss': 0.1}) for _ in range(5)
-    ]
-    engine = EvolutionEngine(base)
-    for _ in range(3):
-        engine.run_generation(data=None)
-        top: List[Strategy] = engine.select_top(2)
-        print(
-            f"Top strategies: {[s.params for s in top]}"
-        )
+    # Example usage
+    if __name__ == "__main__":
+        from python_ai.evolution_engine import EvolutionEngine
+        base: List[Strategy] = [
+            Strategy({'threshold': 0.5, 'stop_loss': 0.1}) for _ in range(5)
+        ]
+        engine = EvolutionEngine(base)
+        for _ in range(3):
+            engine.run_generation(data=None)
+            top: List[Strategy] = engine.select_top(2)
+            print(top)
+            print(f"Top strategies: {[s.params for s in top]}")

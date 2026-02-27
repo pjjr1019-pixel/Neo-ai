@@ -1,0 +1,337 @@
+Pytest output:
+.................................F................FFFF....F.....F....... [ 79%]
+.F.F.F.............                                                      [100%]
+================================== FAILURES ===================================
+____________________________ test_git_environment _____________________________
+python_ai\test_basic.py:142: in test_git_environment
+    assert not errors, "Git environment errors:\n" + "\n".join(errors)
+E   AssertionError: Git environment errors:
+E     git status: error found
+E     on branch master
+E     your branch is up to date with 'origin/master'.
+E     
+E     changes not staged for commit:
+E       (use "git add/rm <file>..." to update what will be committed)
+E       (use "git restore <file>..." to discard changes in working directory)
+E     	deleted:    .coverage
+E     	modified:   .vscode/tasks.json
+E     	modified:   error_logs/errorlog_4.txt
+E     	modified:   python_ai/evolution_engine.py
+E     	modified:   python_ai/fastapi_service/test_fastapi_service.py
+E     	modified:   python_ai/test_bandit.py
+E     
+E     untracked files:
+E       (use "git add <file>..." to include in what will be committed)
+E     	error_logs/errorlog_10.txt
+E     	error_logs/errorlog_11.txt
+E     	error_logs/errorlog_12.txt
+E     	error_logs/errorlog_13.txt
+E     	error_logs/errorlog_14.txt
+E     	error_logs/errorlog_15.txt
+E     	error_logs/errorlog_16.txt
+E     	error_logs/errorlog_17.txt
+E     	error_logs/errorlog_18.txt
+E     	error_logs/errorlog_19.txt
+E     	error_logs/errorlog_20.txt
+E     	error_logs/errorlog_21.txt
+E     	error_logs/errorlog_22.txt
+E     	error_logs/errorlog_23.txt
+E     	error_logs/errorlog_24.txt
+E     	error_logs/errorlog_25.txt
+E     	error_logs/errorlog_26.txt
+E     	error_logs/errorlog_27.txt
+E     	error_logs/errorlog_28.txt
+E     	error_logs/errorlog_6.txt
+E     	error_logs/errorlog_7.txt
+E     	error_logs/errorlog_8.txt
+E     	error_logs/errorlog_9.txt
+E     	error_logs/errorlog_master.txt
+E     	python_ai/test_master.py
+E     
+E     no changes added to commit (use "git add" and/or "git commit -a")
+E     
+E   assert not ['git status: error found\non branch master\nyour branch is up to date with \'origin/master\'.\n\nchanges not staged f...rrorlog_master.txt\n\tpython_ai/test_master.py\n\nno changes added to commit (use "git add" and/or "git commit -a")\n']
+____________________________ test_black_formatting ____________________________
+python_ai\test_black.py:10: in test_black_formatting
+    assert result.returncode == 0, (
+E   AssertionError: Black formatting errors found:
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['black', '--check', 'python_ai'], returncode=1, stdout='', stderr='would reformat C:\\Users\\Pg...e.py\n\nOh no! \\U0001f4a5 \\U0001f494 \\U0001f4a5\n24 files would be reformatted, 4 files would be left unchanged.\n').returncode
+____________________________ test_ci_env_variables ____________________________
+python_ai\test_ci_env.py:9: in test_ci_env_variables
+    assert not missing, f"Missing CI environment variables: {missing}"
+E   AssertionError: Missing CI environment variables: ['CI', 'GITHUB_ACTIONS', 'PYTHONPATH']
+E   assert not ['CI', 'GITHUB_ACTIONS', 'PYTHONPATH']
+___________________________ test_coverage_threshold ___________________________
+python_ai\test_coverage.py:10: in test_coverage_threshold
+    assert result.returncode == 0, (
+E   AssertionError: Coverage below threshold:
+E     ============================= test session starts =============================
+E     platform win32 -- Python 3.10.11, pytest-9.0.2, pluggy-1.6.0
+E     benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+E     rootdir: C:\Users\Pgiov\OneDrive\Documents\Custom programs\Neo
+E     configfile: pytest.ini
+E     plugins: anyio-4.12.1, Faker-40.4.0, locust-2.43.3, asyncio-1.3.0, base-url-2.1.0, benchmark-5.2.3, cov-7.0.0, mock-3.15.1, playwright-0.7.2, timeout-2.4.0, xdist-3.8.0, requests-mock-1.12.1
+E     asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+E     collected 91 items
+E     
+E     python_ai\fastapi_service\test_fastapi_service.py .......                [  7%]
+E     python_ai\integration_test.py .                                          [  8%]
+E     python_ai\test_api.py ..........                                         [ 19%]
+E     python_ai\test_bandit.py .                                               [ 20%]
+E     python_ai\test_basic.py ..............F
+E     
+E     ================================== FAILURES ===================================
+E     ____________________________ test_git_environment _____________________________
+E     python_ai\test_basic.py:142: in test_git_environment
+E         assert not errors, "Git environment errors:\n" + "\n".join(errors)
+E     E   AssertionError: Git environment errors:
+E     E     git status: error found
+E     E     on branch master
+E     E     your branch is up to date with 'origin/master'.
+E     E     
+E     E     changes not staged for commit:
+E     E       (use "git add/rm <file>..." to update what will be committed)
+E     E       (use "git restore <file>..." to discard changes in working directory)
+E     E     	deleted:    .coverage
+E     E     	modified:   .vscode/tasks.json
+E     E     	modified:   error_logs/errorlog_4.txt
+E     E     	modified:   python_ai/evolution_engine.py
+E     E     	modified:   python_ai/fastapi_service/test_fastapi_service.py
+E     E     	modified:   python_ai/test_bandit.py
+E     E     
+E     E     untracked files:
+E     E       (use "git add <file>..." to include in what will be committed)
+E     E     	error_logs/errorlog_10.txt
+E     E     	error_logs/errorlog_11.txt
+E     E     	error_logs/errorlog_12.txt
+E     E     	error_logs/errorlog_13.txt
+E     E     	error_logs/errorlog_14.txt
+E     E     	error_logs/errorlog_15.txt
+E     E     	error_logs/errorlog_16.txt
+E     E     	error_logs/errorlog_17.txt
+E     E     	error_logs/errorlog_18.txt
+E     E     	error_logs/errorlog_19.txt
+E     E     	error_logs/errorlog_20.txt
+E     E     	error_logs/errorlog_21.txt
+E     E     	error_logs/errorlog_22.txt
+E     E     	error_logs/errorlog_23.txt
+E     E     	error_logs/errorlog_24.txt
+E     E     	error_logs/errorlog_25.txt
+E     E     	error_logs/errorlog_26.txt
+E     E     	error_logs/errorlog_27.txt
+E     E     	error_logs/errorlog_28.txt
+E     E     	error_logs/errorlog_6.txt
+E     E     	error_logs/errorlog_7.txt
+E     E     	error_logs/errorlog_8.txt
+E     E     	error_logs/errorlog_9.txt
+E     E     	error_logs/errorlog_master.txt
+E     E     	python_ai/test_master.py
+E     E     
+E     E     no changes added to commit (use "git add" and/or "git commit -a")
+E     E     
+E     E   assert not ['git status: error found\non branch master\nyour branch is up to date with \'origin/master\'.\n\nchanges not staged f...rrorlog_master.txt\n\tpython_ai/test_master.py\n\nno changes added to commit (use "git add" and/or "git commit -a")\n']
+E     =========================== short test summary info ===========================
+E     FAILED python_ai/test_basic.py::test_git_environment - AssertionError: Git en...
+E     !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+E     ======================== 1 failed, 33 passed in 5.98s =========================
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 33 passed in 5.98s =========================\n', stderr='').returncode
+___________________________ test_coverage_threshold ___________________________
+python_ai\test_coverage_threshold.py:10: in test_coverage_threshold
+    assert result.returncode == 0, (
+E   AssertionError: Coverage below threshold:
+E     ============================= test session starts =============================
+E     platform win32 -- Python 3.10.11, pytest-9.0.2, pluggy-1.6.0
+E     benchmark: 5.2.3 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+E     rootdir: C:\Users\Pgiov\OneDrive\Documents\Custom programs\Neo
+E     configfile: pytest.ini
+E     plugins: anyio-4.12.1, Faker-40.4.0, locust-2.43.3, asyncio-1.3.0, base-url-2.1.0, benchmark-5.2.3, cov-7.0.0, mock-3.15.1, playwright-0.7.2, timeout-2.4.0, xdist-3.8.0, requests-mock-1.12.1
+E     asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+E     collected 91 items
+E     
+E     python_ai\fastapi_service\test_fastapi_service.py .......                [  7%]
+E     python_ai\integration_test.py .                                          [  8%]
+E     python_ai\test_api.py ..........                                         [ 19%]
+E     python_ai\test_bandit.py .                                               [ 20%]
+E     python_ai\test_basic.py ..............F
+E     
+E     ================================== FAILURES ===================================
+E     ____________________________ test_git_environment _____________________________
+E     python_ai\test_basic.py:142: in test_git_environment
+E         assert not errors, "Git environment errors:\n" + "\n".join(errors)
+E     E   AssertionError: Git environment errors:
+E     E     git status: error found
+E     E     on branch master
+E     E     your branch is up to date with 'origin/master'.
+E     E     
+E     E     changes not staged for commit:
+E     E       (use "git add/rm <file>..." to update what will be committed)
+E     E       (use "git restore <file>..." to discard changes in working directory)
+E     E     	deleted:    .coverage
+E     E     	modified:   .vscode/tasks.json
+E     E     	modified:   error_logs/errorlog_4.txt
+E     E     	modified:   python_ai/evolution_engine.py
+E     E     	modified:   python_ai/fastapi_service/test_fastapi_service.py
+E     E     	modified:   python_ai/test_bandit.py
+E     E     
+E     E     untracked files:
+E     E       (use "git add <file>..." to include in what will be committed)
+E     E     	error_logs/errorlog_10.txt
+E     E     	error_logs/errorlog_11.txt
+E     E     	error_logs/errorlog_12.txt
+E     E     	error_logs/errorlog_13.txt
+E     E     	error_logs/errorlog_14.txt
+E     E     	error_logs/errorlog_15.txt
+E     E     	error_logs/errorlog_16.txt
+E     E     	error_logs/errorlog_17.txt
+E     E     	error_logs/errorlog_18.txt
+E     E     	error_logs/errorlog_19.txt
+E     E     	error_logs/errorlog_20.txt
+E     E     	error_logs/errorlog_21.txt
+E     E     	error_logs/errorlog_22.txt
+E     E     	error_logs/errorlog_23.txt
+E     E     	error_logs/errorlog_24.txt
+E     E     	error_logs/errorlog_25.txt
+E     E     	error_logs/errorlog_26.txt
+E     E     	error_logs/errorlog_27.txt
+E     E     	error_logs/errorlog_28.txt
+E     E     	error_logs/errorlog_6.txt
+E     E     	error_logs/errorlog_7.txt
+E     E     	error_logs/errorlog_8.txt
+E     E     	error_logs/errorlog_9.txt
+E     E     	error_logs/errorlog_master.txt
+E     E     	python_ai/test_master.py
+E     E     
+E     E     no changes added to commit (use "git add" and/or "git commit -a")
+E     E     
+E     E   assert not ['git status: error found\non branch master\nyour branch is up to date with \'origin/master\'.\n\nchanges not staged f...rrorlog_master.txt\n\tpython_ai/test_master.py\n\nno changes added to commit (use "git add" and/or "git commit -a")\n']
+E     =========================== short test summary info ===========================
+E     FAILED python_ai/test_basic.py::test_git_environment - AssertionError: Git en...
+E     !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+E     ======================== 1 failed, 33 passed in 5.91s =========================
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 33 passed in 5.91s =========================\n', stderr='').returncode
+_____________________ test_all_functions_have_docstrings ______________________
+python_ai\test_docstring_style.py:16: in test_all_functions_have_docstrings
+    assert not missing, "Missing docstrings:\n" + "\n".join(missing)
+E   AssertionError: Missing docstrings:
+E     python_ai\evolution_engine.py:Strategy
+E     python_ai\evolution_engine.py:EvolutionEngine
+E     python_ai\test_benchmark_predict.py:MockResponse
+E     python_ai\test_benchmark_predict.py:MockClient
+E     python_ai\test_benchmark_predict.py:MockClient
+E     python_ai\test_benchmark_predict.py:FakeResponse
+E     python_ai\test_benchmark_predict.py:MockResponse
+E     python_ai\test_benchmark_predict.py:MockClient
+E     python_ai\test_flake8.py:FakeResult
+E     python_ai\test_flake8.py:FakeResult
+E     python_ai\fastapi_service\fastapi_service.py:PredictInput
+E     python_ai\fastapi_service\fastapi_service.py:LearnInput
+E   assert not ['python_ai\\evolution_engine.py:Strategy', 'python_ai\\evolution_engine.py:EvolutionEngine', 'python_ai\\test_benchma...ckClient', 'python_ai\\test_benchmark_predict.py:MockClient', 'python_ai\\test_benchmark_predict.py:FakeResponse', ...]
+____________________ test_genetic_hyperparameter_evolution ____________________
+python_ai\test_evolution_engine.py:79: in test_genetic_hyperparameter_evolution
+    assert np.allclose(
+E   assert False
+E    +  where False = <function allclose at 0x000001FAA0FB8A70>([0.8, 1.6, 2.4000000000000004, 3.2, 4.0], array([0.6, 1.2, 1.8, 2.4, 3. ]), atol=1e-06)
+E    +    where <function allclose at 0x000001FAA0FB8A70> = np.allclose
+____________________________ test_git_status_clean ____________________________
+python_ai\test_git_status.py:10: in test_git_status_clean
+    assert not result.stdout.strip(), (
+E   AssertionError: Git working tree is not clean:
+E      D .coverage
+E      M .vscode/tasks.json
+E      M error_logs/Errorlog_4.txt
+E      M python_ai/evolution_engine.py
+E      M python_ai/fastapi_service/test_fastapi_service.py
+E      M python_ai/test_bandit.py
+E     ?? error_logs/Errorlog_10.txt
+E     ?? error_logs/Errorlog_11.txt
+E     ?? error_logs/Errorlog_12.txt
+E     ?? error_logs/Errorlog_13.txt
+E     ?? error_logs/Errorlog_14.txt
+E     ?? error_logs/Errorlog_15.txt
+E     ?? error_logs/Errorlog_16.txt
+E     ?? error_logs/Errorlog_17.txt
+E     ?? error_logs/Errorlog_18.txt
+E     ?? error_logs/Errorlog_19.txt
+E     ?? error_logs/Errorlog_20.txt
+E     ?? error_logs/Errorlog_21.txt
+E     ?? error_logs/Errorlog_22.txt
+E     ?? error_logs/Errorlog_23.txt
+E     ?? error_logs/Errorlog_24.txt
+E     ?? error_logs/Errorlog_25.txt
+E     ?? error_logs/Errorlog_26.txt
+E     ?? error_logs/Errorlog_27.txt
+E     ?? error_logs/Errorlog_28.txt
+E     ?? error_logs/Errorlog_6.txt
+E     ?? error_logs/Errorlog_7.txt
+E     ?? error_logs/Errorlog_8.txt
+E     ?? error_logs/Errorlog_9.txt
+E     ?? error_logs/Errorlog_master.txt
+E     ?? python_ai/test_master.py
+E     
+E   assert not 'D .coverage\n M .vscode/tasks.json\n M error_logs/Errorlog_4.txt\n M python_ai/evolution_engine.py\n M python_ai/fast...rror_logs/Errorlog_8.txt\n?? error_logs/Errorlog_9.txt\n?? error_logs/Errorlog_master.txt\n?? python_ai/test_master.py'
+E    +  where 'D .coverage\n M .vscode/tasks.json\n M error_logs/Errorlog_4.txt\n M python_ai/evolution_engine.py\n M python_ai/fast...rror_logs/Errorlog_8.txt\n?? error_logs/Errorlog_9.txt\n?? error_logs/Errorlog_master.txt\n?? python_ai/test_master.py' = <built-in method strip of str object at 0x000001FA89C56320>()
+E    +    where <built-in method strip of str object at 0x000001FA89C56320> = ' D .coverage\n M .vscode/tasks.json\n M error_logs/Errorlog_4.txt\n M python_ai/evolution_engine.py\n M python_ai/fas...or_logs/Errorlog_8.txt\n?? error_logs/Errorlog_9.txt\n?? error_logs/Errorlog_master.txt\n?? python_ai/test_master.py\n'.strip
+E    +      where ' D .coverage\n M .vscode/tasks.json\n M error_logs/Errorlog_4.txt\n M python_ai/evolution_engine.py\n M python_ai/fas...or_logs/Errorlog_8.txt\n?? error_logs/Errorlog_9.txt\n?? error_logs/Errorlog_master.txt\n?? python_ai/test_master.py\n' = CompletedProcess(args=['git', 'status', '--porcelain'], returncode=0, stdout=' D .coverage\n M .vscode/tasks.json\n M ...rlog_8.txt\n?? error_logs/Errorlog_9.txt\n?? error_logs/Errorlog_master.txt\n?? python_ai/test_master.py\n', stderr='').stdout
+_____________________________ test_isort_imports ______________________________
+python_ai\test_isort.py:7: in test_isort_imports
+    result = subprocess.run([
+..\..\..\..\AppData\Local\Programs\Python\Python310\lib\subprocess.py:503: in run
+    with Popen(*popenargs, **kwargs) as process:
+..\..\..\..\AppData\Local\Programs\Python\Python310\lib\subprocess.py:971: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+..\..\..\..\AppData\Local\Programs\Python\Python310\lib\subprocess.py:1456: in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+E   FileNotFoundError: [WinError 2] The system cannot find the file specified
+___________________________ test_mypy_type_checking ___________________________
+python_ai\test_mypy.py:10: in test_mypy_type_checking
+    assert result.returncode == 0, (
+E   AssertionError: Mypy type errors found:
+E     python_ai\resource_monitor.py:10: error: Library stubs not installed for "psutil"  [import-untyped]
+E     python_ai\resource_monitor.py:10: note: Hint: "python3 -m pip install types-psutil"
+E     python_ai\resource_monitor.py:10: note: (or run "mypy --install-types" to install all missing stub packages)
+E     python_ai\resource_monitor.py:10: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+E     python_ai\evolution_engine.py:46: error: Attribute "performance" already defined on line 22  [no-redef]
+E     python_ai\evolution_engine.py:46: error: Incompatible types in assignment (expression has type "float", variable has type "None")  [assignment]
+E     python_ai\evolution_engine.py:47: error: Incompatible return value type (got "None", expected "float")  [return-value]
+E     python_ai\evolution_engine.py:150: error: Item "None" of "Strategy | None" has no attribute "performance"  [union-attr]
+E     python_ai\evolution_engine.py:198: error: Name "alloc" already defined on line 194  [no-redef]
+E     python_ai\evolution_engine.py:244: error: Incompatible types in assignment (expression has type "ndarray[Any, Any]", variable has type "list[list[Any]]")  [assignment]
+E     python_ai\evolution_engine.py:292: error: Missing return statement  [return]
+E     python_ai\evolution_engine.py:340: error: Incompatible types in assignment (expression has type "float", variable has type "None")  [assignment]
+E     python_ai\evolution_engine.py:411: error: Name "best" already defined on line 401  [no-redef]
+E     python_ai\evolution_engine.py:412: error: Name "best_perf" already defined on line 402  [no-redef]
+E     python_ai\evolution_engine.py:413: error: Attribute "population" already defined on line 261  [no-redef]
+E     python_ai\evolution_engine.py:413: error: List item 0 has incompatible type "None"; expected "Strategy"  [list-item]
+E     python_ai\test_evolution_engine.py:53: error: Item "None" of "list[float] | None" has no attribute "__iter__" (not iterable)  [union-attr]
+E     python_ai\test_evolution_engine.py:107: error: Incompatible types in assignment (expression has type "float", variable has type "None")  [assignment]
+E     python_ai\test_evolution_engine.py:118: error: Incompatible types in assignment (expression has type "float", variable has type "None")  [assignment]
+E     python_ai\test_evolution_engine.py:126: error: Argument 1 to "len" has incompatible type "list[float] | None"; expected "Sized"  [arg-type]
+E     python_ai\test_evolution_engine.py:130: error: Incompatible types in assignment (expression has type "dict[Strategy | None, float]", variable has type "list[float] | None")  [assignment]
+E     python_ai\test_evolution_engine.py:134: error: Item "list[float]" of "list[float] | None" has no attribute "keys"  [union-attr]
+E     python_ai\test_evolution_engine.py:134: error: Item "None" of "list[float] | None" has no attribute "keys"  [union-attr]
+E     python_ai\test_evolution_engine.py:136: error: Item "list[float]" of "list[float] | None" has no attribute "values"  [union-attr]
+E     python_ai\test_evolution_engine.py:136: error: Item "None" of "list[float] | None" has no attribute "values"  [union-attr]
+E     Found 22 errors in 3 files (checked 28 source files)
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['mypy', 'python_ai'], returncode=1, stdout='python_ai\\resource_monitor.py:10: error: Library s...t] | None" has no attribute "values"  [union-attr]\nFound 22 errors in 3 files (checked 28 source files)\n', stderr='').returncode
+=========================== short test summary info ===========================
+FAILED python_ai/test_basic.py::test_git_environment - AssertionError: Git en...
+FAILED python_ai/test_black.py::test_black_formatting - AssertionError: Black...
+FAILED python_ai/test_ci_env.py::test_ci_env_variables - AssertionError: Miss...
+FAILED python_ai/test_coverage.py::test_coverage_threshold - AssertionError: ...
+FAILED python_ai/test_coverage_threshold.py::test_coverage_threshold - Assert...
+FAILED python_ai/test_docstring_style.py::test_all_functions_have_docstrings
+FAILED python_ai/test_evolution_engine.py::test_genetic_hyperparameter_evolution
+FAILED python_ai/test_git_status.py::test_git_status_clean - AssertionError: ...
+FAILED python_ai/test_isort.py::test_isort_imports - FileNotFoundError: [WinE...
+FAILED python_ai/test_mypy.py::test_mypy_type_checking - AssertionError: Mypy...
+10 failed, 81 passed in 26.77s
+
+Pytest errors:
