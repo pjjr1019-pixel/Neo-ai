@@ -1,0 +1,7 @@
+[bandit]
+skips: B101,B311
+exclude:
+    tests
+    test_*.py
+    *_test.py
+    */tests/*

@@ -1,3 +1,4 @@
+
 import pkgutil
 import pytest
 import glob
@@ -56,10 +57,8 @@ def test_all_required_packages_installed():
                         if pkgutil.find_loader(pkg) is None:
                             missing.append(pkg)
                     except Exception:
-                        # Some packages can't be imported as modules, skip
                         continue
     except FileNotFoundError:
-        # If requirements.txt is missing, skip this test
         return
     assert not missing, f"Missing required packages: {', '.join(missing)}"
 

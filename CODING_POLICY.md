@@ -9,3 +9,10 @@
 # This policy is permanent and must be followed for every file, function, and test.
 
 # If you see this file, you must enforce these rules for all future code.
+
+# Bandit Security Policy
+
+- Bandit warnings B101 (assert used) and B311 (random for non-crypto) are expected in test code and ML/AI simulation code.
+- These warnings are not actionable unless code is used for security/cryptographic purposes.
+- The .bandit config suppresses these warnings for tests and ML code.
+- All other Bandit warnings must be reviewed and addressed as appropriate.

@@ -60,7 +60,7 @@ def test_no_unused_imports():
 
 
 def test_no_todo_comments():
-    """No forbidden comments allowed anywhere."""
+    """No forbidden comments allowed anywhere in codebase."""
     for root, _, files in os.walk("python_ai"):
         for file in files:
             if file.endswith(".py"):

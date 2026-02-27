@@ -8,7 +8,6 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from python_ai.fastapi_service.fastapi_service import app
 
-
 def test_root():
     """Test root endpoint returns service status."""
     client = TestClient(app)
@@ -16,13 +15,11 @@ def test_root():
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"message": "NEO Hybrid AI Service is running."}
 
-
 def test_predict_invalid():
     """Test predict endpoint with invalid input."""
     client = TestClient(app)
     response = client.post("/predict", json={})
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
-
 
 def test_predict_valid():
     """Test predict endpoint with valid input."""
@@ -33,7 +30,6 @@ def test_predict_valid():
     assert "output" in data
     assert "Predicted value" in data["output"]
 
-
 def test_metrics_endpoint():
     """Test metrics endpoint returns request count."""
     client = TestClient(app)
@@ -42,7 +38,6 @@ def test_metrics_endpoint():
     data = response.json()
     assert "request_count" in data
     assert data["request_count"] >= 0
-
 
 def test_explain_endpoint():
     """Test the /explain endpoint for feature importance and compliance."""
@@ -53,7 +48,6 @@ def test_explain_endpoint():
     assert "feature_importance" in data
     assert "explanation" in data
     assert isinstance(data["feature_importance"], dict)
-
 
 def test_learn_invalid_missing_features():
     """Test /learn endpoint with missing features."""
@@ -71,7 +65,6 @@ def test_learn_invalid_wrong_type():
     )
     assert response.status_code == 422
 
-
 def test_learn_invalid_missing_target():
     """Test /learn endpoint with missing target."""
     client = TestClient(app)
@@ -80,3 +73,5 @@ def test_learn_invalid_missing_target():
         json={"features": [1, 2, 3]},
     )
     assert response.status_code == 422
+
+

@@ -1,6 +1,7 @@
+
 """
 Minimal FastAPI app for NEO Hybrid AI service.
-Exposes root, predict, and metrics endpoints.
+Exposes root, predict, learn, metrics, and explain endpoints.
 Flake8-compliant and best practices.
 """
 
@@ -8,8 +9,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
-
-# Pydantic model for /predict
 
 
 class PredictInput(BaseModel):
@@ -28,7 +27,6 @@ def predict(payload: PredictInput):
     return {"output": f"Predicted value for '{payload.input}'"}
 
 
-# Dependency and learning logic for /learn endpoint
 def get_learning_logic():
     """Get learning logic dependency for /learn endpoint."""
     return learning_logic

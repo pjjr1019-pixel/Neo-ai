@@ -1,0 +1,1255 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run full comprehensive test suite",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after syntax fix",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after loop syntax fix",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after final loop fix",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after all loop fixes",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after indentation fix",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest to confirm fix loop",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Second retest for automation",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Final retest after compliance fixes",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Second compliance retest",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Verbose test run for detailed failure output",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Retest after flake8 whitespace and line wrap fix",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Verbose retest for compliance confirmation",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run full compliance and test suite",
+			"type": "shell",
+			"command": "pytest --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run fun compliance tests for detailed output",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Check unused imports with flake8",
+			"type": "shell",
+			"command": "flake8 python_ai/ --select=F401",
+			"group": "test"
+		},
+		{
+			"label": "Check line length with flake8",
+			"type": "shell",
+			"command": "flake8 python_ai/ --max-line-length=79",
+			"group": "test"
+		},
+		{
+			"label": "Re-run fun compliance tests after fixes",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Re-run fun compliance tests after line wrap fix",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Final compliance test run after forbidden comment fix",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after removing unused imports and forbidden comments",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Final compliance test run after wrapping long lines",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after fixing test_bandit.py line length",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after fixing test_dependency_import.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after wrapping line 39 in test_dependency_import.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after fixing test_evolution_engine.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after fixing test_fun_compliance.py imports",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after removing unused imports from test_bandit.py and test_custom_policy.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after removing unused imports from test_docstring_style.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for unused import and error details",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --select=E9,F63,F7,F82 --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after removing all unused pytest imports",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for unused import details only",
+			"type": "shell",
+			"command": "flake8 python_ai/ --select=F401 --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after cleaning workspace",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for unused import details after user edits",
+			"type": "shell",
+			"command": "flake8 python_ai/ --select=F401 --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after removing unused pytest import from test_docstring_style.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for all errors after unused import fix",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run (final check)",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check (final check)",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after fixing imports in test_basic.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after fixing imports in test_basic.py",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after E302 fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after all E302 fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after fixing evolution_engine.py",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after all flake8 fixes",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after whitespace and blank line fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after all whitespace and blank line fixes",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after final test_evolution_engine.py fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after final test_evolution_engine.py fixes",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after final blank line fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after final blank line fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after final whitespace/blank line fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after final whitespace/blank line fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Flake8 lint check after corrected function boundary fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "flake8 python_ai/ --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Compliance test run after corrected function boundary fixes in test_evolution_engine.py",
+			"type": "shell",
+			"command": "pytest python_ai/test_fun_compliance.py --maxfail=100 --disable-warnings --tb=short --strict-markers --strict-config --cov=. --cov-report=html --cov-report=term-missing -v",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 (full output)",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 (full output)",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 (full output)",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 (full output)",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest (full output)",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 . --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest --maxfail=1 --disable-warnings -q",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest full",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest with trace",
+			"type": "shell",
+			"command": "pytest -v --tb=short --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest on file",
+			"type": "shell",
+			"command": "pytest -v --tb=short --disable-warnings python_ai/test_evolution_engine.py",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest full after bandit install",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest with trace after bandit install",
+			"type": "shell",
+			"command": "pytest -v --tb=short --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run bandit manually",
+			"type": "shell",
+			"command": "bandit -r python_ai --quiet --exit-zero",
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after bandit path fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest with trace after bandit path fix",
+			"type": "shell",
+			"command": "pytest -v --tb=short --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run all compliant tests (pytest, flake8, bandit)",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings && flake8 python_ai/ --count --show-source --statistics && .venv\\Scripts\\bandit.exe -r python_ai --quiet --exit-zero",
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after bandit path fix (absolute)",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest with trace after bandit path fix (absolute)",
+			"type": "shell",
+			"command": "pytest -v --tb=short --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details after bandit fix",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after flake8 blank line fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details after blank line fix",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after flake8 fixes",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details after all fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after evolution_engine.py top fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details after evolution_engine.py fix",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after all blank line fixes",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 for details after all blank line fixes",
+			"type": "shell",
+			"command": "flake8 python_ai/ --count --show-source --statistics",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after import/blank line fixes",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after F821 fix in test_evolution_engine.py",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8",
+			"type": "shell",
+			"command": "flake8 python_ai/fastapi_service/fastapi_service.py",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 full",
+			"type": "shell",
+			"command": "flake8",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 final",
+			"type": "shell",
+			"command": "flake8",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest final",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after indentation fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 after rewrite",
+			"type": "shell",
+			"command": "flake8 python_ai/fastapi_service/fastapi_service.py",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after rewrite",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 after E302 fix",
+			"type": "shell",
+			"command": "flake8 python_ai/test_evolution_engine.py",
+			"problemMatcher": [
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest after E302 fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 for error log",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1 && flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest",
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run flake8 and pytest after E302 full fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest",
+				"$flake8"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to Errorlog.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after E302 fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after full E302 fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after repair",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after Errorlog.txt closed",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog.txt 2>&1; flake8 >> Errorlog.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8, output to new file",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog2.txt 2>&1; flake8 >> Errorlog2.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after SyntaxError fix",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog2.txt 2>&1; flake8 >> Errorlog2.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 after Errorlog2.txt closed",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog2.txt 2>&1; flake8 >> Errorlog2.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to Errorlog3.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > Errorlog3.txt 2>&1; flake8 >> Errorlog3.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_1.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_1.txt 2>&1; flake8 >> error_logs/Errorlog_1.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_2.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_2.txt 2>&1; flake8 >> error_logs/Errorlog_2.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_1.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_1.txt 2>&1; flake8 >> error_logs/Errorlog_1.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_2.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_2.txt 2>&1; flake8 >> error_logs/Errorlog_2.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_3.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_3.txt 2>&1; flake8 >> error_logs/Errorlog_3.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run pytest and flake8 to error_logs/Errorlog_4.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_4.txt 2>&1; flake8 >> error_logs/Errorlog_4.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		},
+		{
+			"label": "Run all tests in suite to error_logs/Errorlog_5.txt",
+			"type": "shell",
+			"command": "pytest -q --disable-warnings > error_logs/Errorlog_5.txt 2>&1",
+			"problemMatcher": [
+				"$pytest"
+			],
+			"group": "test"
+		}
+	]
+}
