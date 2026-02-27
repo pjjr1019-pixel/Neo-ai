@@ -1,4 +1,3 @@
-
 import pkgutil
 import glob
 import pytest
@@ -8,8 +7,13 @@ def test_all_required_packages_installed():
     """Fail if any required package in requirements.txt is missing."""
     missing = []
     skip_pkgs = {
-        "psycopg2", "redis", "pytest", "pytest-asyncio",
-        "fastapi", "httpx", "numpy"
+        "psycopg2",
+        "redis",
+        "pytest",
+        "pytest-asyncio",
+        "fastapi",
+        "httpx",
+        "numpy",
     }
     try:
         with open("../requirements.txt") as f:
@@ -39,9 +43,7 @@ def test_import_all_modules():
             __import__(module)
         except ModuleNotFoundError as e:
             if e.name == "psutil":
-                pytest.skip(
-                    "psutil not installed; skipping resource_monitor import."
-                )
+                pytest.skip("psutil not installed; skipping resource_monitor import.")
             else:
                 errors.append(f"{module}: {type(e).__name__}: {e}")
         except Exception as e:

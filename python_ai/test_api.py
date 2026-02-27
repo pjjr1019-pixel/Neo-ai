@@ -63,10 +63,7 @@ def test_learn_error_handling():
     """Test error handling for /learn endpoint with invalid input."""
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    payload = {
-        "features": "notalist",
-        "target": None
-    }
+    payload = {"features": "notalist", "target": None}
     response = client.post("/learn", json=payload)
     assert response.status_code == 422
     app.dependency_overrides.pop(get_learning_logic, None)

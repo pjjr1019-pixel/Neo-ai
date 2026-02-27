@@ -87,26 +87,25 @@ def test_sharpe_ratio_zero_division():
 def test_resource_monitor_main(monkeypatch):
     """Test resource_monitor main and log_resource_usage coverage."""
     import pytest
+
     try:
         import python_ai.resource_monitor as rm
     except ModuleNotFoundError as e:
         if e.name == "psutil":
-            pytest.skip(
-                "psutil not installed; skipping resource_monitor test."
-            )
+            pytest.skip("psutil not installed; skipping resource_monitor test.")
         else:
             raise
     called = {}
 
     def fake_log_resource_usage():
         """Mock log_resource_usage for test coverage."""
-        called['log'] = True
+        called["log"] = True
 
-    monkeypatch.setattr(rm, 'log_resource_usage', fake_log_resource_usage)
-    monkeypatch.setattr(builtins, 'print', lambda *a, **k: None)
-    sys.argv = ['resource_monitor.py']
+    monkeypatch.setattr(rm, "log_resource_usage", fake_log_resource_usage)
+    monkeypatch.setattr(builtins, "print", lambda *a, **k: None)
+    sys.argv = ["resource_monitor.py"]
     rm.__name__ = "__main__"
     rm.main = lambda: None  # Prevent infinite loop
     rm.log_resource_usage()
     # Assert log was called (line kept <80 chars)
-    assert 'log' in called
+    assert "log" in called

@@ -94,8 +94,5 @@ def test_learn_invalid_missing_target():
     missing target.
     """
     client = TestClient(app)
-    response = client.post(
-        "/learn",
-        json={"input": "test"}
-    )
+    response = client.post("/learn", json={"input": "test"})
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT

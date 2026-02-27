@@ -1,4 +1,3 @@
-
 """
 Minimal FastAPI app for NEO Hybrid AI service.
 Exposes root, predict, learn, metrics, and explain endpoints.
@@ -70,7 +69,7 @@ def explain():
         "feature_importance": {
             "feature1": 0.5,
             "feature2": 0.3,
-            "feature3": 0.2
+            "feature3": 0.2,
         },
-        "explanation": "Feature importance is illustrative."
+        "explanation": "Feature importance is illustrative.",
     }

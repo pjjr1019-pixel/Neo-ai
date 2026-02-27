@@ -35,8 +35,5 @@ def log_resource_usage() -> NoReturn:
 
 
 if __name__ == "__main__":
-    print(
-        f"Logging resource usage to {LOG_FILE} "
-        f"every {INTERVAL} seconds..."
-    )
+    print(f"Logging resource usage to {LOG_FILE} " f"every {INTERVAL} seconds...")
     log_resource_usage()

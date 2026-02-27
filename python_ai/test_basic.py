@@ -1,4 +1,3 @@
-
 import pkgutil
 import pytest
 import glob
@@ -75,6 +74,7 @@ def test_fun_compliance_suite():
 def test_import_all_modules():
     """Import all Python modules in python_ai and catch any exception."""
     import pytest
+
     errors = []
     for path in glob.glob("python_ai/**/*.py", recursive=True):
         module = path.replace("/", ".").replace("\\", ".").replace(".py", "")
@@ -85,25 +85,18 @@ def test_import_all_modules():
         except ModuleNotFoundError as e:
             # Allow missing optional dependencies like psutil
             if e.name == "psutil":
-                pytest.skip(
-                    "psutil not installed; skipping resource_monitor import."
-                )
+                pytest.skip("psutil not installed; skipping resource_monitor import.")
             else:
                 error_msg = (
-                    f"{module}: {type(e).__name__}: {e}\n"
-                    f"{traceback.format_exc()}"
+                    f"{module}: {type(e).__name__}: {e}\n" f"{traceback.format_exc()}"
                 )
                 errors.append(error_msg)
         except Exception as e:
             error_msg = (
-                f"{module}: {type(e).__name__}: {e}\n"
-                f"{traceback.format_exc()}"
+                f"{module}: {type(e).__name__}: {e}\n" f"{traceback.format_exc()}"
             )
             errors.append(error_msg)
-    assert not errors, (
-        "Module import errors:\n" +
-        "\n".join(errors)
-    )
+    assert not errors, "Module import errors:\n" + "\n".join(errors)
 
 
 def test_git_environment():
@@ -115,7 +108,13 @@ def test_git_environment():
         ["git", "submodule", "status"],
     ]
     error_keywords = [
-        "unsafe", "error", "fatal", "not found", "missing", "failed", "warning"
+        "unsafe",
+        "error",
+        "fatal",
+        "not found",
+        "missing",
+        "failed",
+        "warning",
     ]
     errors = []
     for cmd in commands:
@@ -124,17 +123,13 @@ def test_git_environment():
             output = result.stdout.lower() + result.stderr.lower()
             for keyword in error_keywords:
                 if keyword in output:
-                    error_msg = (
-                        f"{' '.join(cmd)}: {keyword} found\n"
-                        f"{output}"
-                    )
+                    error_msg = f"{' '.join(cmd)}: {keyword} found\n" f"{output}"
                     errors.append(error_msg)
         except Exception as e:
-            error_msg = (
-                f"{' '.join(cmd)}: Exception {type(e).__name__}: {e}"
-            )
+            error_msg = f"{' '.join(cmd)}: Exception {type(e).__name__}: {e}"
             errors.append(error_msg)
     import pytest
+
     # If running in CI and .gitconfig is missing, skip this test
     for err in errors:
         if "fatal: unable to read config file" in err and ".gitconfig" in err:

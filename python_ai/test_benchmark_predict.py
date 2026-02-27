@@ -20,6 +20,7 @@ from python_ai.benchmark_predict import worker
 )
 def test_worker_status(monkeypatch, status_code, should_raise):
     """Test worker status response and error handling."""
+
     class MockResponse:
         def __init__(self, code):
             """Initialize MockResponse with status code."""
@@ -55,8 +56,10 @@ def test_worker_edge_cases(input_data, expected):
 
 # Edge: No post method
 
+
 def test_worker_no_post_method(monkeypatch):
     """Test worker when client lacks post method."""
+
     class MockClient:
         pass
 
@@ -66,6 +69,7 @@ def test_worker_no_post_method(monkeypatch):
 
 def test_worker_http_error(monkeypatch):
     """Test worker handles HTTP error gracefully."""
+
     class FakeResponse:
         status_code = 500
 
@@ -73,6 +77,7 @@ def test_worker_http_error(monkeypatch):
         return FakeResponse()
 
     import httpx
+
     monkeypatch.setattr(httpx.AsyncClient, "post", fake_post)
 
     import asyncio
@@ -90,6 +95,7 @@ def test_worker_http_error(monkeypatch):
 
 def test_main_patch(monkeypatch):
     """Test main patching worker for async execution."""
+
     async def fake_worker(client, n):
         return None
 
@@ -140,8 +146,10 @@ def test_benchmark_predict(output):
 
 def test_main_print(monkeypatch, capsys):
     """Test main print statements for coverage."""
+
     async def fake_worker(client, n):
         return None
+
     monkeypatch.setattr(bp, "worker", fake_worker)
     monkeypatch.setattr(bp, "REQUESTS", 10)
     monkeypatch.setattr(bp, "CONCURRENCY", 2)
@@ -156,6 +164,7 @@ def test_main_print(monkeypatch, capsys):
 
 def test_worker_status_invalid(monkeypatch):
     """Test worker with invalid status code (not 200 or 500)."""
+
     class MockResponse:
         def __init__(self, code):
             """Initialize MockResponse with status code."""

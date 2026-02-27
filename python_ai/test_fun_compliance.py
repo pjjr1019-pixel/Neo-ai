@@ -3,7 +3,6 @@ Fun Compliance Tests for NEO Hybrid AI
 Ensures style, documentation, and maintainability with a smile!
 """
 
-
 import subprocess
 import sys
 import ast
@@ -31,9 +30,9 @@ def test_all_functions_have_docstrings():
                     tree = ast.parse(f.read())
                     for node in ast.walk(tree):
                         if isinstance(node, ast.FunctionDef):
-                            assert ast.get_docstring(node), (
-                                f"No docstring in {file}:{node.name}"
-                            )
+                            assert ast.get_docstring(
+                                node
+                            ), f"No docstring in {file}:{node.name}"
 
 
 def test_line_length():
@@ -44,9 +43,7 @@ def test_line_length():
                 path = os.path.join(root, file)
                 with open(path, "r", encoding="utf-8") as f:
                     for i, line in enumerate(f, 1):
-                        assert len(line.rstrip()) <= 79, (
-                            f"{file}:{i} exceeds 79 chars"
-                        )
+                        assert len(line.rstrip()) <= 79, f"{file}:{i} exceeds 79 chars"
 
 
 def test_no_unused_imports():
@@ -71,6 +68,6 @@ def test_no_todo_comments():
                         is_docstring = line.strip() in {'"""', "'''"}
                         if is_empty or is_docstring:
                             continue
-                        assert FORBIDDEN_WORD not in line, (
-                            f"Forbidden comment in {file}"
-                        )
+                        assert (
+                            FORBIDDEN_WORD not in line
+                        ), f"Forbidden comment in {file}"
