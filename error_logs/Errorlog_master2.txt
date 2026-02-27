@@ -14,8 +14,8 @@ python_ai\test_fun_compliance.py:46: in test_line_length
 E   AssertionError: benchmark_predict.py:27 exceeds 79 chars
 E   assert 85 <= 79
 E    +  where 85 = len('        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]')
-E    +    where '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]' = <built-in method rstrip of str object at 0x0000017EEA08EB80>()
-E    +      where <built-in method rstrip of str object at 0x0000017EEA08EB80> = '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]\n'.rstrip
+E    +    where '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]' = <built-in method rstrip of str object at 0x000002246B2CE4C0>()
+E    +      where <built-in method rstrip of str object at 0x000002246B2CE4C0> = '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]\n'.rstrip
 __________________________ test_fun_compliance_suite __________________________
 python_ai\test_basic.py:67: in test_fun_compliance_suite
     test_flake8_compliance()
@@ -58,10 +58,10 @@ E     E    +  where 1 = CompletedProcess(args=['C:\\Users\\Pgiov\\AppData\\Local
 E     =========================== short test summary info ===========================
 E     FAILED python_ai/test_basic.py::test_flake8_compliance - AssertionError: Flak...
 E     !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
-E     ======================== 1 failed, 19 passed in 2.61s =========================
+E     ======================== 1 failed, 19 passed in 4.21s =========================
 E     
 E   assert 1 == 0
-E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 19 passed in 2.61s =========================\n', stderr='').returncode
+E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 19 passed in 4.21s =========================\n', stderr='').returncode
 ___________________________ test_coverage_threshold ___________________________
 python_ai\test_coverage_threshold.py:16: in test_coverage_threshold
     assert result.returncode == 0, "Coverage below threshold:\n" + result.stdout
@@ -91,10 +91,10 @@ E     E    +  where 1 = CompletedProcess(args=['C:\\Users\\Pgiov\\AppData\\Local
 E     =========================== short test summary info ===========================
 E     FAILED python_ai/test_basic.py::test_flake8_compliance - AssertionError: Flak...
 E     !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
-E     ======================== 1 failed, 19 passed in 2.62s =========================
+E     ======================== 1 failed, 19 passed in 3.69s =========================
 E     
 E   assert 1 == 0
-E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 19 passed in 2.62s =========================\n', stderr='').returncode
+E    +  where 1 = CompletedProcess(args=['pytest', '--cov=python_ai', '--cov-report=term', '--cov-fail-under=90'], returncode=1, stdout=...!!!!!!!!!!!!!!!!!!!!!!!\n======================== 1 failed, 19 passed in 3.69s =========================\n', stderr='').returncode
 _____________________ test_all_functions_have_docstrings ______________________
 python_ai\test_docstring_style.py:15: in test_all_functions_have_docstrings
     assert not missing, "Missing docstrings:\n" + "\n".join(missing)
@@ -148,8 +148,8 @@ ____________________ test_genetic_hyperparameter_evolution ____________________
 python_ai\test_evolution_engine.py:67: in test_genetic_hyperparameter_evolution
     assert np.allclose(agg_mean, expected_mean, atol=1e-6)
 E   assert False
-E    +  where False = <function allclose at 0x0000017EE9F08970>([1.0, 2.0, 3.0, 4.0, 5.0], array([0.6, 1.2, 1.8, 2.4, 3. ]), atol=1e-06)
-E    +    where <function allclose at 0x0000017EE9F08970> = np.allclose
+E    +  where False = <function allclose at 0x000002246B148AB0>([1.0, 2.0, 3.0, 4.0, 5.0], array([0.6, 1.2, 1.8, 2.4, 3. ]), atol=1e-06)
+E    +    where <function allclose at 0x000002246B148AB0> = np.allclose
 ___________________________ test_flake8_compliance ____________________________
 python_ai\test_flake8.py:19: in test_flake8_compliance
     assert result.returncode == 0, f"Flake8 errors found:\n{result.stdout}"
@@ -225,8 +225,8 @@ python_ai\test_fun_compliance.py:46: in test_line_length
 E   AssertionError: benchmark_predict.py:27 exceeds 79 chars
 E   assert 85 <= 79
 E    +  where 85 = len('        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]')
-E    +    where '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]' = <built-in method rstrip of str object at 0x0000017EEA353990>()
-E    +      where <built-in method rstrip of str object at 0x0000017EEA353990> = '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]\n'.rstrip
+E    +    where '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]' = <built-in method rstrip of str object at 0x000002246B593990>()
+E    +      where <built-in method rstrip of str object at 0x000002246B593990> = '        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]\n'.rstrip
 _____________________________ test_isort_imports ______________________________
 python_ai\test_isort.py:6: in test_isort_imports
     result = subprocess.run(
@@ -377,6 +377,6 @@ FAILED python_ai/test_fun_compliance.py::test_line_length - AssertionError: b...
 FAILED python_ai/test_isort.py::test_isort_imports - FileNotFoundError: [WinE...
 FAILED python_ai/test_master.py::test_flake8_compliance - AssertionError: Fla...
 FAILED python_ai/test_mypy.py::test_mypy_type_checking - AssertionError: Mypy...
-15 failed, 76 passed in 21.63s
+15 failed, 76 passed in 34.63s
 
 Pytest errors:
