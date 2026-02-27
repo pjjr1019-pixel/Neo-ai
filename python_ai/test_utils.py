@@ -92,7 +92,7 @@ def test_resource_monitor_main(monkeypatch):
         import python_ai.resource_monitor as rm
     except ModuleNotFoundError as e:
         if e.name == "psutil":
-            pytest.skip("psutil not installed; " "skipping resource_monitor test.")
+            pytest.skip("psutil not installed; skipping resource_monitor test.")
         else:
             raise
     called = {}

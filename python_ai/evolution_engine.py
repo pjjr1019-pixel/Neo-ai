@@ -87,11 +87,7 @@ class EvolutionEngine:
             if previous_population and i < len(previous_population):
                 prev = previous_population[i]
                 param_changes = {
-                    k: (
-                        prev.params.get(k),
-                        strat.params.get(k),
-                    )
-                    for k in strat.params
+                    k: (prev.params.get(k), strat.params.get(k)) for k in strat.params
                 }
                 lines.append("  Param Changes:")
                 for k, (old, new) in param_changes.items():
