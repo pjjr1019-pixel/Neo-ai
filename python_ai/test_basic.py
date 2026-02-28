@@ -1,14 +1,16 @@
-import pkgutil
-import pytest
 import glob
-import traceback
+import pkgutil
 import subprocess
+import traceback
+
+import pytest
+
 from python_ai.test_fun_compliance import (
-    test_flake8_compliance,
     test_all_functions_have_docstrings,
+    test_flake8_compliance,
     test_line_length,
-    test_no_unused_imports,
     test_no_todo_comments,
+    test_no_unused_imports,
 )
 
 
@@ -86,8 +88,7 @@ def test_import_all_modules():
             # Allow missing optional dependencies like psutil
             if e.name == "psutil":
                 pytest.skip(
-                    "psutil not installed; "
-                    "skipping resource_monitor import."
+                    "psutil not installed; skipping resource_monitor import."
                 )
             else:
                 error_msg = (
@@ -101,9 +102,7 @@ def test_import_all_modules():
                 f"{traceback.format_exc()}"
             )
             errors.append(error_msg)
-    assert not errors, (
-        "Module import errors:\n" + "\n".join(errors)
-    )
+    assert not errors, "Module import errors:\n" + "\n".join(errors)
 
 
 def test_git_environment():
@@ -131,8 +130,7 @@ def test_git_environment():
             for keyword in error_keywords:
                 if keyword in output:
                     error_msg = (
-                        f"{' '.join(cmd)}: {keyword} found\n"
-                        f"{output}"
+                        f"{' '.join(cmd)}: {keyword} found\n" f"{output}"
                     )
                     errors.append(error_msg)
         except Exception as e:

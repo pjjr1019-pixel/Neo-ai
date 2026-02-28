@@ -1,5 +1,6 @@
 import numpy as np
-from .evolution_engine import Strategy, EvolutionEngine
+
+from .evolution_engine import EvolutionEngine, Strategy
 
 
 def test_strategy_mutation_changes_params() -> None:
@@ -65,9 +66,7 @@ def test_genetic_hyperparameter_evolution() -> None:
     assert len(agg_mean) == len(data)
     assert len(agg_median) == len(data)
     # Check aggregation math
-    arr = np.array(
-        [[0.5 * x for x in data], [0.7 * x for x in data]]
-    )
+    arr = np.array([[0.5 * x for x in data], [0.7 * x for x in data]])
     expected_mean = np.mean(arr, axis=0)
     try:
         assert np.allclose(agg_mean, expected_mean, atol=1e-6)
@@ -82,9 +81,7 @@ def test_genetic_hyperparameter_evolution() -> None:
     except ValueError:
         pass
     else:
-        assert False, (
-            "Should raise ValueError for invalid aggregation"
-        )
+        assert False, "Should raise ValueError for invalid aggregation"
 
     avg_scores = engine.meta_learn(data=data, method="crossval", k_folds=4)
     engine = EvolutionEngine(base)

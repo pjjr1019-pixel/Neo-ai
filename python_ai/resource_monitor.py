@@ -6,10 +6,11 @@ intervals. Run this script alongside your FastAPI server for live resource
 monitoring.
 """
 
-import time
-import psutil
 import os
+import time
 from typing import NoReturn
+
+import psutil
 
 LOG_FILE = "resource_usage.log"
 INTERVAL = 2  # seconds
@@ -35,8 +36,5 @@ def log_resource_usage() -> NoReturn:
 
 
 if __name__ == "__main__":
-    print(
-        f"Logging resource usage to {LOG_FILE} "
-        f"every {INTERVAL} seconds..."
-    )
+    print(f"Logging resource usage to {LOG_FILE} every {INTERVAL} seconds...")
     log_resource_usage()

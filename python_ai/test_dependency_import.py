@@ -1,5 +1,6 @@
-import pkgutil
 import glob
+import pkgutil
+
 import pytest
 
 
@@ -44,13 +45,10 @@ def test_import_all_modules():
         except ModuleNotFoundError as e:
             if e.name == "psutil":
                 pytest.skip(
-                    "psutil not installed; "
-                    "skipping resource_monitor import."
+                    "psutil not installed; skipping resource_monitor import."
                 )
             else:
                 errors.append(f"{module}: {type(e).__name__}: {e}")
         except Exception as e:
             errors.append(f"{module}: {type(e).__name__}: {e}")
-    assert not errors, (
-        "Module import errors:\n" + "\n".join(errors)
-    )
+    assert not errors, "Module import errors:\n" + "\n".join(errors)

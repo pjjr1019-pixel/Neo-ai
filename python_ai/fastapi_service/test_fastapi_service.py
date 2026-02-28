@@ -7,6 +7,7 @@ blank lines, and error handling.
 
 from fastapi import status
 from fastapi.testclient import TestClient
+
 from python_ai.fastapi_service.fastapi_service import app
 
 

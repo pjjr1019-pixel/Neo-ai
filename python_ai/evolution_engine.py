@@ -5,9 +5,9 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 - Designed for extensibility and compliance with project coding policy
 """
 
-import random
 import copy
-from typing import List, Dict, Any
+import random
+from typing import Any, Dict, List
 
 
 class Strategy:

@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 
 def test_bandit_security():
@@ -22,6 +22,4 @@ def test_bandit_security():
     no_issues = "No issues identified." in result.stdout
     no_errors = result.returncode == 0
     msg = "Bandit security issues found:\n" + result.stdout
-    assert no_issues or no_errors, (
-        msg
-    )
+    assert no_issues or no_errors, msg

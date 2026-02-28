@@ -3,11 +3,13 @@ Unit tests for benchmark_predict.py using pytest and unittest.mock.
 Ensures async worker and main logic are robust and flake8-compliant.
 """
 
-import pytest
-import python_ai.benchmark_predict as bp
-import httpx
-from unittest.mock import patch, AsyncMock
 import asyncio
+from unittest.mock import AsyncMock, patch
+
+import httpx
+import pytest
+
+import python_ai.benchmark_predict as bp
 from python_ai.benchmark_predict import worker
 
 

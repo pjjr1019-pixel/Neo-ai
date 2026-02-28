@@ -3,10 +3,11 @@ Fun Compliance Tests for NEO Hybrid AI
 Ensures style, documentation, and maintainability with a smile!
 """
 
-import subprocess
-import sys
 import ast
 import os
+import subprocess
+import sys
+
 from python_ai.fun_compliance_config import FORBIDDEN_WORD
 
 
@@ -43,9 +44,9 @@ def test_line_length():
                 path = os.path.join(root, file)
                 with open(path, "r", encoding="utf-8") as f:
                     for i, line in enumerate(f, 1):
-                        assert len(line.rstrip()) <= 79, (
-                            f"{file}:{i} exceeds 79 chars"
-                        )
+                        assert (
+                            len(line.rstrip()) <= 79
+                        ), f"{file}:{i} exceeds 79 chars"
 
 
 def test_no_unused_imports():
