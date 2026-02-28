@@ -4,13 +4,8 @@ import subprocess
 
 def test_bandit_security():
     """Run bandit security checks on all Python files."""
-    venv_dir = os.environ.get("VIRTUAL_ENV")
-    if venv_dir:
-        bandit_path = os.path.join(venv_dir, "Scripts", "bandit.exe")
-    else:
-        bandit_path = os.path.join(
-            os.getcwd(), ".venv", "Scripts", "bandit.exe"
-        )
+    import shutil
+    bandit_path = shutil.which("bandit") or "bandit"
     bandit_args = [
         bandit_path,
         "-r",
