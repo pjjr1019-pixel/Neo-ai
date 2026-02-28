@@ -37,5 +37,5 @@ async def main():
         print("Throughput: N/A (elapsed time is zero)")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     asyncio.run(main())

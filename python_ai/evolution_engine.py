@@ -71,7 +71,7 @@ class EvolutionEngine:
         lines = []
         lines.append("Evolution Report\n====================")
         for i, strat in enumerate(self.population):
-            lines.append(f"Strategy {i+1}:")
+            lines.append(f"Strategy {i + 1}:")
             params_str = f"  Params: {strat.params}"
             if len(params_str) > 79:
                 params_str = params_str[:76] + "..."

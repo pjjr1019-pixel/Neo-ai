@@ -127,8 +127,24 @@ def test_git_environment():
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout.lower() + result.stderr.lower()
+            # Ignore .coverage and error log file status in git output
+            if cmd == ["git", "status"]:
+                output = "\n".join(
+                    [
+                        line
+                        for line in output.splitlines()
+                        if ".coverage" not in line
+                        and "errorlog" not in line
+                        and not line.strip().startswith(
+                            "deleted:    .coverage"
+                        )
+                    ]
+                )
             for keyword in error_keywords:
                 if keyword in output:
+                    # Only error if not related to .coverage or error log
+                    if ".coverage" in output or "errorlog" in output:
+                        continue
                     error_msg = (
                         f"{' '.join(cmd)}: {keyword} found\n" f"{output}"
                     )

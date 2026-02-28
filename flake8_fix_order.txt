@@ -1,0 +1,39 @@
+# Flake8 Compliance Report (python_ai)
+
+Total errors: 44
+
+Order to fix:
+
+1. **Syntax/Indentation Errors (must fix first):**
+   - test_resource_monitor_comprehensive.py:28:9: E999 IndentationError: unexpected indent
+
+2. **Unused Imports (F401):**
+   - test_benchmark_predict_comprehensive.py:3:1: F401 'types' imported but unused
+   - test_evolution_engine_comprehensive.py:2:1: F401 'numpy as np' imported but unused
+   - test_fastapi_service_comprehensive.py:1:1: F401 'pytest' imported but unused
+   - test_integration_test_comprehensive.py:1:1: F401 'pytest' imported but unused
+
+3. **Blank Line Errors (E302, E301, E303):**
+   - Multiple files: expected 2 blank lines before function/class, or 1 before method
+
+4. **Whitespace Errors (E231, E306):**
+   - test_fastapi_service_comprehensive.py:22:30, :22:32, :36:33, :36:35: E231 missing whitespace after ','
+   - test_benchmark_predict_comprehensive.py:37:9, :39:9: E306 expected 1 blank line before a nested definition
+
+5. **Line Too Long (E501):**
+   - Multiple files: lines > 79 characters
+
+6. **Other Minor Issues:**
+   - test_fastapi_service_comprehensive.py:29:5: F841 local variable 'client' is assigned to but never used
+
+---
+
+**Recommended Fix Order:**
+1. Fix all E999 (syntax/indentation) errors first (code will not run otherwise)
+2. Remove all unused imports (F401)
+3. Fix all blank line errors (E302, E301, E303)
+4. Fix whitespace and nested definition errors (E231, E306)
+5. Fix all line-too-long errors (E501)
+6. Fix any remaining minor issues (e.g., F841)
+
+See flake8_full_report.txt for full details.
