@@ -55,13 +55,19 @@ def test_genetic_hyperparameter_evolution() -> None:
     base = [Strategy({"threshold": 0.5 + i * 0.2}) for i in range(4)]
     engine = EvolutionEngine(base)
     # Ensure population is evaluated
-    agg_mean = engine.ensemble_strategy_selection(data, top_n=2, aggregation="mean")
-    agg_median = engine.ensemble_strategy_selection(data, top_n=3, aggregation="median")
+    agg_mean = engine.ensemble_strategy_selection(
+        data, top_n=2, aggregation="mean"
+    )
+    agg_median = engine.ensemble_strategy_selection(
+        data, top_n=3, aggregation="median"
+    )
     assert isinstance(agg_median, list)
     assert len(agg_mean) == len(data)
     assert len(agg_median) == len(data)
     # Check aggregation math
-    arr = np.array([[0.5 * x for x in data], [0.7 * x for x in data]])
+    arr = np.array(
+        [[0.5 * x for x in data], [0.7 * x for x in data]]
+    )
     expected_mean = np.mean(arr, axis=0)
     try:
         assert np.allclose(agg_mean, expected_mean, atol=1e-6)
@@ -70,18 +76,24 @@ def test_genetic_hyperparameter_evolution() -> None:
 
     # Test invalid aggregation
     try:
-        engine.ensemble_strategy_selection(data, top_n=2, aggregation="invalid")
+        engine.ensemble_strategy_selection(
+            data, top_n=2, aggregation="invalid"
+        )
     except ValueError:
         pass
     else:
-        assert False, "Should raise ValueError for invalid aggregation"
+        assert False, (
+            "Should raise ValueError for invalid aggregation"
+        )
 
     avg_scores = engine.meta_learn(data=data, method="crossval", k_folds=4)
     engine = EvolutionEngine(base)
     # Set performances manually for deterministic allocation
     for i, strat in enumerate(engine.population):
         strat.performance = i * 10.0
-    allocs = engine.dynamic_resource_allocation(total_resource=1.0, min_alloc=0.1)
+    allocs = engine.dynamic_resource_allocation(
+        total_resource=1.0, min_alloc=0.1
+    )
     assert set(allocs.keys()) == set(engine.population)
     # All allocations should be >= min_alloc
     for v in allocs.values():
@@ -89,7 +101,9 @@ def test_genetic_hyperparameter_evolution() -> None:
     # If all performances are equal, allocations should be equal
     for strat in engine.population:
         strat.performance = 5.0
-    allocs_eq = engine.dynamic_resource_allocation(total_resource=1.0, min_alloc=0.0)
+    allocs_eq = engine.dynamic_resource_allocation(
+        total_resource=1.0, min_alloc=0.0
+    )
     vals = list(allocs_eq.values())
     assert all(abs(v - vals[0]) < 1e-6 for v in vals)
 

@@ -13,4 +13,6 @@ def test_coverage_threshold():
         capture_output=True,
         text=True,
     )
-    assert result.returncode == 0, "Coverage below threshold:\n" + result.stdout
+    assert result.returncode == 0, (
+        "Coverage below threshold:\n" + result.stdout
+    )

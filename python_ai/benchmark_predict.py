@@ -24,10 +24,15 @@ async def worker(client, n):
 async def main():
     start = time.perf_counter()
     async with httpx.AsyncClient(timeout=10) as client:
-        tasks = [worker(client, REQUESTS // CONCURRENCY) for _ in range(CONCURRENCY)]
+        tasks = [
+            worker(client, REQUESTS // CONCURRENCY)
+            for _ in range(CONCURRENCY)
+        ]
         await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - start
-    print(f"Sent {REQUESTS} requests in {elapsed:.2f} seconds.")
+    print(
+        f"Sent {REQUESTS} requests in {elapsed:.2f} seconds."
+    )
     if elapsed > 0:
         print(f"Throughput: {REQUESTS / elapsed:.2f} req/sec")
     else:

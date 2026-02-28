@@ -6,4 +6,6 @@ def test_black_formatting():
     result = subprocess.run(
         ["black", "--check", "python_ai"], capture_output=True, text=True
     )
-    assert result.returncode == 0, "Black formatting errors found:\n" + result.stdout
+    assert result.returncode == 0, (
+        "Black formatting errors found:\n" + result.stdout
+    )

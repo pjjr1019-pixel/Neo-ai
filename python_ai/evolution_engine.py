@@ -87,7 +87,8 @@ class EvolutionEngine:
             if previous_population and i < len(previous_population):
                 prev = previous_population[i]
                 param_changes = {
-                    k: (prev.params.get(k), strat.params.get(k)) for k in strat.params
+                    k: (prev.params.get(k), strat.params.get(k))
+                    for k in strat.params
                 }
                 lines.append("  Param Changes:")
                 for k, (old, new) in param_changes.items():
@@ -117,7 +118,9 @@ class EvolutionEngine:
             Dict mapping strategy to average score.
         """
         n: int = len(self.population)
-        scores: Dict[Strategy | None, float] = {strat: 0.0 for strat in self.population}
+        scores: Dict[Strategy | None, float] = {
+            strat: 0.0 for strat in self.population
+        }
         for _ in range(rounds):
             for i, strat_a in enumerate(self.population):
                 for j, strat_b in enumerate(self.population):
@@ -170,7 +173,8 @@ class EvolutionEngine:
         """
         # Gather performances, avoid None
         performances: List[float] = [
-            s.performance if s.performance is not None else 0.0 for s in self.population
+            s.performance if s.performance is not None else 0.0
+            for s in self.population
         ]
         min_perf: float = min(performances)
         # Shift performances to be non-negative
@@ -275,9 +279,9 @@ class EvolutionEngine:
             List of top Strategy objects.
         """
         # Select top-n strategies by performance
-        return sorted(self.population, key=lambda s: s.performance or 0, reverse=True)[
-            :n
-        ]
+        return sorted(
+            self.population, key=lambda s: s.performance or 0, reverse=True
+        )[:n]
 
     def meta_learn(
         self, data, method: str = "crossval", k_folds: int = 5
@@ -308,7 +312,9 @@ class EvolutionEngine:
                 start: int = i * fold_size
                 end: int = start + fold_size if i < k_folds - 1 else n
                 val_idx: List[int] = list(range(start, end))
-                train_idx: List[int] = [j for j in range(n) if j not in val_idx]
+                train_idx: List[int] = [
+                    j for j in range(n) if j not in val_idx
+                ]
                 train_data = [data[j] for j in train_idx]
                 val_data = [data[j] for j in val_idx]
                 fold_scores = []
@@ -376,7 +382,9 @@ class EvolutionEngine:
             population = survivors + offspring
         self.population = population
 
-    def bayesian_hyperparameter_optimization(self, data=None, n_iter: int = 10) -> None:
+    def bayesian_hyperparameter_optimization(
+        self, data=None, n_iter: int = 10
+    ) -> None:
         """
         Stub for Bayesian optimization of hyperparameters.
         Args:
