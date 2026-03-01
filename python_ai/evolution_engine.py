@@ -3,11 +3,14 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 - Mutates strategies (thresholds, sizing, stop-loss)
 - Supports meta-learning (MAML, Reptile)
 - Designed for extensibility and compliance with project coding policy
+- Wired to BacktestingEngine for real performance evaluation
 """
 
 import copy
 import random
 from typing import Any, Dict, List, Optional
+
+from python_ai.backtesting_engine import get_backtesting_engine
 
 
 class Strategy:
@@ -35,16 +38,37 @@ class Strategy:
                 new_params[k] += random.uniform(-0.1, 0.1) * v  # nosec: B311
         return Strategy(new_params)
 
-    def evaluate(self, data) -> float:
-        """
-        Evaluate strategy performance (stub).
+    def evaluate(self, data: Dict[str, Any]) -> float:
+        """Evaluate strategy performance using backtesting engine.
+
         Args:
-            data: Input data for evaluation.
+            data: Dict with 'ohlcv_data' (prices) and 'signals' (trading
+                 signals).
+
         Returns:
-            Random float as performance.
+            Fitness score from backtest (0-1 scale).
         """
-        # Placeholder: implement backtesting logic
-        self.performance = random.uniform(0, 1)  # nosec: B311
+        if not isinstance(data, dict):
+            self.performance = 0.0
+            return self.performance
+
+        ohlcv_data = data.get("ohlcv_data", {})
+        signals = data.get("signals", [])
+
+        if not ohlcv_data or not signals:
+            self.performance = 0.0
+            return self.performance
+
+        try:
+            backtest_engine = get_backtesting_engine()
+            metrics = backtest_engine.run_backtest(
+                ohlcv_data,
+                signals,
+            )
+            self.performance = metrics.fitness_score
+        except Exception:
+            self.performance = 0.0
+
         return self.performance
 
 
@@ -306,27 +330,23 @@ class EvolutionEngine:
     def meta_learn(
         self, data, method: str = "crossval", k_folds: int = 5
     ) -> List[float] | None:
-        """
-        Meta-learning with cross-validation support.
+        """Meta-learning with cross-validation support.
+
         Args:
             data: Input data for meta-learning.
             method: Meta-learning method ('crossval', etc.).
             k_folds: Number of folds for cross-validation.
+
         Returns:
             List of average scores or None.
-        """
-        """
-        Meta-learning with cross-validation support.
-        If method == 'crossval', performs k-fold cross-validation on
-        current population.
         """
         if method == "crossval":
             if not data or not hasattr(data, "__len__"):
                 raise ValueError(
-                    "Data must be a non-empty sequence for cross-validation."
+                    "Data must be a non-empty sequence for "
+                    "cross-validation."
                 )
             n: int = len(data)
-            # Cap k_folds at data size
             actual_k_folds: int = min(k_folds, n)
             fold_size: int = max(1, n // actual_k_folds)
             results = []
@@ -341,22 +361,25 @@ class EvolutionEngine:
                 val_data = [data[j] for j in val_idx]
                 fold_scores = []
                 for strat in self.population:
-                    # Train: here just evaluate on train_data for placeholder
-                    strat.evaluate(train_data)
-                    # Validate: evaluate on val_data
-                    val_score: float = strat.evaluate(val_data)
+                    fold_eval_data: Dict[str, Any] = {
+                        "ohlcv_data": {"close": train_data},
+                        "signals": ["HOLD"] * len(train_data),
+                    }
+                    strat.evaluate(fold_eval_data)
+                    val_eval_data: Dict[str, Any] = {
+                        "ohlcv_data": {"close": val_data},
+                        "signals": ["HOLD"] * len(val_data),
+                    }
+                    val_score: float = strat.evaluate(val_eval_data)
                     fold_scores.append(val_score)
                 results.append(fold_scores)
-            # Average scores per strategy
             avg_scores: List[float] = [
                 sum(scores) / k_folds for scores in zip(*results)
             ]
-            # Assign average performance to each strategy
             for strat, avg in zip(self.population, avg_scores):
                 strat.performance = avg
             return avg_scores
         else:
-            # Placeholder for other meta-learning methods (MAML, Reptile, etc.)
             return None
 
     def genetic_hyperparameter_evolution(

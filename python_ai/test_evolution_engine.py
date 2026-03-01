@@ -12,7 +12,11 @@ def test_strategy_mutation_changes_params() -> None:
 def test_strategy_evaluate_sets_performance() -> None:
     """Test that evaluate sets performance attribute."""
     s = Strategy({"threshold": 1.0})
-    perf = s.evaluate(data=None)
+    eval_data = {
+        "ohlcv_data": {"close": [100.0, 105.0, 110.0]},
+        "signals": ["HOLD", "HOLD", "HOLD"],
+    }
+    perf = s.evaluate(data=eval_data)
     assert isinstance(perf, float)
     assert s.performance == perf
 
