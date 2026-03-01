@@ -6,7 +6,7 @@ Follows repository pattern for clean separation of concerns.
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -103,7 +103,8 @@ class PredictionRepository:
         Returns:
             Optional[Prediction]: Prediction if found, None otherwise.
         """
-        return session.get(Prediction, prediction_id)
+        result = session.get(Prediction, prediction_id)
+        return cast(Optional[Prediction], result)
 
     @staticmethod
     def get_recent(
@@ -214,7 +215,8 @@ class TrainingSessionRepository:
         Returns:
             Optional[TrainingSession]: Training session if found.
         """
-        return session.get(TrainingSession, session_id)
+        result = session.get(TrainingSession, session_id)
+        return cast(Optional[TrainingSession], result)
 
     @staticmethod
     def get_latest(
@@ -237,8 +239,9 @@ class TrainingSessionRepository:
         )
         if model_name:
             query = query.where(TrainingSession.model_name == model_name)
-        result = session.execute(query)
-        return result.scalar_one_or_none()
+        result_obj = session.execute(query)
+        result = result_obj.scalar_one_or_none()
+        return cast(Optional[TrainingSession], result)
 
 
 class ModelMetricsRepository:

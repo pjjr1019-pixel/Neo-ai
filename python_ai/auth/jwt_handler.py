@@ -65,7 +65,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if password matches hash.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    return bool(pwd_context.verify(plain_password, hashed_password))
 
 
 def get_password_hash(password: str) -> str:
@@ -77,7 +77,7 @@ def get_password_hash(password: str) -> str:
     Returns:
         str: Bcrypt hashed password.
     """
-    return pwd_context.hash(password)
+    return str(pwd_context.hash(password))
 
 
 def create_access_token(
@@ -111,7 +111,10 @@ def create_access_token(
         }
     )
 
-    return jwt.encode(to_encode, config.secret_key, algorithm=config.algorithm)
+    encoded = jwt.encode(
+        to_encode, config.secret_key, algorithm=config.algorithm
+    )
+    return str(encoded)
 
 
 def create_refresh_token(
@@ -145,7 +148,10 @@ def create_refresh_token(
         }
     )
 
-    return jwt.encode(to_encode, config.secret_key, algorithm=config.algorithm)
+    encoded = jwt.encode(
+        to_encode, config.secret_key, algorithm=config.algorithm
+    )
+    return str(encoded)
 
 
 def decode_token(token: str) -> Optional[TokenData]:
