@@ -1,24 +1,30 @@
 """
 FastAPI app for NEO Hybrid AI service.
 
-Exposes root, predict, learn, metrics, and explain endpoints.
+Exposes root, predict, learn, metrics, health, and explain endpoints.
 Uses real ML model for predictions with confidence calibration.
 """
 
 import logging
+import platform
 import time
 from typing import Any, Dict, List
 
 import numpy as np
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from pydantic import BaseModel
 
 from python_ai.data_pipeline import get_pipeline
 from python_ai.ml_model import get_model
+from python_ai.rate_limiter import RateLimitMiddleware
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(title="NEO Hybrid AI", version="0.2.0")
+app.add_middleware(
+    RateLimitMiddleware,  # type: ignore[arg-type]
+    requests_per_minute=120,
+)
 
 # ── Simple in-process counters ────────────────────────────────
 _request_counts: Dict[str, int] = {
@@ -51,6 +57,41 @@ class PredictInput(BaseModel):
 def root():
     """Root endpoint returns service status message."""
     return {"message": "NEO Hybrid AI Service is running."}
+
+
+@app.get("/health")
+def health() -> Dict[str, Any]:
+    """Health check with model, DB, and system status.
+
+    Returns:
+        Dict with status, model info, uptime, and system details.
+    """
+    model = get_model()
+    uptime = time.time() - _start_time
+    status = "healthy"
+    checks: Dict[str, Any] = {}
+
+    # Model health
+    checks["model"] = {
+        "status": "ok" if model.is_trained else "degraded",
+        "trained": model.is_trained,
+        "train_count": model.train_count,
+    }
+    if not model.is_trained:
+        status = "degraded"
+
+    # System info
+    checks["system"] = {
+        "python": platform.python_version(),
+        "platform": platform.system(),
+    }
+
+    return {
+        "status": status,
+        "uptime_seconds": round(uptime, 1),
+        "version": "0.2.0",
+        "checks": checks,
+    }
 
 
 @app.post("/compute-features")
@@ -182,6 +223,52 @@ def metrics() -> Dict[str, Any]:
         "train_count": model.train_count,
         "training_metrics": model.training_metrics,
     }
+
+
+@app.get("/metrics/prometheus")
+def metrics_prometheus() -> Response:
+    """Expose metrics in Prometheus text exposition format.
+
+    Returns:
+        Plain-text response with Prometheus-compatible metrics.
+    """
+    model = get_model()
+    uptime = time.time() - _start_time
+    lines: List[str] = [
+        "# HELP neo_requests_total Total requests by endpoint.",
+        "# TYPE neo_requests_total counter",
+    ]
+    for endpoint, count in _request_counts.items():
+        lines.append(f'neo_requests_total{{endpoint="{endpoint}"}} {count}')
+    lines += [
+        "# HELP neo_uptime_seconds Service uptime in seconds.",
+        "# TYPE neo_uptime_seconds gauge",
+        f"neo_uptime_seconds {uptime:.1f}",
+        "# HELP neo_model_trained Whether the model is trained.",
+        "# TYPE neo_model_trained gauge",
+        f"neo_model_trained {1 if model.is_trained else 0}",
+        "# HELP neo_train_count Number of training runs.",
+        "# TYPE neo_train_count counter",
+        f"neo_train_count {model.train_count}",
+    ]
+
+    if model.training_metrics:
+        r2 = model.training_metrics.get("r2_ensemble", 0)
+        mse = model.training_metrics.get("mse_ensemble", 0)
+        lines += [
+            "# HELP neo_model_r2 R-squared of ensemble.",
+            "# TYPE neo_model_r2 gauge",
+            f"neo_model_r2 {r2:.6f}",
+            "# HELP neo_model_mse Mean squared error of ensemble.",
+            "# TYPE neo_model_mse gauge",
+            f"neo_model_mse {mse:.6f}",
+        ]
+
+    body = "\n".join(lines) + "\n"
+    return Response(
+        content=body,
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
 
 
 @app.get("/explain")
