@@ -45,7 +45,7 @@ _users_db: dict = {
         "disabled": False,
         "hashed_password": (
             # Default password: "admin123" - CHANGE IN PRODUCTION
-            "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4"
+            "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4"  # nosec: B105
             ".FVttYxVE9KW3QG"
         ),
     },

@@ -221,7 +221,7 @@ class JWTHandler:
         return {
             "access_token": create_access_token(data),
             "refresh_token": create_refresh_token(data),
-            "token_type": "bearer",
+            "token_type": "bearer",  # nosec: B105 - not a password
         }
 
     def refresh_access_token(self, refresh_token: str) -> Optional[str]:
@@ -236,7 +236,7 @@ class JWTHandler:
         token_data = decode_token(refresh_token)
         if token_data is None:
             return None
-        if token_data.token_type != "refresh":
+        if token_data.token_type != "refresh":  # nosec: B105 - not a password
             return None
 
         data = {"sub": token_data.username, "roles": token_data.roles}

@@ -32,7 +32,7 @@ class Strategy:
         # Example mutation: tweak thresholds slightly
         for k, v in new_params.items():
             if isinstance(v, (int, float)) and not isinstance(v, bool):
-                new_params[k] += random.uniform(-0.1, 0.1) * v
+                new_params[k] += random.uniform(-0.1, 0.1) * v  # nosec: B311
         return Strategy(new_params)
 
     def evaluate(self, data) -> float:
@@ -44,7 +44,7 @@ class Strategy:
             Random float as performance.
         """
         # Placeholder: implement backtesting logic
-        self.performance = random.uniform(0, 1)
+        self.performance = random.uniform(0, 1)  # nosec: B311
         return self.performance
 
 
@@ -380,8 +380,8 @@ class EvolutionEngine:
         population: List[Strategy] = [
             Strategy(
                 {
-                    "threshold": random.uniform(0, 1),
-                    "stop_loss": random.uniform(0, 0.5),
+                    "threshold": random.uniform(0, 1),  # nosec: B311
+                    "stop_loss": random.uniform(0, 0.5),  # nosec: B311
                 }
             )
             for _ in range(population_size)
@@ -397,7 +397,7 @@ class EvolutionEngine:
             for parent in survivors:
                 child = (
                     parent.mutate()
-                    if random.random() < mutation_rate
+                    if random.random() < mutation_rate  # nosec: B311
                     else copy.deepcopy(parent)
                 )
                 offspring.append(child)
@@ -421,8 +421,8 @@ class EvolutionEngine:
         best_perf: float = float("-inf")
         for _ in range(n_iter):
             params: Dict[str, float] = {
-                "threshold": random.uniform(0, 1),
-                "stop_loss": random.uniform(0, 0.5),
+                "threshold": random.uniform(0, 1),  # nosec: B311
+                "stop_loss": random.uniform(0, 0.5),  # nosec: B311
             }
             strat = Strategy(params)
             perf: float = strat.evaluate(data)

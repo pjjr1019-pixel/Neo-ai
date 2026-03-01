@@ -39,7 +39,7 @@ jobs:
         run: mypy python_ai --ignore-missing-imports
 
       - name: Security scan with Bandit
-        run: bandit -r python_ai/ -x 'python_ai/test_*.py' -ll
+        run: bandit -r python_ai/ --exclude '*/test_*.py,*/integration_test.py,*/benchmark_predict.py' -ll
 
   test:
     name: Tests (Python ${{ matrix.python-version }})

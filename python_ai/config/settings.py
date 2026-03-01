@@ -215,7 +215,10 @@ class APISettings(BaseSettings):
         extra="ignore",
     )
 
-    host: str = Field(default="0.0.0.0", description="Server host")
+    host: str = Field(
+        default="0.0.0.0",  # nosec: B104 - override with API_HOST env var
+        description="Server host",
+    )
     port: int = Field(default=8000, description="Server port")
     debug: bool = Field(default=False, description="Debug mode")
     reload: bool = Field(default=False, description="Auto-reload")
