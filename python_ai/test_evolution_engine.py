@@ -45,6 +45,7 @@ def test_genetic_hyperparameter_evolution() -> None:
     data = list(range(20))
     engine = EvolutionEngine(base)
     avg_scores = engine.meta_learn(data=data, method="crossval", k_folds=4)
+    assert avg_scores is not None
     for score in avg_scores:
         assert isinstance(score, float)
     # Each strategy should have performance set
@@ -100,14 +101,15 @@ def test_genetic_hyperparameter_evolution() -> None:
     vals = list(allocs_eq.values())
     assert all(abs(v - vals[0]) < 1e-6 for v in vals)
 
+    assert avg_scores is not None
     assert len(avg_scores) == 4
 
     base = [Strategy({"threshold": 0.5 + i * 0.2}) for i in range(3)]
     data = [1, 2, 3]
-    avg_scores = engine.self_play_and_coevolution(data, rounds=3)
-    assert set(avg_scores.keys()) == set(engine.population)
+    coevo_scores = engine.self_play_and_coevolution(data, rounds=3)
+    assert set(coevo_scores.keys()) == set(engine.population)
     # All scores should be between 0 and 1
-    for v in avg_scores.values():
+    for v in coevo_scores.values():
         assert 0.0 <= v <= 1.0
     # Each strategy should have performance set
     for strat in engine.population:

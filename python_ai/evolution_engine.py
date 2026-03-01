@@ -7,7 +7,7 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 
 import copy
 import random
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class Strategy:
@@ -20,7 +20,7 @@ class Strategy:
             params: Dictionary of strategy parameters.
         """
         self.params: Dict[str, Any] = params.copy()
-        self.performance = None
+        self.performance: Optional[float] = None
 
     def mutate(self) -> "Strategy":
         """
@@ -44,7 +44,7 @@ class Strategy:
             Random float as performance.
         """
         # Placeholder: implement backtesting logic
-        self.performance: float = random.uniform(0, 1)
+        self.performance = random.uniform(0, 1)
         return self.performance
 
 
@@ -103,7 +103,7 @@ class EvolutionEngine:
 
     def self_play_and_coevolution(
         self, data, rounds: int = 5
-    ) -> Dict[Strategy | None, float]:
+    ) -> Dict[Strategy, float]:
         """
         Simulate self-play and co-evolution between strategies.
         Args:
@@ -122,7 +122,7 @@ class EvolutionEngine:
             Dict mapping strategy to average score.
         """
         n: int = len(self.population)
-        scores: Dict[Strategy | None, float] = {
+        scores: Dict[Strategy, float] = {
             strat: 0.0 for strat in self.population
         }
         for _ in range(rounds):
@@ -144,8 +144,10 @@ class EvolutionEngine:
                         scores[strat_b] += 0.5
         # Normalize scores by number of matches
         matches: int = rounds * n * (n - 1)
-        avg_scores: Dict[Strategy | None, float] = {
-            strat: score / matches for strat, score in scores.items()
+        avg_scores: Dict[Strategy, float] = {
+            strat: score / matches
+            for strat, score in scores.items()
+            if strat is not None
         }
         # Assign average score as performance
         for strat, avg in avg_scores.items():
@@ -203,7 +205,7 @@ class EvolutionEngine:
                         (total_resource - n * min_alloc) * (perf / total)
                     )
                 else:
-                    alloc: float = min_alloc
+                    alloc = min_alloc
                 allocs[strat] = alloc
         return allocs
 
@@ -249,11 +251,11 @@ class EvolutionEngine:
         # Aggregate predictions
         import numpy as np
 
-        predictions = np.array(predictions)
+        pred_matrix = np.array(predictions)
         if aggregation == "mean":
-            agg = np.mean(predictions, axis=0)
+            agg = np.mean(pred_matrix, axis=0)
         elif aggregation == "median":
-            agg = np.median(predictions, axis=0)
+            agg = np.median(pred_matrix, axis=0)
         else:
             raise ValueError(f"Unknown aggregation method: {aggregation}")
         return agg.tolist()
@@ -346,7 +348,7 @@ class EvolutionEngine:
             return avg_scores
         else:
             # Placeholder for other meta-learning methods (MAML, Reptile, etc.)
-            pass
+            return None
 
     def genetic_hyperparameter_evolution(
         self,
@@ -406,8 +408,8 @@ class EvolutionEngine:
         Stub for Bayesian optimization of hyperparameters
         (replace with e.g. skopt or optuna for real use).
         """
-        best = None
-        best_perf = float("-inf")
+        best: Optional[Strategy] = None
+        best_perf: float = float("-inf")
         for _ in range(n_iter):
             params: Dict[str, float] = {
                 "threshold": random.uniform(0, 1),
@@ -416,9 +418,9 @@ class EvolutionEngine:
             strat = Strategy(params)
             perf: float = strat.evaluate(data)
             if perf > best_perf:
-                best: Strategy = strat
-                best_perf: float = perf
-        self.population: List[None | Strategy] = [best]
+                best = strat
+                best_perf = perf
+        self.population = [best] if best is not None else []
 
     # Example usage
     if __name__ == "__main__":
