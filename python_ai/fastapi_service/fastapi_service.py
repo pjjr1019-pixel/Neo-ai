@@ -1,11 +1,16 @@
 """
-Minimal FastAPI app for NEO Hybrid AI service.
+FastAPI app for NEO Hybrid AI service.
+
 Exposes root, predict, learn, metrics, and explain endpoints.
-Flake8-compliant and best practices.
+Uses real ML model for predictions with confidence calibration.
 """
+
+from typing import Any, Dict
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+
+from python_ai.ml_model import get_model
 
 app = FastAPI()
 
@@ -13,7 +18,7 @@ app = FastAPI()
 class PredictInput(BaseModel):
     """Input schema for /predict endpoint."""
 
-    input: str
+    features: Dict[str, float]
 
 
 @app.get("/")
@@ -23,9 +28,22 @@ def root():
 
 
 @app.post("/predict")
-def predict(payload: PredictInput):
-    """Predict endpoint for model inference."""
-    return {"output": f"Predicted value for '{payload.input}'"}
+def predict(payload: PredictInput) -> Dict[str, Any]:
+    """Predict endpoint for real model inference.
+
+    Args:
+        payload: PredictInput with features dict.
+
+    Returns:
+        Dict with prediction, confidence, and signal.
+    """
+    model = get_model()
+    pred, confidence, signal = model.predict(payload.features)
+    return {
+        "prediction": float(pred),
+        "confidence": float(confidence),
+        "signal": signal,
+    }
 
 
 def get_learning_logic():
@@ -66,14 +84,37 @@ def metrics():
 
 
 @app.get("/explain")
-def explain():
-    """Return dummy feature importance for explainability."""
-    # In a real system, this would return model-specific feature importances
+def explain() -> Dict[str, Any]:
+    """Return real feature importance from model.
+
+    Returns:
+        Dict with feature importance from Random Forest and Gradient  Boosting.
+    """
+    import numpy as np
+
+    model = get_model()
+    rf_importance: np.ndarray = (
+        model.rf_model.feature_importances_
+        if model.rf_model is not None
+        else np.array([])
+    )
+    gb_importance: np.ndarray = (
+        model.gb_model.feature_importances_
+        if model.gb_model is not None
+        else np.array([])
+    )
+
+    # Average importance across models
+    avg_importance: np.ndarray = (
+        (rf_importance + gb_importance) / 2.0
+        if len(rf_importance) > 0
+        else np.array([])
+    )
+
     return {
         "feature_importance": {
-            "feature1": 0.5,
-            "feature2": 0.3,
-            "feature3": 0.2,
+            f"feature_{i}": float(imp) for i, imp in enumerate(avg_importance)
         },
-        "explanation": "Feature importance is illustrative.",
+        "explanation": "Feature importance from ensemble (RF + GB).",
+        "model_type": "RandomForest + GradientBoosting Ensemble",
     }

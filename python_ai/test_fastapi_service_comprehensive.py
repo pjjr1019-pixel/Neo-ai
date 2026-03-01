@@ -14,9 +14,12 @@ def test_root():
 def test_predict():
     """Test the predict endpoint returns a prediction."""
     client = TestClient(app)
-    resp = client.post("/predict", json={"input": "test"})
+    resp = client.post("/predict", json={"features": {"f0": 1.0, "f1": 2.0}})
     assert resp.status_code == 200
-    assert "Predicted value" in resp.json()["output"]
+    resp_data = resp.json()
+    assert "prediction" in resp_data
+    assert "confidence" in resp_data
+    assert "signal" in resp_data
 
 
 def test_learn_success():

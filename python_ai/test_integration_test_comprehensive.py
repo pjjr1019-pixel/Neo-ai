@@ -14,11 +14,13 @@ def test_root_endpoint():
 
 def test_predict_endpoint_valid():
     """Test the predict endpoint with valid input returns a prediction."""
-    payload = {"input": "test input"}
+    payload = {"features": {"f0": 1.0, "f1": 2.0}}
     resp = client.post("/predict", json=payload)
     assert resp.status_code == 200
-    assert "output" in resp.json()
-    assert "test input" in resp.json()["output"]
+    resp_data = resp.json()
+    assert "prediction" in resp_data
+    assert "confidence" in resp_data
+    assert "signal" in resp_data
 
 
 def test_predict_endpoint_invalid():
