@@ -11,6 +11,8 @@ app = FastAPI()
 
 
 class PredictInput(BaseModel):
+    """Input schema for /predict endpoint."""
+
     input: str
 
 
@@ -43,6 +45,8 @@ def learning_logic(data):
 
 
 class LearnInput(BaseModel):
+    """Input schema for /learn endpoint."""
+
     features: list
     target: int
 

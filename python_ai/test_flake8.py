@@ -23,6 +23,8 @@ def test_flake8_error_print(monkeypatch, capsys):
     """Test print output when flake8 errors are found."""
 
     class FakeResult:
+        """Fake subprocess result for simulating flake8 output."""
+
         returncode = 1
         stdout = "E999 syntax error"
 
@@ -40,6 +42,8 @@ def test_flake8_pass_print(monkeypatch, capsys):
     """Test print output when flake8 passes (no errors)."""
 
     class FakeResult:
+        """Fake result object for simulating flake8 output."""
+
         returncode = 0
         stdout = ""
 

@@ -1,11 +1,14 @@
-import os
 import subprocess
 
 
 def test_bandit_security():
     """Run bandit security checks on all Python files."""
     import shutil
-    bandit_path = shutil.which("bandit") or "bandit"
+    import pytest
+
+    bandit_path = shutil.which("bandit")
+    if not bandit_path:
+        pytest.skip("bandit is not installed or not found in PATH")
     bandit_args = [
         bandit_path,
         "-r",

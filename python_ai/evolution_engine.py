@@ -11,6 +11,8 @@ from typing import Any, Dict, List
 
 
 class Strategy:
+    """Strategy for evolutionary algorithm with parameters and performance."""
+
     def __init__(self, params: Dict[str, Any]) -> None:
         """
         Initialize a Strategy with parameters.
@@ -29,7 +31,7 @@ class Strategy:
         new_params: Dict[str, Any] = self.params.copy()
         # Example mutation: tweak thresholds slightly
         for k, v in new_params.items():
-            if isinstance(v, (int, float)):
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
                 new_params[k] += random.uniform(-0.1, 0.1) * v
         return Strategy(new_params)
 
@@ -47,6 +49,8 @@ class Strategy:
 
 
 class EvolutionEngine:
+    """Engine for running evolutionary optimization of strategies."""
+
     def explainable_evolution_report(self, previous_population=None) -> str:
         """
         Generate a human-readable report of the evolution process and
@@ -172,6 +176,8 @@ class EvolutionEngine:
             Dict mapping strategy to allocated resource.
         """
         # Gather performances, avoid None
+        if not self.population:
+            return {}
         performances: List[float] = [
             s.performance if s.performance is not None else 0.0
             for s in self.population
@@ -184,8 +190,12 @@ class EvolutionEngine:
         allocs = {}
         if total == 0:
             # Equal allocation if all performances are the same
+            if total_resource > n * min_alloc:
+                equal_share = total_resource / n
+            else:
+                equal_share = min_alloc
             for strat in self.population:
-                allocs[strat] = total_resource / n
+                allocs[strat] = equal_share
         else:
             for strat, perf in zip(self.population, shifted):
                 if total_resource > n * min_alloc:
@@ -254,6 +264,7 @@ class EvolutionEngine:
         Args:
             base_strategies: List of Strategy objects to start the population.
         """
+        self.base_strategies: List[Strategy] = base_strategies
         self.population: List[Strategy] = base_strategies
 
     def run_generation(self, data) -> None:

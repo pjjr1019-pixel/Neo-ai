@@ -111,3 +111,27 @@ def test_resource_monitor_main(monkeypatch):
     rm.log_resource_usage()
     # Assert log was called (line kept <80 chars)
     assert "log" in called
+
+
+# Additional coverage for utility functions
+def test_simulate_trading_invalid_signals():
+    """Test simulate_trading ignores unknown signals."""
+    # Should ignore unknown signals
+    prices = [100, 200]
+    signals = ["hold", "foo"]
+    result = simulate_trading(prices, signals)
+    assert result == 1000
+
+
+def test_sharpe_ratio_all_negative():
+    """Test sharpe_ratio returns float for all negative input."""
+    arr = np.array([-1, -2, -3])
+    ratio = sharpe_ratio(arr)
+    assert isinstance(ratio, float)
+
+
+def test_select_best_model_empty():
+    """Test select_best_model raises ValueError on empty metrics."""
+    # Should raise ValueError on empty metrics
+    with pytest.raises(ValueError):
+        select_best_model([])
