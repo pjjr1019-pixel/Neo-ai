@@ -1,10 +1,10 @@
 """Logger utilities and adapters."""
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Mapping, MutableMapping, Optional, Tuple
 
 
-class LoggerAdapter(logging.LoggerAdapter):
+class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
     """Enhanced logger adapter with extra context support.
 
     Allows adding structured context to log messages
@@ -26,9 +26,9 @@ class LoggerAdapter(logging.LoggerAdapter):
 
     def process(
         self,
-        msg: str,
-        kwargs: Dict[str, Any],
-    ) -> tuple:
+        msg: object,
+        kwargs: MutableMapping[str, Any],
+    ) -> Tuple[object, MutableMapping[str, Any]]:
         """Process log message with extra context.
 
         Args:
@@ -39,7 +39,8 @@ class LoggerAdapter(logging.LoggerAdapter):
             Processed message and kwargs tuple.
         """
         # Merge adapter extra with call-time extra
-        combined_extra = dict(self.extra)
+        extra_dict: Mapping[str, object] = self.extra or {}
+        combined_extra: Dict[str, Any] = dict(extra_dict)
         if "extra" in kwargs:
             combined_extra.update(kwargs["extra"])
         kwargs["extra"] = {"extra": combined_extra}
@@ -54,69 +55,10 @@ class LoggerAdapter(logging.LoggerAdapter):
         Returns:
             New LoggerAdapter with merged context.
         """
-        merged = dict(self.extra)
+        extra_dict: Mapping[str, object] = self.extra or {}
+        merged: Dict[str, Any] = dict(extra_dict)
         merged.update(context)
         return LoggerAdapter(self.logger, merged)
-
-    def debug(
-        self,
-        msg: str,
-        *args: Any,
-        exc_info: Any = None,
-        **kwargs: Any,
-    ) -> None:
-        """Log debug message."""
-        self.log(logging.DEBUG, msg, *args, exc_info=exc_info, **kwargs)
-
-    def info(
-        self,
-        msg: str,
-        *args: Any,
-        exc_info: Any = None,
-        **kwargs: Any,
-    ) -> None:
-        """Log info message."""
-        self.log(logging.INFO, msg, *args, exc_info=exc_info, **kwargs)
-
-    def warning(
-        self,
-        msg: str,
-        *args: Any,
-        exc_info: Any = None,
-        **kwargs: Any,
-    ) -> None:
-        """Log warning message."""
-        self.log(logging.WARNING, msg, *args, exc_info=exc_info, **kwargs)
-
-    def error(
-        self,
-        msg: str,
-        *args: Any,
-        exc_info: Any = None,
-        **kwargs: Any,
-    ) -> None:
-        """Log error message."""
-        self.log(logging.ERROR, msg, *args, exc_info=exc_info, **kwargs)
-
-    def critical(
-        self,
-        msg: str,
-        *args: Any,
-        exc_info: Any = None,
-        **kwargs: Any,
-    ) -> None:
-        """Log critical message."""
-        self.log(logging.CRITICAL, msg, *args, exc_info=exc_info, **kwargs)
-
-    def exception(
-        self,
-        msg: str,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        """Log exception with traceback."""
-        kwargs["exc_info"] = True
-        self.error(msg, *args, **kwargs)
 
 
 _loggers: Dict[str, LoggerAdapter] = {}
