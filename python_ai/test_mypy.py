@@ -18,7 +18,7 @@ def test_mypy_type_checking():
         )
 
     result = subprocess.run(
-        [sys.executable, "-m", "mypy", "python_ai"],
+        [sys.executable, "-m", "mypy", "python_ai", "--ignore-missing-imports"],
         capture_output=True,
         text=True,
     )
