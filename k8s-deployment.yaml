@@ -1,0 +1,272 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: neo-trading
+  labels:
+    name: neo-trading
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: neo-config
+  namespace: neo-trading
+data:
+  LOG_LEVEL: "INFO"
+  NEO_ENV: "production"
+  PYTHONUNBUFFERED: "1"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: neo-db-credentials
+  namespace: neo-trading
+type: Opaque
+stringData:
+  postgres-username: neo_user
+  postgres-password: neo_secure_password
+  postgres-db: neo_trading_db
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neo-data-pvc
+  namespace: neo-trading
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo-ai-service
+  namespace: neo-trading
+  labels:
+    app: neo-ai-service
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: neo-ai-service
+  template:
+    metadata:
+      labels:
+        app: neo-ai-service
+        version: v1
+    spec:
+      serviceAccountName: neo-sa
+      containers:
+      - name: neo-ai-service
+        image: neo-ai-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: neo-config
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: neo-db-credentials
+              key: postgres-username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: neo-db-credentials
+              key: postgres-password
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@neo-postgres:5432/neo_trading_db"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+        - name: neo-data
+          mountPath: /app/data
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+      volumes:
+      - name: neo-data
+        persistentVolumeClaim:
+          claimName: neo-data-pvc
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - neo-ai-service
+              topologyKey: kubernetes.io/hostname
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo-ai-service
+  namespace: neo-trading
+  labels:
+    app: neo-ai-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: neo-ai-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo-ai-service-lb
+  namespace: neo-trading
+  labels:
+    app: neo-ai-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: neo-ai-service
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: neo-sa
+  namespace: neo-trading
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: neo-role
+  namespace: neo-trading
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: neo-rolebinding
+  namespace: neo-trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: neo-role
+subjects:
+- kind: ServiceAccount
+  name: neo-sa
+  namespace: neo-trading
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: neo-ai-service-hpa
+  namespace: neo-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: neo-ai-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 4
+        periodSeconds: 15
+      selectPolicy: Max
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: neo-ai-service-pdb
+  namespace: neo-trading
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: neo-ai-service
