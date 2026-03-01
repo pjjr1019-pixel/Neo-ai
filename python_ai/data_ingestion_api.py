@@ -266,9 +266,9 @@ class DataIngestionAPI:
                 append=True,
             )
 
-            self.ingestion_stats[symbol] = self.ingestion_stats.get(symbol, 0) + len(
-                valid_candles
-            )
+            self.ingestion_stats[symbol] = self.ingestion_stats.get(
+                symbol, 0
+            ) + len(valid_candles)
 
             return {
                 "success": success,

@@ -164,7 +164,9 @@ class AutonomousTradingLoop:
             symbol: 0.02 for symbol in symbols
         }
 
-    def _update_price_history(self, symbol: str, candle: Dict[str, float]) -> None:
+    def _update_price_history(
+        self, symbol: str, candle: Dict[str, float]
+    ) -> None:
         """Update rolling price history for feature computation.
 
         Args:
@@ -263,7 +265,9 @@ class AutonomousTradingLoop:
 
         try:
             while self.is_running:
-                if duration_seconds and (time.time() - start_time > duration_seconds):
+                if duration_seconds and (
+                    time.time() - start_time > duration_seconds
+                ):
                     break
 
                 for symbol in self.symbols:
@@ -278,7 +282,8 @@ class AutonomousTradingLoop:
         finally:
             self.is_running = False
             print(
-                f"Trading loop stopped. Executed {len(self.trades_executed)}" f" trades"
+                f"Trading loop stopped. Executed {len(self.trades_executed)}"
+                f" trades"
             )
 
     def stop(self) -> None:
