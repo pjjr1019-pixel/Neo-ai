@@ -9,7 +9,7 @@ import logging
 from contextlib import asynccontextmanager, contextmanager
 from typing import AsyncGenerator, Generator, Optional
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -49,10 +49,12 @@ class DatabaseManager:
     def __init__(self) -> None:
         """Initialize database manager (only once due to singleton)."""
         if not DatabaseManager._initialized:
-            self._sync_engine: Optional[object] = None
+            self._sync_engine: Optional[Engine] = None
             self._async_engine: Optional[AsyncEngine] = None
-            self._sync_session_factory: Optional[sessionmaker] = None
-            self._async_session_factory: Optional[async_sessionmaker] = None
+            self._sync_session_factory: Optional[sessionmaker[Session]] = None
+            self._async_session_factory: Optional[
+                async_sessionmaker[AsyncSession]
+            ] = None
             DatabaseManager._initialized = True
 
     def init_sync_engine(self, testing: bool = False) -> None:
