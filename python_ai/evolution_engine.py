@@ -122,6 +122,13 @@ class EvolutionEngine:
             Dict mapping strategy to average score.
         """
         n: int = len(self.population)
+        # Need at least 2 strategies for coevolution
+        if n < 2:
+            # Assign zero performance to single/empty population
+            for strat in self.population:
+                strat.performance = 0.0
+            return {strat: 0.0 for strat in self.population}
+
         scores: Dict[Strategy, float] = {
             strat: 0.0 for strat in self.population
         }
@@ -319,9 +326,11 @@ class EvolutionEngine:
                     "Data must be a non-empty sequence for cross-validation."
                 )
             n: int = len(data)
-            fold_size: int = max(1, n // k_folds)
+            # Cap k_folds at data size
+            actual_k_folds: int = min(k_folds, n)
+            fold_size: int = max(1, n // actual_k_folds)
             results = []
-            for i in range(k_folds):
+            for i in range(actual_k_folds):
                 start: int = i * fold_size
                 end: int = start + fold_size if i < k_folds - 1 else n
                 val_idx: List[int] = list(range(start, end))
