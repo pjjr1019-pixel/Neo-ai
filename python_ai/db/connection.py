@@ -138,7 +138,8 @@ class DatabaseManager:
         """
         if self._sync_engine is None:
             self.init_sync_engine(testing=testing)
-        Base.metadata.create_all(bind=self._sync_engine)
+        engine = self._sync_engine
+        Base.metadata.create_all(bind=engine)  # type: ignore
         logger.info("Database tables created")
 
     async def create_tables_async(self) -> None:

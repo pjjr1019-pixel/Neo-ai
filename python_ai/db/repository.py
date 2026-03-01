@@ -194,9 +194,10 @@ class TrainingSessionRepository:
         Returns:
             TrainingSession: Updated training session.
         """
-        training_session.completed_at = datetime.utcnow()
-        training_session.status = status
-        training_session.error_message = error_message
+        now = datetime.utcnow()
+        training_session.completed_at = now  # type: ignore
+        training_session.status = status  # type: ignore
+        training_session.error_message = error_message  # type: ignore
         session.flush()
         return training_session
 
