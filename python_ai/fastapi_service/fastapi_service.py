@@ -5,14 +5,22 @@ Exposes root, predict, learn, metrics, and explain endpoints.
 Uses real ML model for predictions with confidence calibration.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from python_ai.data_pipeline import get_pipeline
 from python_ai.ml_model import get_model
 
 app = FastAPI()
+
+
+class ComputeFeaturesInput(BaseModel):
+    """Input schema for /compute-features endpoint."""
+
+    symbol: str
+    ohlcv_data: Dict[str, List[float]]
 
 
 class PredictInput(BaseModel):
@@ -25,6 +33,24 @@ class PredictInput(BaseModel):
 def root():
     """Root endpoint returns service status message."""
     return {"message": "NEO Hybrid AI Service is running."}
+
+
+@app.post("/compute-features")
+def compute_features(
+    payload: ComputeFeaturesInput,
+) -> Dict[str, float]:
+    """Compute features from raw OHLCV price data.
+
+    Args:
+        payload: ComputeFeaturesInput with symbol and OHLCV data.
+
+    Returns:
+        Dict with f0-f9 feature keys and normalized float values.
+    """
+    pipeline = get_pipeline()
+    pipeline.update_price_data(payload.symbol, payload.ohlcv_data)
+    features = pipeline.compute_features(payload.symbol)
+    return features
 
 
 @app.post("/predict")
