@@ -71,9 +71,7 @@ class DataValidator:
             if prices[i - 1] == 0:
                 continue
 
-            price_change = abs(
-                (prices[i] - prices[i - 1]) / prices[i - 1]
-            )
+            price_change = abs((prices[i] - prices[i - 1]) / prices[i - 1])
             if price_change > max_price_jump:
                 return False
 
@@ -200,9 +198,7 @@ class HistoricalDataStore:
             print(f"Failed to load candles for {symbol}: {e}")
             return []
 
-    def get_latest_candle(
-        self, symbol: str
-    ) -> Optional[Dict[str, float]]:
+    def get_latest_candle(self, symbol: str) -> Optional[Dict[str, float]]:
         """Get the latest candle for a symbol.
 
         Args:
@@ -256,9 +252,7 @@ class DataIngestionAPI:
 
         if valid_candles:
             close_prices = [c["close"] for c in valid_candles]
-            if not self.validator.validate_price_series(
-                close_prices
-            ):
+            if not self.validator.validate_price_series(close_prices):
                 return {
                     "success": False,
                     "message": "Price series validation failed",
@@ -272,9 +266,8 @@ class DataIngestionAPI:
                 append=True,
             )
 
-            self.ingestion_stats[symbol] = (
-                self.ingestion_stats.get(symbol, 0)
-                + len(valid_candles)
+            self.ingestion_stats[symbol] = self.ingestion_stats.get(symbol, 0) + len(
+                valid_candles
             )
 
             return {
@@ -308,9 +301,7 @@ class DataIngestionAPI:
         """
         return self.store.load_candles(symbol, limit=limit)
 
-    def get_data_statistics(
-        self, symbol: str
-    ) -> Dict[str, Any]:
+    def get_data_statistics(self, symbol: str) -> Dict[str, Any]:
         """Get statistics for ingested data.
 
         Args:
@@ -351,9 +342,7 @@ class DataIngestionAPI:
         total_candles = sum(self.ingestion_stats.values())
         return {
             "total_candles_ingested": total_candles,
-            "symbols_processed": list(
-                self.ingestion_stats.keys()
-            ),
+            "symbols_processed": list(self.ingestion_stats.keys()),
             "ingestion_stats": self.ingestion_stats.copy(),
         }
 

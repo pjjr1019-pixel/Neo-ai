@@ -5,9 +5,7 @@ Covers simulated data generation, trading cycle execution,
 statistics tracking, and loop control.
 """
 
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import MagicMock
 
 from python_ai.autonomous_trading_loop import (
     AutonomousTradingLoop,
@@ -21,9 +19,7 @@ class TestSimulatedMarketDataFeed:
 
     def test_feed_initialization(self) -> None:
         """Test market feed initializes correctly."""
-        feed = SimulatedMarketDataFeed(
-            initial_price=100.0, volatility=0.02
-        )
+        feed = SimulatedMarketDataFeed(initial_price=100.0, volatility=0.02)
         assert feed.initial_price == 100.0
         assert feed.volatility == 0.02
         assert feed.current_price == 100.0
@@ -46,9 +42,7 @@ class TestSimulatedMarketDataFeed:
 
     def test_price_random_walk(self) -> None:
         """Test that generated prices follow random walk."""
-        feed = SimulatedMarketDataFeed(
-            initial_price=100.0, volatility=0.01
-        )
+        feed = SimulatedMarketDataFeed(initial_price=100.0, volatility=0.01)
         prices = []
         for _ in range(10):
             candle = feed.get_latest_candle("BTC/USD")
@@ -84,9 +78,7 @@ class TestAutonomousTradingLoop:
         orchestrator = MagicMock()
         symbols = ["BTC/USD", "ETH/USD"]
 
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, symbols
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, symbols)
         assert loop.data_feed is feed
         assert loop.orchestrator is orchestrator
         assert loop.symbols == symbols
@@ -98,9 +90,7 @@ class TestAutonomousTradingLoop:
         """Test price history is maintained."""
         feed = SimulatedMarketDataFeed()
         orchestrator = MagicMock()
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
 
         candle = {
             "open": 100.0,
@@ -118,13 +108,9 @@ class TestAutonomousTradingLoop:
         """Test volatility calculation from prices."""
         feed = SimulatedMarketDataFeed()
         orchestrator = MagicMock()
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
 
-        loop.last_prices["BTC/USD"] = [
-            100.0, 101.0, 99.0, 101.5, 100.5
-        ]
+        loop.last_prices["BTC/USD"] = [100.0, 101.0, 99.0, 101.5, 100.5]
         volatility = loop._estimate_volatility("BTC/USD")
         assert 0.0 <= volatility <= 1.0
 
@@ -139,9 +125,7 @@ class TestAutonomousTradingLoop:
             "prediction": 101.5,
         }
 
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
         loop.last_prices["BTC/USD"] = [100.0 + i for i in range(20)]
 
         result = loop._execute_trading_cycle("BTC/USD")
@@ -154,9 +138,7 @@ class TestAutonomousTradingLoop:
         """Test trading cycle with insufficient price history."""
         feed = SimulatedMarketDataFeed()
         orchestrator = MagicMock()
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
 
         loop.last_prices["BTC/USD"] = [100.0]
         result = loop._execute_trading_cycle("BTC/USD")
@@ -173,9 +155,7 @@ class TestAutonomousTradingLoop:
             "prediction": 101.5,
         }
 
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
         loop.last_prices["BTC/USD"] = [100.0 + i for i in range(20)]
         loop._execute_trading_cycle("BTC/USD")
 
@@ -196,13 +176,9 @@ class TestAutonomousTradingLoop:
                 "prediction": 101.5,
             }
 
-        orchestrator.execute_autonomous_cycle.side_effect = (
-            side_effect
-        )
+        orchestrator.execute_autonomous_cycle.side_effect = side_effect
 
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
         loop.last_prices["BTC/USD"] = [100.0 + i for i in range(20)]
         loop._execute_trading_cycle("BTC/USD")
 
@@ -216,9 +192,7 @@ class TestAutonomousTradingLoop:
         """Test statistics with no trades."""
         feed = SimulatedMarketDataFeed()
         orchestrator = MagicMock()
-        loop = AutonomousTradingLoop(
-            feed, orchestrator, ["BTC/USD"]
-        )
+        loop = AutonomousTradingLoop(feed, orchestrator, ["BTC/USD"])
 
         stats = loop.get_statistics()
         assert stats["total_trades"] == 0

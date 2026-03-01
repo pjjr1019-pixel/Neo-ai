@@ -15,9 +15,7 @@ import numpy as np
 class MarketDataFeed:
     """Abstract base class for market data feeds."""
 
-    def get_latest_candle(
-        self, symbol: str
-    ) -> Optional[Dict[str, float]]:
+    def get_latest_candle(self, symbol: str) -> Optional[Dict[str, float]]:
         """Get the latest OHLCV candle for a symbol.
 
         Args:
@@ -70,9 +68,7 @@ class SimulatedMarketDataFeed(MarketDataFeed):
         self.subscriptions: Dict[str, List[Callable]] = {}
         self.is_running = True
 
-    def get_latest_candle(
-        self, symbol: str
-    ) -> Optional[Dict[str, float]]:
+    def get_latest_candle(self, symbol: str) -> Optional[Dict[str, float]]:
         """Generate a simulated candle with random walk.
 
         Args:
@@ -168,9 +164,7 @@ class AutonomousTradingLoop:
             symbol: 0.02 for symbol in symbols
         }
 
-    def _update_price_history(
-        self, symbol: str, candle: Dict[str, float]
-    ) -> None:
+    def _update_price_history(self, symbol: str, candle: Dict[str, float]) -> None:
         """Update rolling price history for feature computation.
 
         Args:
@@ -269,9 +263,7 @@ class AutonomousTradingLoop:
 
         try:
             while self.is_running:
-                if duration_seconds and (
-                    time.time() - start_time > duration_seconds
-                ):
+                if duration_seconds and (time.time() - start_time > duration_seconds):
                     break
 
                 for symbol in self.symbols:
@@ -285,8 +277,9 @@ class AutonomousTradingLoop:
             print("Trading loop interrupted by user")
         finally:
             self.is_running = False
-            print(f"Trading loop stopped. Executed {len(self.trades_executed)}"
-                  f" trades")
+            print(
+                f"Trading loop stopped. Executed {len(self.trades_executed)}" f" trades"
+            )
 
     def stop(self) -> None:
         """Stop the trading loop."""
@@ -307,23 +300,15 @@ class AutonomousTradingLoop:
             }
 
         trades = self.trades_executed
-        buy_trades = [
-            t for t in trades if t["signal"] == "BUY"
-        ]
-        sell_trades = [
-            t for t in trades if t["signal"] == "SELL"
-        ]
-        avg_conf = np.mean(
-            [t["confidence"] for t in trades]
-        )
+        buy_trades = [t for t in trades if t["signal"] == "BUY"]
+        sell_trades = [t for t in trades if t["signal"] == "SELL"]
+        avg_conf = np.mean([t["confidence"] for t in trades])
 
         return {
             "total_trades": len(trades),
             "buy_signals": len(buy_trades),
             "sell_signals": len(sell_trades),
-            "hold_signals": len(
-                [t for t in trades if t["signal"] == "HOLD"]
-            ),
+            "hold_signals": len([t for t in trades if t["signal"] == "HOLD"]),
             "avg_confidence": float(avg_conf),
             "symbols_traded": list(set(t["symbol"] for t in trades)),
         }
@@ -351,6 +336,7 @@ def get_autonomous_trading_loop(
         from python_ai.orchestrator_integration import (
             get_orchestrator_integration,
         )
+
         orchestrator_integration = get_orchestrator_integration()
 
     if symbols is None:
