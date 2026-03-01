@@ -4,13 +4,13 @@ Tests for Data Ingestion API.
 Covers data validation, historical storage, and ingestion workflows.
 """
 
-import tempfile
 import shutil
+import tempfile
 
 from python_ai.data_ingestion_api import (
+    DataIngestionAPI,
     DataValidator,
     HistoricalDataStore,
-    DataIngestionAPI,
     get_data_ingestion_api,
 )
 

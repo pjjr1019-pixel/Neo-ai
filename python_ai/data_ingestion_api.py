@@ -5,10 +5,10 @@ Handles real OHLCV data ingestion from market sources, validation,
 and historical data storage for backtesting and model training.
 """
 
-from typing import Any, Dict, List, Optional
 import csv
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 

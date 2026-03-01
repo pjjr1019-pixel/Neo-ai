@@ -26,13 +26,11 @@ def test_root():
 def test_predict_invalid():
     """
     Test predict endpoint with invalid input.
-    Ensures the endpoint returns a valid response and output key.
+    Ensures the endpoint returns a 422 validation error for bad schema.
     """
     client = TestClient(app)
     response = client.post("/predict", json={"input": "test"})
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert "output" in data
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_metrics_endpoint():

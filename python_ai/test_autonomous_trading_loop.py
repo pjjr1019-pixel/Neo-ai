@@ -170,6 +170,7 @@ class TestAutonomousTradingLoop:
         orchestrator = MagicMock()
 
         def side_effect(*args, **kwargs):
+            """Return mock trading cycle result."""
             return {
                 "symbol": "BTC/USD",
                 "signal": "BUY",

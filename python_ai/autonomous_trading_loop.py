@@ -5,9 +5,9 @@ Provides streaming OHLCV data from market sources or simulations.
 Supports live trading data feeds and historical data replay.
 """
 
-from typing import Any, Callable, Dict, List, Optional
 import time
 from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 
