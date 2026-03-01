@@ -4,6 +4,7 @@ Ensures full flake8 compliance and adherence to project coding policy.
 """
 
 import pytest
+
 from python_ai.evolution_engine import EvolutionEngine, Strategy
 
 

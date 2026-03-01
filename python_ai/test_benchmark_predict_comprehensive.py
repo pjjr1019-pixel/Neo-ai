@@ -1,7 +1,9 @@
 import asyncio
 import time
-import python_ai.benchmark_predict as bp
+
 import pytest
+
+import python_ai.benchmark_predict as bp
 
 
 class DummyResponse:

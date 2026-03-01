@@ -4,6 +4,7 @@ import subprocess
 def test_bandit_security():
     """Run bandit security checks on all Python files."""
     import shutil
+
     import pytest
 
     bandit_path = shutil.which("bandit")

@@ -7,7 +7,6 @@ All tests are flake8-compliant and include docstrings.
 import tempfile
 import threading
 
-
 import python_ai.resource_monitor as rm
 
 
@@ -162,6 +161,7 @@ def test_log_resource_usage_import_side_effect(monkeypatch):
     automatically.
     """
     import importlib
+
     import python_ai.resource_monitor as rm2
 
     importlib.reload(rm2)
