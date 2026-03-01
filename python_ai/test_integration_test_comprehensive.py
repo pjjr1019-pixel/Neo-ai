@@ -30,11 +30,11 @@ def test_predict_endpoint_invalid():
 
 
 def test_learn_endpoint_valid():
-    """Test the learn endpoint with valid input triggers learning."""
-    payload = {"features": [1, 2, 3], "target": 1}
+    """Test the learn endpoint with valid input buffers sample."""
+    payload = {"features": [1, 2, 3], "target": 1.0}
     resp = client.post("/learn", json=payload)
     assert resp.status_code == 200
-    assert resp.json()["status"] == "learning triggered"
+    assert resp.json()["status"] == "buffered"
 
 
 def test_learn_endpoint_invalid():
@@ -48,10 +48,10 @@ def test_learn_endpoint_invalid():
 
 
 def test_metrics_endpoint():
-    """Test the metrics endpoint returns request count."""
+    """Test the metrics endpoint returns request counts."""
     resp = client.get("/metrics")
     assert resp.status_code == 200
-    assert "request_count" in resp.json()
+    assert "request_counts" in resp.json()
 
 
 def test_explain_endpoint():

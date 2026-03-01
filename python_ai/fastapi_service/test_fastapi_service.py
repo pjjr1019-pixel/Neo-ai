@@ -42,8 +42,9 @@ def test_metrics_endpoint():
     response = client.get("/metrics")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert "request_count" in data
-    assert isinstance(data["request_count"], int)
+    assert "request_counts" in data
+    assert isinstance(data["request_counts"], dict)
+    assert "total_requests" in data
 
 
 def test_explain_endpoint():

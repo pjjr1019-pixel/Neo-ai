@@ -23,28 +23,34 @@ def test_predict():
 
 
 def test_learn_success():
-    """Test the learn endpoint with valid input triggers learning."""
+    """Test the learn endpoint with valid input buffers sample."""
     client = TestClient(app)
-    payload = {"features": [1, 2, 3], "target": 1}
+    payload = {"features": [1, 2, 3], "target": 1.0}
     resp = client.post("/learn", json=payload)
     assert resp.status_code == 200
-    assert resp.json()["status"] == "learning triggered"
+    assert resp.json()["status"] == "buffered"
 
 
 def test_learn_error_cases():
     """Test the learn endpoint with invalid input returns error status."""
     logic = get_learning_logic()
-    assert logic(None)["status"] == "error"
-    assert logic({"features": "notalist", "target": 1})["status"] == "error"
-    assert logic({"features": [1, 2, 3]})["status"] == "error"
+    result_none = logic(None)
+    assert result_none["status"] == "error"
+    result_bad_feats = logic(
+        {"features": "notalist", "target": 1},
+    )
+    assert result_bad_feats["status"] == "error"
+    result_no_target = logic({"features": [1, 2, 3]})
+    assert result_no_target["status"] == "error"
 
 
 def test_metrics():
-    """Test the metrics endpoint returns request count."""
+    """Test the metrics endpoint returns request counts."""
     client = TestClient(app)
     resp = client.get("/metrics")
     assert resp.status_code == 200
-    assert "request_count" in resp.json()
+    assert "request_counts" in resp.json()
+    assert "total_requests" in resp.json()
 
 
 def test_explain():

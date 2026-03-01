@@ -3,8 +3,10 @@ Machine Learning Model for NEO Hybrid AI.
 
 Provides a real ML model for price prediction with ensemble methods,
 confidence calibration, and model persistence.
+Supports both synthetic demo training and real market data training.
 """
 
+import logging
 import os
 import pickle
 import warnings
@@ -12,10 +14,14 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Suppress sklearn warnings
 warnings.filterwarnings("ignore", category=UserWarning)
+
+logger = logging.getLogger(__name__)
 
 
 class MLModel:
@@ -35,6 +41,8 @@ class MLModel:
         self.gb_model: Optional[GradientBoostingRegressor] = None
         self.scaler: Optional[StandardScaler] = None
         self.is_trained = False
+        self.training_metrics: Dict[str, Any] = {}
+        self.train_count: int = 0
 
         if os.path.exists(self.model_path):
             self.load()
@@ -83,6 +91,77 @@ class MLModel:
 
         self.is_trained = True
         self.save()
+
+    def train(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        test_size: float = 0.2,
+    ) -> Dict[str, Any]:
+        """Train models on real market data.
+
+        Replaces synthetic training with actual feature matrices
+        produced by TrainingDataBuilder.
+
+        Args:
+            X: Feature matrix of shape (n_samples, n_features).
+            y: Target array of shape (n_samples,).
+            test_size: Fraction held out for evaluation.
+
+        Returns:
+            Dict with training metrics (r2, mse, samples, etc.).
+        """
+        if X.shape[0] < 10:
+            raise ValueError(f"Need >= 10 samples to train, got {X.shape[0]}")
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X,
+            y,
+            test_size=test_size,
+            random_state=42,
+        )
+
+        self._initialize_models()
+
+        assert self.scaler is not None
+        X_train_scaled = self.scaler.fit_transform(X_train)
+        X_test_scaled = self.scaler.transform(X_test)
+
+        assert self.rf_model is not None
+        assert self.gb_model is not None
+        self.rf_model.fit(X_train_scaled, y_train)
+        self.gb_model.fit(X_train_scaled, y_train)
+
+        # Evaluate on held-out set
+        rf_pred = self.rf_model.predict(X_test_scaled)
+        gb_pred = self.gb_model.predict(X_test_scaled)
+        ensemble_pred = (rf_pred + gb_pred) / 2.0
+
+        metrics: Dict[str, Any] = {
+            "r2_rf": float(r2_score(y_test, rf_pred)),
+            "r2_gb": float(r2_score(y_test, gb_pred)),
+            "r2_ensemble": float(r2_score(y_test, ensemble_pred)),
+            "mse_rf": float(mean_squared_error(y_test, rf_pred)),
+            "mse_gb": float(mean_squared_error(y_test, gb_pred)),
+            "mse_ensemble": float(mean_squared_error(y_test, ensemble_pred)),
+            "train_samples": int(X_train.shape[0]),
+            "test_samples": int(X_test.shape[0]),
+            "n_features": int(X.shape[1]),
+        }
+
+        self.training_metrics = metrics
+        self.train_count += 1
+        self.is_trained = True
+        self.save()
+
+        logger.info(
+            "Model trained on %d samples  |  R² ensemble=%.4f  "
+            "MSE ensemble=%.6f",
+            X.shape[0],
+            metrics["r2_ensemble"],
+            metrics["mse_ensemble"],
+        )
+        return metrics
 
     def predict(self, features: Dict[str, float]) -> Tuple[float, float, str]:
         """Make a prediction with confidence.
@@ -138,6 +217,8 @@ class MLModel:
                     "gb_model": self.gb_model,
                     "scaler": self.scaler,
                     "is_trained": self.is_trained,
+                    "training_metrics": self.training_metrics,
+                    "train_count": self.train_count,
                 },
                 f,
             )
@@ -151,6 +232,11 @@ class MLModel:
                 self.gb_model = data["gb_model"]
                 self.scaler = data["scaler"]
                 self.is_trained = data["is_trained"]
+                self.training_metrics = data.get(
+                    "training_metrics",
+                    {},
+                )
+                self.train_count = data.get("train_count", 0)
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}") from e
 

@@ -7,10 +7,15 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 """
 
 import copy
+import logging
 import random
 from typing import Any, Dict, List, Optional
 
+import optuna
+
 from python_ai.backtesting_engine import get_backtesting_engine
+
+logger = logging.getLogger(__name__)
 
 
 class Strategy:
@@ -430,29 +435,49 @@ class EvolutionEngine:
     def bayesian_hyperparameter_optimization(
         self, data=None, n_iter: int = 10
     ) -> None:
-        """
-        Stub for Bayesian optimization of hyperparameters.
+        """Bayesian optimization of strategy hyperparameters via Optuna TPE.
+
+        Uses Tree-structured Parzen Estimator (TPE) to efficiently
+        search the strategy parameter space instead of random sampling.
+
         Args:
-            data: Input data for evaluation.
-            n_iter: Number of iterations.
+            data: Input data for evaluation (passed to Strategy.evaluate).
+            n_iter: Number of Optuna trials to run.
         """
-        """
-        Stub for Bayesian optimization of hyperparameters
-        (replace with e.g. skopt or optuna for real use).
-        """
-        best: Optional[Strategy] = None
-        best_perf: float = float("-inf")
-        for _ in range(n_iter):
+        optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+        def objective(trial: optuna.Trial) -> float:
+            """Single Optuna trial: sample params → evaluate."""
             params: Dict[str, float] = {
-                "threshold": random.uniform(0, 1),  # nosec: B311
-                "stop_loss": random.uniform(0, 0.5),  # nosec: B311
+                "threshold": trial.suggest_float(
+                    "threshold",
+                    0.0,
+                    1.0,
+                ),
+                "stop_loss": trial.suggest_float(
+                    "stop_loss",
+                    0.01,
+                    0.5,
+                ),
             }
             strat = Strategy(params)
-            perf: float = strat.evaluate(data)
-            if perf > best_perf:
-                best = strat
-                best_perf = perf
-        self.population = [best] if best is not None else []
+            return strat.evaluate(data)
+
+        study = optuna.create_study(direction="maximize")
+        study.optimize(objective, n_trials=n_iter)
+
+        best_params = study.best_params
+        best_strat = Strategy(best_params)
+        best_strat.evaluate(data)
+        self.population = [best_strat]
+
+        logger.info(
+            "Bayesian optimization complete: best_value=%.4f  "
+            "params=%s  trials=%d",
+            study.best_value,
+            best_params,
+            len(study.trials),
+        )
 
     # Example usage
     if __name__ == "__main__":

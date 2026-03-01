@@ -20,16 +20,16 @@ def test_predict_and_learn_integration_v2() -> None:
     assert "signal" in resp_data
 
     # Test /learn endpoint
-    learn_payload = {"features": [1, 2, 3], "target": 1}
+    learn_payload = {"features": [1, 2, 3], "target": 1.0}
     learn_resp = client.post("/learn", json=learn_payload)
     assert learn_resp.status_code == 200
-    assert learn_resp.json()["status"] == "learning triggered"
+    assert learn_resp.json()["status"] == "buffered"
 
     # Test /metrics endpoint
     metrics_resp = client.get("/metrics")
     assert metrics_resp.status_code == 200
     metrics_data = metrics_resp.json()
-    assert "request_count" in metrics_data
+    assert "request_counts" in metrics_data
 
 
 def test_root_endpoint() -> None:
@@ -40,10 +40,10 @@ def test_root_endpoint() -> None:
 
 
 def test_learn_endpoint_valid() -> None:
-    """Test /learn endpoint with valid payload returns learning triggered."""
-    resp = client.post("/learn", json={"features": [1, 2], "target": 1})
+    """Test /learn endpoint with valid payload buffers sample."""
+    resp = client.post("/learn", json={"features": [1, 2], "target": 1.0})
     assert resp.status_code == 200
-    assert resp.json()["status"] == "learning triggered"
+    assert resp.json()["status"] == "buffered"
 
 
 def test_learn_endpoint_invalid():
@@ -57,10 +57,10 @@ def test_learn_endpoint_invalid():
 
 
 def test_metrics_endpoint():
-    """Test /metrics endpoint returns request count."""
+    """Test /metrics endpoint returns request counts."""
     resp = client.get("/metrics")
     assert resp.status_code == 200
-    assert "request_count" in resp.json()
+    assert "request_counts" in resp.json()
 
 
 def test_explain_endpoint():
