@@ -85,8 +85,8 @@ def setup_logging(config: Optional[LogConfig] = None) -> logging.Logger:
         Root logger instance.
     """
     from python_ai.logging.handlers import (
-        JSONFormatter,
         ColoredFormatter,
+        JSONFormatter,
         RotatingJSONFileHandler,
     )
 

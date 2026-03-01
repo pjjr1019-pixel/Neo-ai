@@ -6,9 +6,10 @@ Uses SQLite in-memory database for isolation.
 """
 
 import os
-import pytest
 from datetime import datetime
 from unittest.mock import patch
+
+import pytest
 
 # Set testing environment before imports
 os.environ["DB_ECHO"] = "false"
@@ -451,7 +452,7 @@ class TestConvenienceFunctions:
 
     def test_init_db(self):
         """Test init_db convenience function."""
-        from python_ai.db.connection import DatabaseManager, init_db, close_db
+        from python_ai.db.connection import DatabaseManager, close_db, init_db
 
         DatabaseManager.reset()
         manager = init_db(testing=True)
@@ -462,8 +463,8 @@ class TestConvenienceFunctions:
         """Test get_db_manager function."""
         from python_ai.db.connection import (
             DatabaseManager,
-            get_db_manager,
             close_db,
+            get_db_manager,
         )
 
         DatabaseManager.reset()

@@ -9,13 +9,13 @@ from datetime import datetime
 from typing import Any, Dict
 
 from sqlalchemy import (
+    JSON,
     Column,
     DateTime,
     Float,
     ForeignKey,
     Index,
     Integer,
-    JSON,
     String,
     Text,
 )

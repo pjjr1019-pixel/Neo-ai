@@ -5,21 +5,21 @@ Provides async PostgreSQL connection pooling, session management,
 and ORM models for data persistence.
 """
 
+from python_ai.db.config import DatabaseConfig, get_database_url
 from python_ai.db.connection import (
-    get_db,
-    get_async_db,
-    init_db,
-    close_db,
     DatabaseManager,
+    close_db,
+    get_async_db,
+    get_db,
+    init_db,
 )
 from python_ai.db.models import (
     Base,
+    FeatureImportance,
+    ModelMetrics,
     Prediction,
     TrainingSession,
-    ModelMetrics,
-    FeatureImportance,
 )
-from python_ai.db.config import DatabaseConfig, get_database_url
 
 __all__ = [
     "get_db",
