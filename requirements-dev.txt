@@ -3,3 +3,5 @@ pytest-asyncio
 fastapi
 httpx
 numpy
+mypy
+types-psutil
