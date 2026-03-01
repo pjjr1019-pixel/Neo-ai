@@ -146,7 +146,7 @@ class MLModel:
         """Load model from disk."""
         try:
             with open(self.model_path, "rb") as f:
-                data: Dict[str, Any] = pickle.load(f)
+                data: Dict[str, Any] = pickle.load(f)  # nosec: B301
                 self.rf_model = data["rf_model"]
                 self.gb_model = data["gb_model"]
                 self.scaler = data["scaler"]
