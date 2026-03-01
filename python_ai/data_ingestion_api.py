@@ -171,7 +171,7 @@ class HistoricalDataStore:
             List of OHLCV candles.
         """
         file_path = self.data_dir / f"{symbol}.csv"
-        candles = []
+        candles: List[Dict[str, float]] = []
 
         if not file_path.exists():
             return candles

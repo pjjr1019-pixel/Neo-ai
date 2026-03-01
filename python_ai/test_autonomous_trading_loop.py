@@ -46,6 +46,7 @@ class TestSimulatedMarketDataFeed:
         prices = []
         for _ in range(10):
             candle = feed.get_latest_candle("BTC/USD")
+            assert candle is not None
             prices.append(candle["close"])
 
         assert len(prices) == 10
