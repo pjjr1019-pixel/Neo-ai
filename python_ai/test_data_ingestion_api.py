@@ -4,8 +4,6 @@ Tests for Data Ingestion API.
 Covers data validation, historical storage, and ingestion workflows.
 """
 
-import pytest
-from pathlib import Path
 import tempfile
 import shutil
 
