@@ -5,6 +5,23 @@ All NEO exceptions inherit from ``NeoBaseError`` so callers can
 catch a single base class for any NEO-specific failure.
 """
 
+__all__ = [
+    "NeoAPIError",
+    "NeoAuthError",
+    "NeoBaseError",
+    "NeoConfigError",
+    "NeoDataError",
+    "NeoFeatureError",
+    "NeoModelError",
+    "NeoModelIntegrityError",
+    "NeoModelNotTrainedError",
+    "NeoModelTrainingError",
+    "NeoPipelineError",
+    "NeoPermissionError",
+    "NeoRateLimitError",
+    "NeoTokenError",
+]
+
 
 class NeoBaseError(Exception):
     """Root exception for all NEO Hybrid AI errors.

@@ -527,8 +527,8 @@ class TestIncrementalIndicators:
         inc = IncrementalIndicators()
         prices = [100 + i * 0.5 for i in range(30)]
         features = inc.update(prices)
-        assert "f0" in features
-        assert "f9" in features
+        assert "rsi_14" in features
+        assert "return_10d" in features
 
     def test_append_bar(self):
         """Test append bar."""
@@ -538,7 +538,7 @@ class TestIncrementalIndicators:
         prices = [100.0 + i for i in range(20)]
         inc.update(prices)
         feat = inc.append_bar(121.0)
-        assert feat["f0"] > 0  # RSI should be non-zero
+        assert feat["rsi_14"] > 0  # RSI should be non-zero
 
     def test_latest_features_defaults(self):
         """Test lafeatures defaults."""

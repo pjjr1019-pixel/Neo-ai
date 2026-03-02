@@ -10,6 +10,8 @@ import logging
 import time
 from typing import Any, Callable, Dict, Optional, TypeVar
 
+__all__ = ["CacheBackedFallback", "FallbackResult", "GracefulDegradation"]
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")

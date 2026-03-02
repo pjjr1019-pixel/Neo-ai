@@ -13,6 +13,8 @@ import logging
 import threading
 import time
 from enum import Enum
+
+__all__ = ["CircuitBreaker", "CircuitOpenError", "CircuitState"]
 from typing import Any, Callable, TypeVar
 
 logger = logging.getLogger(__name__)

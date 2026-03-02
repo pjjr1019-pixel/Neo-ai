@@ -490,5 +490,4 @@ class EvolutionEngine:
         for _ in range(3):
             engine.run_generation(data=None)
             top: List[Strategy] = engine.select_top(2)
-            print(top)
-            print(f"Top strategies: {[s.params for s in top]}")
+            logger.info("Top strategies: %s", [s.params for s in top])

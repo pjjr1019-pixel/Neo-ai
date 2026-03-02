@@ -9,6 +9,28 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
+# ── Canonical feature names ───────────────────────────────────
+# Order matters: the ML model sees values in this order.
+FEATURE_NAMES: Tuple[str, ...] = (
+    "rsi_14",
+    "macd_value",
+    "macd_signal",
+    "bb_upper_dist",
+    "bb_lower_dist",
+    "atr_14",
+    "price_vs_sma",
+    "return_1d",
+    "return_5d",
+    "return_10d",
+)
+
+__all__ = [
+    "DataPipeline",
+    "FEATURE_NAMES",
+    "TechnicalIndicators",
+    "get_pipeline",
+]
+
 
 class TechnicalIndicators:
     """Compute technical indicators from price data."""
@@ -227,30 +249,34 @@ class DataPipeline:
         atr = self.indicators.calculate_atr(high, low, close)[-1]
         sma = self.indicators.calculate_sma(close)[-1]
 
-        # Return feature dict
+        # Return feature dict with descriptive names
         return {
-            "f0": float(rsi) / 100.0,  # Normalize RSI (0-1)
-            "f1": float(macd_val),
-            "f2": float(signal_val),
-            "f3": float(upper_val - close[-1]),  # Distance from upper band
-            "f4": float(close[-1] - lower_val),  # Distance from lower band
-            "f5": float(atr),
-            "f6": float(close[-1] - sma),  # Price vs SMA
-            "f7": float(
+            "rsi_14": float(rsi) / 100.0,  # Normalize RSI (0-1)
+            "macd_value": float(macd_val),
+            "macd_signal": float(signal_val),
+            "bb_upper_dist": float(
+                upper_val - close[-1]
+            ),  # Distance from upper band
+            "bb_lower_dist": float(
+                close[-1] - lower_val
+            ),  # Distance from lower band
+            "atr_14": float(atr),
+            "price_vs_sma": float(close[-1] - sma),  # Price vs SMA
+            "return_1d": float(
                 (close[-1] - close[-2]) / close[-2] if len(close) > 1 else 0
-            ),  # Daily return
-            "f8": float(
+            ),
+            "return_5d": float(
                 (close[-1] - close[-5]) / close[-5] if len(close) > 5 else 0
-            ),  # 5-day return
-            "f9": float(
+            ),
+            "return_10d": float(
                 (close[-1] - close[-10]) / close[-10] if len(close) > 10 else 0
-            ),  # 10-day return
+            ),
         }
 
     @staticmethod
     def _default_features() -> Dict[str, float]:
         """Return default zero features."""
-        return {f"f{i}": 0.0 for i in range(10)}
+        return {name: 0.0 for name in FEATURE_NAMES}
 
 
 # Global pipeline instance (singleton)

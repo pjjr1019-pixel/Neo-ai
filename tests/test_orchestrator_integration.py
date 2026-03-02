@@ -7,6 +7,7 @@ integration, and execution history tracking.
 
 import pytest
 
+from python_ai.data_pipeline import FEATURE_NAMES
 from python_ai.orchestrator_integration import (
     OrchestratorIntegration,
     get_orchestrator_integration,
@@ -42,18 +43,7 @@ class TestOrchestratorIntegration:
         assert len(features) == 10
         assert all(
             key in features
-            for key in [
-                "f0",
-                "f1",
-                "f2",
-                "f3",
-                "f4",
-                "f5",
-                "f6",
-                "f7",
-                "f8",
-                "f9",
-            ]
+            for key in FEATURE_NAMES
         )
 
     def test_compute_features_invalid_data(self) -> None:
@@ -71,16 +61,16 @@ class TestOrchestratorIntegration:
         """Test model prediction on computed features."""
         integration = OrchestratorIntegration()
         features = {
-            "f0": 0.5,
-            "f1": 0.6,
-            "f2": 0.7,
-            "f3": 0.8,
-            "f4": 0.4,
-            "f5": 0.5,
-            "f6": 0.6,
-            "f7": 0.7,
-            "f8": 0.3,
-            "f9": 0.4,
+            "rsi_14": 0.5,
+            "macd_value": 0.6,
+            "macd_signal": 0.7,
+            "bb_upper_dist": 0.8,
+            "bb_lower_dist": 0.4,
+            "atr_14": 0.5,
+            "price_vs_sma": 0.6,
+            "return_1d": 0.7,
+            "return_5d": 0.3,
+            "return_10d": 0.4,
         }
         result = integration.predict_with_model(features)
         assert "prediction" in result

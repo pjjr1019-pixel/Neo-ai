@@ -1,6 +1,7 @@
 """Tests for Data Pipeline."""
 
 from python_ai.data_pipeline import (
+    FEATURE_NAMES,
     DataPipeline,
     TechnicalIndicators,
     get_pipeline,
@@ -95,7 +96,7 @@ class TestDataPipeline:
 
         assert isinstance(features, dict)
         assert len(features) == 10
-        assert all(f"f{i}" in features for i in range(10))
+        assert all(name in features for name in FEATURE_NAMES)
         assert all(isinstance(v, float) for v in features.values())
 
     def test_default_features(self) -> None:

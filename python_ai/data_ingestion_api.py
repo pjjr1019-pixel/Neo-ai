@@ -6,11 +6,14 @@ and historical data storage for backtesting and model training.
 """
 
 import csv
+import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 class DataValidator:
@@ -153,7 +156,7 @@ class HistoricalDataStore:
             self.in_memory_cache[symbol] = candles
             return True
         except Exception as e:
-            print(f"Failed to save candles for {symbol}: {e}")
+            logger.error("Failed to save candles for %s: %s", symbol, e)
             return False
 
     def load_candles(
@@ -195,7 +198,7 @@ class HistoricalDataStore:
             self.in_memory_cache[symbol] = candles
             return candles
         except Exception as e:
-            print(f"Failed to load candles for {symbol}: {e}")
+            logger.error("Failed to load candles for %s: %s", symbol, e)
             return []
 
     def get_latest_candle(self, symbol: str) -> Optional[Dict[str, float]]:

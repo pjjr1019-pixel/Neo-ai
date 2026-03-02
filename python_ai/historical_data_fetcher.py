@@ -229,7 +229,7 @@ def _cli() -> None:  # pragma: no cover
         days=args.days,
         timeframe=args.timeframe,
     )
-    print(f"\nTraining complete.  Metrics:\n{metrics}")
+    logger.info("Training complete.  Metrics:\n%s", metrics)
 
 
 if __name__ == "__main__":

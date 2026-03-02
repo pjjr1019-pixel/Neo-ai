@@ -9,7 +9,7 @@ values are reused from a rolling cache.
 import logging
 from typing import Dict, List, Optional
 
-from python_ai.data_pipeline import TechnicalIndicators
+from python_ai.data_pipeline import FEATURE_NAMES, TechnicalIndicators
 
 logger = logging.getLogger(__name__)
 
@@ -111,13 +111,13 @@ class IncrementalIndicators:
         return dict(self._cache)
 
     def latest_features(self) -> Dict[str, float]:
-        """Return the most recently computed feature dict (f0-f9).
+        """Return the most recently computed feature dict.
 
         Returns:
-            Dict with keys f0 … f9 matching DataPipeline format.
+            Dict with descriptive feature names matching DataPipeline.
         """
         if not self._cache:
-            return {f"f{i}": 0.0 for i in range(10)}
+            return {name: 0.0 for name in FEATURE_NAMES}
         return dict(self._cache)
 
     # ── Internal ──────────────────────────────────────────────
@@ -144,16 +144,22 @@ class IncrementalIndicators:
         sma = self._indicators.calculate_sma(c)[-1]
 
         self._cache = {
-            "f0": float(rsi) / 100.0,
-            "f1": float(macd_val),
-            "f2": float(signal_val),
-            "f3": float(upper_val - c[-1]),
-            "f4": float(c[-1] - lower_val),
-            "f5": float(atr),
-            "f6": float(c[-1] - sma),
-            "f7": (float((c[-1] - c[-2]) / c[-2]) if len(c) > 1 else 0.0),
-            "f8": (float((c[-1] - c[-5]) / c[-5]) if len(c) > 5 else 0.0),
-            "f9": (float((c[-1] - c[-10]) / c[-10]) if len(c) > 10 else 0.0),
+            "rsi_14": float(rsi) / 100.0,
+            "macd_value": float(macd_val),
+            "macd_signal": float(signal_val),
+            "bb_upper_dist": float(upper_val - c[-1]),
+            "bb_lower_dist": float(c[-1] - lower_val),
+            "atr_14": float(atr),
+            "price_vs_sma": float(c[-1] - sma),
+            "return_1d": (
+                float((c[-1] - c[-2]) / c[-2]) if len(c) > 1 else 0.0
+            ),
+            "return_5d": (
+                float((c[-1] - c[-5]) / c[-5]) if len(c) > 5 else 0.0
+            ),
+            "return_10d": (
+                float((c[-1] - c[-10]) / c[-10]) if len(c) > 10 else 0.0
+            ),
             "rsi_raw": float(rsi),
             "macd_raw": float(macd_val),
             "atr_raw": float(atr),

@@ -15,7 +15,11 @@ from python_ai.data_ingestion_api import (
     DataIngestionAPI,
     get_data_ingestion_api,
 )
-from python_ai.data_pipeline import DataPipeline, get_pipeline
+from python_ai.data_pipeline import (
+    FEATURE_NAMES,
+    DataPipeline,
+    get_pipeline,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +118,7 @@ class TrainingDataBuilder:
             self.pipeline.update_price_data(symbol, window_ohlcv)
             feature_dict = self.pipeline.compute_features(symbol)
 
-            feature_values = [feature_dict[f"f{j}"] for j in range(10)]
+            feature_values = [feature_dict[name] for name in FEATURE_NAMES]
             features_list.append(feature_values)
 
             current_close = closes[i]

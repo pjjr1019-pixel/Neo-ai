@@ -10,7 +10,8 @@ import asyncio
 import logging
 import platform
 import time
-from typing import Any, Dict, List
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator, Dict, List
 
 import numpy as np
 from fastapi import Depends, FastAPI, Response, WebSocket
@@ -21,16 +22,60 @@ from python_ai.auth.dependencies import get_current_user
 from python_ai.auth.models import User
 from python_ai.config.settings import get_settings
 from python_ai.data_pipeline import DataPipeline, get_pipeline
+from python_ai.middleware import (
+    CorrelationIDMiddleware,
+    RequestLoggingMiddleware,
+    register_exception_handlers,
+)
 from python_ai.ml_model import MLModel, get_model
 from python_ai.rate_limiter import RateLimitMiddleware
 from python_ai.ws_signal_stream import websocket_signal_handler
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="NEO Hybrid AI", version="0.3.0")
-
-# ── CORS middleware ───────────────────────────────────────────
 _settings = get_settings()
+_VERSION = "0.4.0"
+
+
+# ── Lifespan (startup / shutdown) ─────────────────────────────
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Manage application startup and shutdown lifecycle.
+
+    Startup:
+      - Log that the service is starting.
+      - Pre-load the ML model so the first request is fast.
+
+    Shutdown:
+      - Flush any buffered learn samples to log.
+      - Log a clean shutdown message.
+    """
+    logger.info("NEO Hybrid AI v%s starting up", _VERSION)
+    # Pre-load model on startup
+    get_model()
+    logger.info("Model loaded, service ready")
+    yield
+    # ── Shutdown ──────────────────────────────────────────────
+    if _learn_buffer:
+        logger.warning(
+            "Shutting down with %d un-trained samples in buffer",
+            len(_learn_buffer),
+        )
+    logger.info("NEO Hybrid AI shutting down gracefully")
+
+
+app = FastAPI(
+    title="NEO Hybrid AI",
+    version=_VERSION,
+    lifespan=lifespan,
+)
+
+# ── Exception handlers (must be registered before middleware) ──
+register_exception_handlers(app)
+
+# ── Middleware (order matters: last added = first executed) ────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_settings.api.cors_origins,
@@ -43,6 +88,9 @@ app.add_middleware(
     RateLimitMiddleware,  # type: ignore[arg-type]
     requests_per_minute=120,
 )
+
+app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(CorrelationIDMiddleware)
 
 # ── Simple in-process counters ────────────────────────────────
 _request_counts: Dict[str, int] = {
@@ -130,7 +178,7 @@ def health(
     return {
         "status": status,
         "uptime_seconds": round(uptime, 1),
-        "version": "0.3.0",
+        "version": _VERSION,
         "checks": checks,
     }
 
@@ -151,7 +199,7 @@ def compute_features(
         _user: Authenticated user.
 
     Returns:
-        Dict with f0-f9 feature keys and normalized float values.
+        Dict with descriptive feature keys and normalized float values.
     """
     _request_counts["compute_features"] += 1
     pipeline.update_price_data(payload.symbol, payload.ohlcv_data)

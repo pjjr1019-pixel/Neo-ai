@@ -499,7 +499,7 @@
     - [ ] Remove default DATABASE_URL with embedded password from config/settings.py
     - [ ] Add startup validation that rejects placeholder/default secrets
     - [x] Unified JWT_SECRET_KEY with AUTH_SECRET_KEY in jwt_handler.py ✅ Done (commit d29f202)
-    - [ ] Document required environment variables in .env.example
+    - [x] Document required environment variables in .env.example ✅ Done (cleaned up redundant JWT fields, v0.4.0)
     - **Success:** No hardcoded secrets, app refuses to start without proper env config.
 
 56b. Fix Pickle Deserialization RCE Risk ✅ COMPLETE
@@ -566,7 +566,7 @@
     - [ ] Create health check endpoints for all microservices
     - [ ] Implement error recovery automation (auto-retry, auto-heal)
     - [ ] Add retry logic with backoff for all database operations in repository.py
-    - [ ] Implement graceful shutdown handler for FastAPI (cleanup connections, flush logs)
+    - [x] Implement graceful shutdown handler for FastAPI (cleanup connections, flush logs) ✅ Done (lifespan handler in fastapi_service.py, v0.4.0)
     - [x] Create consistent exception hierarchy (NeoBaseError -> NeoDataError, NeoModelError, NeoAPIError, etc.) ✅ Done (python_ai/exceptions.py, commit d29f202)
     - **Success:** System survives failures gracefully, errors logged comprehensively, no cascading failures.
 
@@ -587,8 +587,8 @@
     - [ ] Implement mutual TLS (mTLS) for service-to-service communication
     - [ ] Wire CORS middleware to FastAPI app (restrict origins, methods, credentials)
     - [ ] Add X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset headers to responses
-    - [ ] Wire correlation ID middleware to FastAPI app for request tracing
-    - [ ] Add request/response logging middleware (log method, path, status, duration)
+    - [x] Wire correlation ID middleware to FastAPI app for request tracing ✅ Done (python_ai/middleware.py, v0.4.0)
+    - [x] Add request/response logging middleware (log method, path, status, duration) ✅ Done (python_ai/middleware.py, v0.4.0)
     - [ ] Add Pydantic input validation on /predict and /learn request bodies (min/max bounds, type checks)
     - **Success:** All API endpoints protected, auth/authz working, rate limiting enforced.
 
@@ -607,7 +607,7 @@
     - [ ] Create data completeness reporting (% of expected bars received)
     - [ ] Implement data reconciliation for multi-source feeds
     - [ ] Build data quality dashboard with metrics and trends
-    - [ ] Replace fragile f0-f9 numeric feature names with descriptive names (e.g., rsi_14, macd_signal, bb_upper)
+    - [x] Replace fragile f0-f9 numeric feature names with descriptive names (e.g., rsi_14, macd_signal, bb_upper) ✅ Done (FEATURE_NAMES constant in data_pipeline.py, v0.4.0)
     - [ ] Add feature schema validation (expected names, dtypes, ranges) before model input
     - **Success:** Data quality issues detected and alerted, reconciliation automated.
 
@@ -937,10 +937,10 @@
 
 ## PHASE 16.5 — CODE QUALITY & DEVELOPER EXPERIENCE (from codebase audit)
 
-81a. [ ] Code Quality Cleanup
-    - [ ] Replace all print() statements with structured logger calls (logging module)
+81a. [!] Code Quality Cleanup
+    - [x] Replace all print() statements with structured logger calls (logging module) ✅ Done (5 source files, v0.4.0)
     - [x] Replace all datetime.utcnow() with datetime.now(timezone.utc) (deprecated since Python 3.12) ✅ Done
-    - [ ] Add __all__ exports to all public modules for explicit API surface
+    - [x] Add __all__ exports to all public modules for explicit API surface ✅ Done (7 modules, v0.4.0)
     - [ ] Add missing return type annotations across all functions
     - [ ] Ensure consistent exception messages with context (file, line, operation)
     - **Success:** Clean, modern, type-safe codebase with no deprecation warnings.
@@ -966,11 +966,11 @@
     - [ ] Add password complexity requirements validation
     - **Success:** Auth system meets OWASP password storage guidelines.
 
-81e. [ ] Structured Logging & Observability [R]
-    - [ ] Replace all print() statements with structured JSON logging (structlog or python-json-logger)
-    - [ ] Add correlation ID middleware (generate unique ID per request, propagate through all logs)
+81e. [!] Structured Logging & Observability [R]
+    - [x] Replace all print() statements with structured JSON logging (structlog or python-json-logger) ✅ Done (logger calls, v0.4.0)
+    - [x] Add correlation ID middleware (generate unique ID per request, propagate through all logs) ✅ Done (CorrelationIDMiddleware, v0.4.0)
     - [ ] Implement log levels strategy (DEBUG for dev, INFO for prod, ERROR for alerts)
-    - [ ] Add request/response timing middleware with structured log output
+    - [x] Add request/response timing middleware with structured log output ✅ Done (RequestLoggingMiddleware, v0.4.0)
     - [ ] Configure log rotation and retention policies
     - **Success:** All logs are structured JSON, searchable, correlated by request ID.
 
@@ -982,11 +982,11 @@
     - [ ] Create runbook for common operations (deploy, rollback, retrain, troubleshoot)
     - **Success:** Architecture self-documented, new devs onboard from docs alone.
 
-81g. [ ] Consistent Error Response Format [R]
-    - [ ] Define standard JSON error response schema: {type, message, detail, request_id, timestamp}
-    - [ ] Create custom exception handlers in FastAPI for all NeoBaseError subtypes
-    - [ ] Add error codes enum (NEO-001 through NEO-999) for programmatic error handling
-    - [ ] Implement error response tests ensuring all endpoints return consistent format
+81g. [!] Consistent Error Response Format [R]
+    - [x] Define standard JSON error response schema: {type, message, detail, request_id, timestamp} ✅ Done (middleware.py, v0.4.0)
+    - [x] Create custom exception handlers in FastAPI for all NeoBaseError subtypes ✅ Done (register_exception_handlers, v0.4.0)
+    - [x] Add error codes enum (NEO-001 through NEO-999) for programmatic error handling ✅ Done (_ERROR_PREFIX map, v0.4.0)
+    - [x] Implement error response tests ensuring all endpoints return consistent format ✅ Done (test_middleware.py, 12 tests)
     - [ ] Add error rate monitoring and alerting (Prometheus counter per error code)
     - **Success:** All errors follow consistent schema, programmatically parseable.
 

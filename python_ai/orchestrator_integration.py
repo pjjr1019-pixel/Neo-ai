@@ -39,7 +39,7 @@ class OrchestratorIntegration:
                        'volume' lists.
 
         Returns:
-            10-element feature dict (f0-f9) normalized and ready for
+            10-element feature dict (rsi_14, macd_value, etc.) normalized
             prediction.
 
         Raises:
