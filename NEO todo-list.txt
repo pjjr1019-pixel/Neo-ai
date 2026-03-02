@@ -357,6 +357,48 @@
 
 ---
 
+## PHASE 11.05 — CRITICAL CODE AUDIT FIXES (from deep codebase analysis)
+
+56a. Remove Hardcoded Secret Defaults
+    - [ ] Remove default SECRET_KEY value from config/settings.py (force env var)
+    - [ ] Remove default DATABASE_URL with embedded password from config/settings.py
+    - [ ] Add startup validation that rejects placeholder/default secrets
+    - [ ] Document required environment variables in .env.example
+    - **Success:** No hardcoded secrets, app refuses to start without proper env config.
+
+56b. Fix Pickle Deserialization RCE Risk
+    - [ ] Replace pickle.load() in ml_model.py with joblib.load() (already a dependency)
+    - [ ] Add file integrity check (hash verification) before loading any model
+    - [ ] Audit all pickle usage across codebase and replace with safe alternatives
+    - **Success:** No arbitrary code execution risk from model loading.
+
+56c. Fix FastAPI Global State Issues
+    - [ ] Replace MLModel global singleton in fastapi_service.py with FastAPI dependency injection
+    - [ ] Add asyncio.Lock around all global state mutations in FastAPI routes
+    - [ ] Ensure thread-safety for shared model instance across concurrent requests
+    - **Success:** No race conditions, clean DI pattern, safe concurrent access.
+
+56d. Wire Auth Middleware to Endpoints
+    - [ ] Apply JWT/API-key auth dependency to all production endpoints (/predict, /learn, /metrics)
+    - [ ] Keep /health and /docs endpoints public (no auth required)
+    - [ ] Add integration tests verifying auth rejection on unauthenticated requests
+    - **Success:** All sensitive endpoints require valid authentication.
+
+56e. Fix Technical Indicator Calculations
+    - [ ] Fix RSI calculation in data_pipeline.py — use Wilder's exponential smoothing (not simple average)
+    - [ ] Fix Bollinger Bands — add configurable std deviation multiplier parameter (default=2.0)
+    - [ ] Validate MACD calculation against reference implementation (stockcharts.com)
+    - [ ] Add reference test cases with known-good indicator values
+    - **Success:** All technical indicators match industry-standard calculations.
+
+56f. Consolidate Duplicate Configuration
+    - [ ] Merge config/settings.py and strategy_config.py into single source of truth
+    - [ ] Use Pydantic Settings with env_prefix for all configuration
+    - [ ] Implement settings validation on startup (ranges, types, required fields)
+    - **Success:** One config system, no duplication, validated on boot.
+
+---
+
 ## PHASE 11.1 — DATA ENCRYPTION & SECRETS MANAGEMENT
 
 57. Encryption & Secrets Infrastructure
@@ -368,6 +410,7 @@
     - [ ] Implement audit logging for all key access
     - [ ] Setup secret scanning in CI/CD (git-secrets, TruffleHog)
     - [ ] Configure HSM support for production environment
+    - [ ] Implement encryption at rest for model files (.pkl, .onnx) and trade journals
     - **Success:** No hardcoded secrets, all sensitive data encrypted, key rotation automated.
 
 ---
@@ -385,6 +428,9 @@
     - [ ] Configure alert thresholds for error rate anomalies
     - [ ] Create health check endpoints for all microservices
     - [ ] Implement error recovery automation (auto-retry, auto-heal)
+    - [ ] Add retry logic with backoff for all database operations in repository.py
+    - [ ] Implement graceful shutdown handler for FastAPI (cleanup connections, flush logs)
+    - [ ] Create consistent exception hierarchy (NeoBaseError -> NeoDataError, NeoModelError, NeoAPIError, etc.)
     - **Success:** System survives failures gracefully, errors logged comprehensively, no cascading failures.
 
 ---
@@ -402,6 +448,11 @@
     - [ ] Setup request signing (HMAC-SHA256) for sensitive operations
     - [ ] Configure WAF rules for API protection (SQL injection, XSS, DDoS)
     - [ ] Implement mutual TLS (mTLS) for service-to-service communication
+    - [ ] Wire CORS middleware to FastAPI app (restrict origins, methods, credentials)
+    - [ ] Add X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset headers to responses
+    - [ ] Wire correlation ID middleware to FastAPI app for request tracing
+    - [ ] Add request/response logging middleware (log method, path, status, duration)
+    - [ ] Add Pydantic input validation on /predict and /learn request bodies (min/max bounds, type checks)
     - **Success:** All API endpoints protected, auth/authz working, rate limiting enforced.
 
 ---
@@ -419,6 +470,8 @@
     - [ ] Create data completeness reporting (% of expected bars received)
     - [ ] Implement data reconciliation for multi-source feeds
     - [ ] Build data quality dashboard with metrics and trends
+    - [ ] Replace fragile f0-f9 numeric feature names with descriptive names (e.g., rsi_14, macd_signal, bb_upper)
+    - [ ] Add feature schema validation (expected names, dtypes, ranges) before model input
     - **Success:** Data quality issues detected and alerted, reconciliation automated.
 
 ---
@@ -437,6 +490,11 @@
     - [ ] Implement visual regression tests for UI components
     - [ ] Setup continuous testing in CI/CD with automated reporting
     - [ ] Create pre-production load testing environment
+    - [ ] Separate test files from source code (move tests/ out of python_ai/ or use src layout)
+    - [ ] Fix rate limiter state leak between test runs (add proper teardown/reset)
+    - [ ] Enforce minimum coverage threshold (>=80%) in CI pipeline with --cov-fail-under
+    - [ ] Add full pipeline integration test (ingest -> features -> predict -> learn -> metrics)
+    - [ ] Add reference-value test cases for all technical indicators (RSI, MACD, Bollinger)
     - **Success:** All features tested, 80%+ coverage, test results integrated into CI/CD.
 
 ---
@@ -481,6 +539,15 @@
     - [ ] Implement memory/CPU usage trending and alerts
     - [ ] Add system uptime and dependency health checks
     - **Success:** Complete ops visibility, proactive alerting on degradation.
+
+66a. Dependency Injection & Architecture Refactor
+    - [ ] Refactor all global singletons to use FastAPI Depends() injection pattern
+    - [ ] Create provider functions for MLModel, DataPipeline, DatabaseSession
+    - [ ] Make all modules testable via constructor injection (no hidden global state)
+    - [ ] Register WebSocket signal handler in FastAPI app startup event
+    - [ ] Wire database initialization/migration check into app startup lifecycle
+    - **Success:** Clean DI architecture, fully testable, no hidden global state.
+
 ---
 
 ## PHASE 13 â€” INSTITUTIONAL FEATURES (STRATEGIC)
@@ -658,6 +725,39 @@
 
 ---
 
+## PHASE 16.5 — CODE QUALITY & DEVELOPER EXPERIENCE (from codebase audit)
+
+81a. Code Quality Cleanup
+    - [ ] Replace all print() statements with structured logger calls (logging module)
+    - [ ] Replace all datetime.utcnow() with datetime.now(timezone.utc) (deprecated since Python 3.12)
+    - [ ] Add __all__ exports to all public modules for explicit API surface
+    - [ ] Add missing return type annotations across all functions
+    - [ ] Ensure consistent exception messages with context (file, line, operation)
+    - **Success:** Clean, modern, type-safe codebase with no deprecation warnings.
+
+81b. Developer Tooling & Workflow
+    - [ ] Configure pre-commit hooks (black, isort, flake8, mypy, bandit in one command)
+    - [ ] Create .env.example with all required environment variables documented
+    - [ ] Enable mypy strict mode progressively (start with --warn-return-any, --disallow-untyped-defs)
+    - [ ] Create CHANGELOG.md with semantic versioning and release notes
+    - [ ] Add Makefile or justfile with common commands (test, lint, format, run, docker)
+    - **Success:** New contributors productive in <30 minutes, consistent code quality.
+
+81c. API Documentation & Observability
+    - [ ] Customize OpenAPI docs (title, description, tags, request/response examples)
+    - [ ] Wire Prometheus client library for custom business metrics (trades/sec, model accuracy)
+    - [ ] Add business KPI telemetry (P&L tracking, signal accuracy, strategy win rates)
+    - [ ] Create Grafana dashboard JSON templates for key metrics
+    - **Success:** Self-documenting API, real-time business metrics visible.
+
+81d. Password & Auth Hardening
+    - [ ] Use bcrypt or argon2 for password hashing (replace any weaker alternatives)
+    - [ ] Implement account lockout after N failed login attempts
+    - [ ] Add password complexity requirements validation
+    - **Success:** Auth system meets OWASP password storage guidelines.
+
+---
+
 ## PHASE 17 — MOBILE APPLICATION & EXTENDED UX
 
 82. Mobile App (React Native / Flutter)
@@ -683,6 +783,12 @@
     - [ ] Create performance regression tests in CI/CD
     - [ ] Document performance baselines for future optimization
     - **Success:** Detailed performance metrics documented, bottlenecks identified.
+
+83a. Algorithm Complexity Fixes (from audit)
+    - [ ] Fix O(n²) co-evolution round-robin tournament in evolution_engine.py — use Swiss-system or Elo-based pairing
+    - [ ] Profile evolution_engine._run_self_play() and replace nested loops with vectorized fitness evaluation
+    - [ ] Add performance benchmarks for evolution with 50, 100, 500 strategies
+    - **Success:** Evolution scales linearly, handles 500+ strategies without timeout.
 
 84. Code Optimization & Vectorization
     - [ ] Vectorize NumPy/Pandas operations (eliminate Python loops)
@@ -760,6 +866,8 @@
     - [ ] Add .dockerignore for htmlcov/, error_logs/, *.pkl, __pycache__, .git (reduce build context 90%+)
     - [ ] Use multi-stage copy for only python_ai/ source — add pip wheel caching layer
     - [ ] Pin base image digest (python:3.12-slim@sha256:xxx) for reproducible builds
+    - [ ] Replace Dockerfile placeholder deploy steps with real deployment commands
+    - [ ] Replace CD pipeline echo placeholders with actual deploy actions (kubectl apply, docker push)
     - **Success:** Final Python image <200MB, Java image <150MB, fast builds.
 
 89. Kubernetes & Container Orchestration
@@ -768,6 +876,8 @@
     - [ ] Setup horizontal pod autoscaling (HPA) based on load
     - [ ] Implement graceful shutdown with preStop hooks
     - [ ] Add liveness and readiness probes for health checks
+    - [ ] Replace 'latest' image tag in k8s-deployment.yaml with pinned version tags
+    - [ ] Add health check probes pointing to /health endpoint in K8s deployment
     - [ ] Create PersistentVolumeClaims for database storage
     - [ ] Setup environment-specific kustomization overlays
     - **Success:** System runs on Kubernetes, auto-scales, self-healing.
