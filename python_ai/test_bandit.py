@@ -1,15 +1,22 @@
 import subprocess
-import os
 
 
 def test_bandit_security():
     """Run bandit security checks on all Python files."""
-    venv_dir = os.environ.get("VIRTUAL_ENV")
-    if venv_dir:
-        bandit_path = os.path.join(venv_dir, "Scripts", "bandit.exe")
-    else:
-        bandit_path = os.path.join(os.getcwd(), ".venv", "Scripts", "bandit.exe")
-    bandit_args = [bandit_path, "-r", "python_ai", "--quiet", "--exit-zero"]
+    import shutil
+
+    import pytest
+
+    bandit_path = shutil.which("bandit")
+    if not bandit_path:
+        pytest.skip("bandit is not installed or not found in PATH")
+    bandit_args = [
+        bandit_path,
+        "-r",
+        "python_ai",
+        "--quiet",
+        "--exit-zero",
+    ]
     result = subprocess.run(bandit_args, capture_output=True, text=True)
     no_issues = "No issues identified." in result.stdout
     no_errors = result.returncode == 0

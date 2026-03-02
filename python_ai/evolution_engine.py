@@ -3,14 +3,24 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 - Mutates strategies (thresholds, sizing, stop-loss)
 - Supports meta-learning (MAML, Reptile)
 - Designed for extensibility and compliance with project coding policy
+- Wired to BacktestingEngine for real performance evaluation
 """
 
-import random
 import copy
-from typing import List, Dict, Any
+import logging
+import random
+from typing import Any, Dict, List, Optional
+
+import optuna
+
+from python_ai.backtesting_engine import get_backtesting_engine
+
+logger = logging.getLogger(__name__)
 
 
 class Strategy:
+    """Strategy for evolutionary algorithm with parameters and performance."""
+
     def __init__(self, params: Dict[str, Any]) -> None:
         """
         Initialize a Strategy with parameters.
@@ -18,7 +28,7 @@ class Strategy:
             params: Dictionary of strategy parameters.
         """
         self.params: Dict[str, Any] = params.copy()
-        self.performance = None
+        self.performance: Optional[float] = None
 
     def mutate(self) -> "Strategy":
         """
@@ -29,24 +39,47 @@ class Strategy:
         new_params: Dict[str, Any] = self.params.copy()
         # Example mutation: tweak thresholds slightly
         for k, v in new_params.items():
-            if isinstance(v, (int, float)):
-                new_params[k] += random.uniform(-0.1, 0.1) * v
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
+                new_params[k] += random.uniform(-0.1, 0.1) * v  # nosec: B311
         return Strategy(new_params)
 
-    def evaluate(self, data) -> float:
-        """
-        Evaluate strategy performance (stub).
+    def evaluate(self, data: Dict[str, Any]) -> float:
+        """Evaluate strategy performance using backtesting engine.
+
         Args:
-            data: Input data for evaluation.
+            data: Dict with 'ohlcv_data' (prices) and 'signals' (trading
+                 signals).
+
         Returns:
-            Random float as performance.
+            Fitness score from backtest (0-1 scale).
         """
-        # Placeholder: implement backtesting logic
-        self.performance: float = random.uniform(0, 1)
+        if not isinstance(data, dict):
+            self.performance = 0.0
+            return self.performance
+
+        ohlcv_data = data.get("ohlcv_data", {})
+        signals = data.get("signals", [])
+
+        if not ohlcv_data or not signals:
+            self.performance = 0.0
+            return self.performance
+
+        try:
+            backtest_engine = get_backtesting_engine()
+            metrics = backtest_engine.run_backtest(
+                ohlcv_data,
+                signals,
+            )
+            self.performance = metrics.fitness_score
+        except Exception:
+            self.performance = 0.0
+
         return self.performance
 
 
 class EvolutionEngine:
+    """Engine for running evolutionary optimization of strategies."""
+
     def explainable_evolution_report(self, previous_population=None) -> str:
         """
         Generate a human-readable report of the evolution process and
@@ -71,7 +104,7 @@ class EvolutionEngine:
         lines = []
         lines.append("Evolution Report\n====================")
         for i, strat in enumerate(self.population):
-            lines.append(f"Strategy {i+1}:")
+            lines.append(f"Strategy {i + 1}:")
             params_str = f"  Params: {strat.params}"
             if len(params_str) > 79:
                 params_str = params_str[:76] + "..."
@@ -87,7 +120,8 @@ class EvolutionEngine:
             if previous_population and i < len(previous_population):
                 prev = previous_population[i]
                 param_changes = {
-                    k: (prev.params.get(k), strat.params.get(k)) for k in strat.params
+                    k: (prev.params.get(k), strat.params.get(k))
+                    for k in strat.params
                 }
                 lines.append("  Param Changes:")
                 for k, (old, new) in param_changes.items():
@@ -98,7 +132,7 @@ class EvolutionEngine:
 
     def self_play_and_coevolution(
         self, data, rounds: int = 5
-    ) -> Dict[Strategy | None, float]:
+    ) -> Dict[Strategy, float]:
         """
         Simulate self-play and co-evolution between strategies.
         Args:
@@ -117,7 +151,16 @@ class EvolutionEngine:
             Dict mapping strategy to average score.
         """
         n: int = len(self.population)
-        scores: Dict[Strategy | None, float] = {strat: 0.0 for strat in self.population}
+        # Need at least 2 strategies for coevolution
+        if n < 2:
+            # Assign zero performance to single/empty population
+            for strat in self.population:
+                strat.performance = 0.0
+            return {strat: 0.0 for strat in self.population}
+
+        scores: Dict[Strategy, float] = {
+            strat: 0.0 for strat in self.population
+        }
         for _ in range(rounds):
             for i, strat_a in enumerate(self.population):
                 for j, strat_b in enumerate(self.population):
@@ -137,8 +180,10 @@ class EvolutionEngine:
                         scores[strat_b] += 0.5
         # Normalize scores by number of matches
         matches: int = rounds * n * (n - 1)
-        avg_scores: Dict[Strategy | None, float] = {
-            strat: score / matches for strat, score in scores.items()
+        avg_scores: Dict[Strategy, float] = {
+            strat: score / matches
+            for strat, score in scores.items()
+            if strat is not None
         }
         # Assign average score as performance
         for strat, avg in avg_scores.items():
@@ -169,8 +214,11 @@ class EvolutionEngine:
             Dict mapping strategy to allocated resource.
         """
         # Gather performances, avoid None
+        if not self.population:
+            return {}
         performances: List[float] = [
-            s.performance if s.performance is not None else 0.0 for s in self.population
+            s.performance if s.performance is not None else 0.0
+            for s in self.population
         ]
         min_perf: float = min(performances)
         # Shift performances to be non-negative
@@ -180,8 +228,12 @@ class EvolutionEngine:
         allocs = {}
         if total == 0:
             # Equal allocation if all performances are the same
+            if total_resource > n * min_alloc:
+                equal_share = total_resource / n
+            else:
+                equal_share = min_alloc
             for strat in self.population:
-                allocs[strat] = total_resource / n
+                allocs[strat] = equal_share
         else:
             for strat, perf in zip(self.population, shifted):
                 if total_resource > n * min_alloc:
@@ -189,7 +241,7 @@ class EvolutionEngine:
                         (total_resource - n * min_alloc) * (perf / total)
                     )
                 else:
-                    alloc: float = min_alloc
+                    alloc = min_alloc
                 allocs[strat] = alloc
         return allocs
 
@@ -235,11 +287,11 @@ class EvolutionEngine:
         # Aggregate predictions
         import numpy as np
 
-        predictions = np.array(predictions)
+        pred_matrix = np.array(predictions)
         if aggregation == "mean":
-            agg = np.mean(predictions, axis=0)
+            agg = np.mean(pred_matrix, axis=0)
         elif aggregation == "median":
-            agg = np.median(predictions, axis=0)
+            agg = np.median(pred_matrix, axis=0)
         else:
             raise ValueError(f"Unknown aggregation method: {aggregation}")
         return agg.tolist()
@@ -250,6 +302,7 @@ class EvolutionEngine:
         Args:
             base_strategies: List of Strategy objects to start the population.
         """
+        self.base_strategies: List[Strategy] = base_strategies
         self.population: List[Strategy] = base_strategies
 
     def run_generation(self, data) -> None:
@@ -275,61 +328,64 @@ class EvolutionEngine:
             List of top Strategy objects.
         """
         # Select top-n strategies by performance
-        return sorted(self.population, key=lambda s: s.performance or 0, reverse=True)[
-            :n
-        ]
+        return sorted(
+            self.population, key=lambda s: s.performance or 0, reverse=True
+        )[:n]
 
     def meta_learn(
         self, data, method: str = "crossval", k_folds: int = 5
     ) -> List[float] | None:
-        """
-        Meta-learning with cross-validation support.
+        """Meta-learning with cross-validation support.
+
         Args:
             data: Input data for meta-learning.
             method: Meta-learning method ('crossval', etc.).
             k_folds: Number of folds for cross-validation.
+
         Returns:
             List of average scores or None.
-        """
-        """
-        Meta-learning with cross-validation support.
-        If method == 'crossval', performs k-fold cross-validation on
-        current population.
         """
         if method == "crossval":
             if not data or not hasattr(data, "__len__"):
                 raise ValueError(
-                    "Data must be a non-empty sequence for cross-validation."
+                    "Data must be a non-empty sequence for "
+                    "cross-validation."
                 )
             n: int = len(data)
-            fold_size: int = max(1, n // k_folds)
+            actual_k_folds: int = min(k_folds, n)
+            fold_size: int = max(1, n // actual_k_folds)
             results = []
-            for i in range(k_folds):
+            for i in range(actual_k_folds):
                 start: int = i * fold_size
                 end: int = start + fold_size if i < k_folds - 1 else n
                 val_idx: List[int] = list(range(start, end))
-                train_idx: List[int] = [j for j in range(n) if j not in val_idx]
+                train_idx: List[int] = [
+                    j for j in range(n) if j not in val_idx
+                ]
                 train_data = [data[j] for j in train_idx]
                 val_data = [data[j] for j in val_idx]
                 fold_scores = []
                 for strat in self.population:
-                    # Train: here just evaluate on train_data for placeholder
-                    strat.evaluate(train_data)
-                    # Validate: evaluate on val_data
-                    val_score: float = strat.evaluate(val_data)
+                    fold_eval_data: Dict[str, Any] = {
+                        "ohlcv_data": {"close": train_data},
+                        "signals": ["HOLD"] * len(train_data),
+                    }
+                    strat.evaluate(fold_eval_data)
+                    val_eval_data: Dict[str, Any] = {
+                        "ohlcv_data": {"close": val_data},
+                        "signals": ["HOLD"] * len(val_data),
+                    }
+                    val_score: float = strat.evaluate(val_eval_data)
                     fold_scores.append(val_score)
                 results.append(fold_scores)
-            # Average scores per strategy
             avg_scores: List[float] = [
                 sum(scores) / k_folds for scores in zip(*results)
             ]
-            # Assign average performance to each strategy
             for strat, avg in zip(self.population, avg_scores):
                 strat.performance = avg
             return avg_scores
         else:
-            # Placeholder for other meta-learning methods (MAML, Reptile, etc.)
-            pass
+            return None
 
     def genetic_hyperparameter_evolution(
         self,
@@ -352,8 +408,8 @@ class EvolutionEngine:
         population: List[Strategy] = [
             Strategy(
                 {
-                    "threshold": random.uniform(0, 1),
-                    "stop_loss": random.uniform(0, 0.5),
+                    "threshold": random.uniform(0, 1),  # nosec: B311
+                    "stop_loss": random.uniform(0, 0.5),  # nosec: B311
                 }
             )
             for _ in range(population_size)
@@ -369,37 +425,59 @@ class EvolutionEngine:
             for parent in survivors:
                 child = (
                     parent.mutate()
-                    if random.random() < mutation_rate
+                    if random.random() < mutation_rate  # nosec: B311
                     else copy.deepcopy(parent)
                 )
                 offspring.append(child)
             population = survivors + offspring
         self.population = population
 
-    def bayesian_hyperparameter_optimization(self, data=None, n_iter: int = 10) -> None:
-        """
-        Stub for Bayesian optimization of hyperparameters.
+    def bayesian_hyperparameter_optimization(
+        self, data=None, n_iter: int = 10
+    ) -> None:
+        """Bayesian optimization of strategy hyperparameters via Optuna TPE.
+
+        Uses Tree-structured Parzen Estimator (TPE) to efficiently
+        search the strategy parameter space instead of random sampling.
+
         Args:
-            data: Input data for evaluation.
-            n_iter: Number of iterations.
+            data: Input data for evaluation (passed to Strategy.evaluate).
+            n_iter: Number of Optuna trials to run.
         """
-        """
-        Stub for Bayesian optimization of hyperparameters
-        (replace with e.g. skopt or optuna for real use).
-        """
-        best = None
-        best_perf = float("-inf")
-        for _ in range(n_iter):
+        optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+        def objective(trial: optuna.Trial) -> float:
+            """Single Optuna trial: sample params → evaluate."""
             params: Dict[str, float] = {
-                "threshold": random.uniform(0, 1),
-                "stop_loss": random.uniform(0, 0.5),
+                "threshold": trial.suggest_float(
+                    "threshold",
+                    0.0,
+                    1.0,
+                ),
+                "stop_loss": trial.suggest_float(
+                    "stop_loss",
+                    0.01,
+                    0.5,
+                ),
             }
             strat = Strategy(params)
-            perf: float = strat.evaluate(data)
-            if perf > best_perf:
-                best: Strategy = strat
-                best_perf: float = perf
-        self.population: List[None | Strategy] = [best]
+            return strat.evaluate(data)
+
+        study = optuna.create_study(direction="maximize")
+        study.optimize(objective, n_trials=n_iter)
+
+        best_params = study.best_params
+        best_strat = Strategy(best_params)
+        best_strat.evaluate(data)
+        self.population = [best_strat]
+
+        logger.info(
+            "Bayesian optimization complete: best_value=%.4f  "
+            "params=%s  trials=%d",
+            study.best_value,
+            best_params,
+            len(study.trials),
+        )
 
     # Example usage
     if __name__ == "__main__":

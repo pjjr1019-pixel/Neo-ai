@@ -1,0 +1,63 @@
+from fastapi.testclient import TestClient
+
+from python_ai.fastapi_service.fastapi_service import app, get_learning_logic
+
+
+def test_root():
+    """Test the root endpoint returns service status."""
+    client = TestClient(app)
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert resp.json()["message"].startswith("NEO Hybrid AI Service")
+
+
+def test_predict():
+    """Test the predict endpoint returns a prediction."""
+    client = TestClient(app)
+    resp = client.post("/predict", json={"features": {"f0": 1.0, "f1": 2.0}})
+    assert resp.status_code == 200
+    resp_data = resp.json()
+    assert "prediction" in resp_data
+    assert "confidence" in resp_data
+    assert "signal" in resp_data
+
+
+def test_learn_success():
+    """Test the learn endpoint with valid input buffers sample."""
+    client = TestClient(app)
+    payload = {"features": [1, 2, 3], "target": 1.0}
+    resp = client.post("/learn", json=payload)
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "buffered"
+
+
+def test_learn_error_cases():
+    """Test the learn endpoint with invalid input returns error status."""
+    logic = get_learning_logic()
+    result_none = logic(None)
+    assert result_none["status"] == "error"
+    result_bad_feats = logic(
+        {"features": "notalist", "target": 1},
+    )
+    assert result_bad_feats["status"] == "error"
+    result_no_target = logic({"features": [1, 2, 3]})
+    assert result_no_target["status"] == "error"
+
+
+def test_metrics():
+    """Test the metrics endpoint returns request counts."""
+    client = TestClient(app)
+    resp = client.get("/metrics")
+    assert resp.status_code == 200
+    assert "request_counts" in resp.json()
+    assert "total_requests" in resp.json()
+
+
+def test_explain():
+    """Test the explain endpoint returns feature importance and explanation."""
+    client = TestClient(app)
+    resp = client.get("/explain")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "feature_importance" in data
+    assert "explanation" in data

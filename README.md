@@ -15,11 +15,23 @@ NEO is a modular, robust, and fully tested hybrid AI system built with FastAPI, 
 2. Create and activate a virtual environment
 3. Install dependencies:
 	```
-	pip install -r requirements-dev.txt
+	pip install -r requirements.txt
 	```
-4. Run tests:
+4. (Optional) Install pre-commit hooks:
+	```
+	pip install pre-commit
+	pre-commit install
+	```
+5. Run tests and compliance checks:
 	```
 	pytest --maxfail=1 --disable-warnings -v
+	flake8 .
+	bandit -r python_ai
+	```
+6. (Optional) Run coverage:
+	```
+	pip install pytest-cov
+	pytest --cov=python_ai
 	```
 
 ## API Documentation
@@ -32,8 +44,9 @@ NEO is a modular, robust, and fully tested hybrid AI system built with FastAPI, 
 - `requirements-dev.txt`: Dev dependencies
 
 ## CI/CD
-- Ensure `pytest-asyncio` is installed in CI for async test support
-- Use `pip install -r requirements-dev.txt` in your workflow
+- Use `pip install -r requirements.txt` in your workflow
+- Run `pytest`, `flake8 .`, and `bandit -r python_ai` in CI for full compliance
+- (Optional) Add coverage reporting with `pytest --cov=python_ai`
 
 ## Contributing
 - Follow flake8 and modularity best practices

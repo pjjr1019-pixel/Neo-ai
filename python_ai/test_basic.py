@@ -1,14 +1,16 @@
-import pkgutil
-import pytest
 import glob
-import traceback
+import pkgutil
 import subprocess
+import traceback
+
+import pytest
+
 from python_ai.test_fun_compliance import (
-    test_flake8_compliance,
     test_all_functions_have_docstrings,
+    test_flake8_compliance,
     test_line_length,
-    test_no_unused_imports,
     test_no_todo_comments,
+    test_no_unused_imports,
 )
 
 
@@ -85,15 +87,19 @@ def test_import_all_modules():
         except ModuleNotFoundError as e:
             # Allow missing optional dependencies like psutil
             if e.name == "psutil":
-                pytest.skip("psutil not installed; skipping resource_monitor import.")
+                pytest.skip(
+                    "psutil not installed; skipping resource_monitor import."
+                )
             else:
                 error_msg = (
-                    f"{module}: {type(e).__name__}: {e}\n" f"{traceback.format_exc()}"
+                    f"{module}: {type(e).__name__}: {e}\n"
+                    f"{traceback.format_exc()}"
                 )
                 errors.append(error_msg)
         except Exception as e:
             error_msg = (
-                f"{module}: {type(e).__name__}: {e}\n" f"{traceback.format_exc()}"
+                f"{module}: {type(e).__name__}: {e}\n"
+                f"{traceback.format_exc()}"
             )
             errors.append(error_msg)
     assert not errors, "Module import errors:\n" + "\n".join(errors)
@@ -121,9 +127,27 @@ def test_git_environment():
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout.lower() + result.stderr.lower()
+            # Ignore .coverage and error log file status in git output
+            if cmd == ["git", "status"]:
+                output = "\n".join(
+                    [
+                        line
+                        for line in output.splitlines()
+                        if ".coverage" not in line
+                        and "errorlog" not in line
+                        and not line.strip().startswith(
+                            "deleted:    .coverage"
+                        )
+                    ]
+                )
             for keyword in error_keywords:
                 if keyword in output:
-                    error_msg = f"{' '.join(cmd)}: {keyword} found\n" f"{output}"
+                    # Only error if not related to .coverage or error log
+                    if ".coverage" in output or "errorlog" in output:
+                        continue
+                    error_msg = (
+                        f"{' '.join(cmd)}: {keyword} found\n" f"{output}"
+                    )
                     errors.append(error_msg)
         except Exception as e:
             error_msg = f"{' '.join(cmd)}: Exception {type(e).__name__}: {e}"

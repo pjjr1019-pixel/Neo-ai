@@ -6,7 +6,9 @@ def test_git_status_clean():
     result = subprocess.run(
         ["git", "status", "--porcelain"], capture_output=True, text=True
     )
-    assert not result.stdout.strip(), "Git working tree is not clean:\n" + result.stdout
+    assert not result.stdout.strip(), (
+        "Git working tree is not clean:\n" + result.stdout
+    )
 
 
 def test_git_config_safe():

@@ -1,0 +1,93 @@
+version: '3.9'
+
+services:
+  # NEO AI Python Service
+  neo-ai-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: neo-ai-service
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - NEO_ENV=development
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./python_ai:/app/python_ai
+      - ./data:/app/data
+    networks:
+      - neo-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      - postgres-db
+      - redis-cache
+    command: >
+      bash -c "python -m pytest python_ai/ -v &&
+               python -c 'from python_ai.orchestration_core import get_orchestrator_integration;
+                          print(\"NEO AI Service Ready\")'
+              "
+
+  # PostgreSQL Database
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: neo-postgres
+    environment:
+      - POSTGRES_USER=neo_user
+      - POSTGRES_PASSWORD=neo_secure_password
+      - POSTGRES_DB=neo_trading_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - neo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neo_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis-cache:
+    image: redis:7-alpine
+    container_name: neo-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - neo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # Prometheus Monitoring (for Phase 9+)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: neo-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - neo-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+volumes:
+  postgres_data:
+  prometheus_data:
+
+networks:
+  neo-network:
+    driver: bridge

@@ -1,0 +1,104 @@
+name: CD Pipeline
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.neo-ai.example.com
+    steps:
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment..."
+          echo "Image: ${{ needs.build-image.outputs.image-tag }}"
+          # Add actual deployment commands here
+          # e.g., kubectl apply, docker-compose, etc.
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: >
+      github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.event.inputs.environment == 'production')
+    environment:
+      name: production
+      url: https://neo-ai.example.com
+    steps:
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          echo "Image: ${{ needs.build-image.outputs.image-tag }}"
+          # Add actual deployment commands here
+          # e.g., kubectl apply, docker-compose, etc.
+
+      - name: Notify deployment
+        if: success()
+        run: |
+          echo "Production deployment completed successfully"
+          # Add notification logic (Slack, email, etc.)

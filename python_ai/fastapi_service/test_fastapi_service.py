@@ -7,6 +7,7 @@ blank lines, and error handling.
 
 from fastapi import status
 from fastapi.testclient import TestClient
+
 from python_ai.fastapi_service.fastapi_service import app
 
 
@@ -25,13 +26,11 @@ def test_root():
 def test_predict_invalid():
     """
     Test predict endpoint with invalid input.
-    Ensures the endpoint returns a valid response and output key.
+    Ensures the endpoint returns a 422 validation error for bad schema.
     """
     client = TestClient(app)
     response = client.post("/predict", json={"input": "test"})
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert "output" in data
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_metrics_endpoint():
@@ -43,8 +42,9 @@ def test_metrics_endpoint():
     response = client.get("/metrics")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert "request_count" in data
-    assert isinstance(data["request_count"], int)
+    assert "request_counts" in data
+    assert isinstance(data["request_counts"], dict)
+    assert "total_requests" in data
 
 
 def test_explain_endpoint():

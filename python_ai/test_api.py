@@ -1,10 +1,11 @@
 import pytest
+from fastapi.testclient import TestClient
+
 from python_ai.fastapi_service.fastapi_service import (
     app,
     get_learning_logic,
     learning_logic,
 )
-from fastapi.testclient import TestClient
 
 
 @pytest.mark.parametrize(

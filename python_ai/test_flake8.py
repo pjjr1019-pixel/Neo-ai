@@ -6,9 +6,22 @@ Fails if any flake8 errors or warnings are found.
 import subprocess
 import sys
 
+import pytest
+
 
 def test_flake8_compliance():
     """Run flake8 on the project and fail if any errors/warnings are found."""
+    result = subprocess.run(
+        [sys.executable, "-m", "flake8", "--version"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        pytest.skip(
+            "flake8 module not installed. "
+            "Install with: pip install -r requirements-dev.txt"
+        )
+
     result = subprocess.run(
         [sys.executable, "-m", "flake8", "python_ai/"],
         capture_output=True,
@@ -23,6 +36,8 @@ def test_flake8_error_print(monkeypatch, capsys):
     """Test print output when flake8 errors are found."""
 
     class FakeResult:
+        """Fake subprocess result for simulating flake8 output."""
+
         returncode = 1
         stdout = "E999 syntax error"
 
@@ -40,6 +55,8 @@ def test_flake8_pass_print(monkeypatch, capsys):
     """Test print output when flake8 passes (no errors)."""
 
     class FakeResult:
+        """Fake result object for simulating flake8 output."""
+
         returncode = 0
         stdout = ""
 
