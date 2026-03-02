@@ -5,7 +5,9 @@ Provides dependency injection functions for authentication
 and authorization in FastAPI routes.
 """
 
-from typing import Callable, List, Optional
+import logging
+import os
+from typing import Callable, Dict, List, Optional
 
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
@@ -19,6 +21,8 @@ from python_ai.auth.api_key import validate_api_key
 from python_ai.auth.jwt_handler import decode_token
 from python_ai.auth.models import User, UserRole
 from python_ai.auth.password_policy import get_account_lockout
+
+logger = logging.getLogger(__name__)
 
 # OAuth2 scheme for JWT authentication
 oauth2_scheme = OAuth2PasswordBearer(
@@ -35,22 +39,59 @@ api_key_header = APIKeyHeader(
     auto_error=False,
 )
 
+# ── Default admin hash (bcrypt of "admin123") ─────────────────
+_DEFAULT_ADMIN_HASH: str = (
+    "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4" ".FVttYxVE9KW3QG"
+)
 
-# In-memory user store (replace with database in production)
-_users_db: dict = {
-    "admin": {
-        "username": "admin",
-        "email": "admin@neo.ai",
+# In-memory user store — seeded from env vars.
+# In production, replace with a database-backed lookup.
+_users_db: Dict[str, Dict] = {}
+
+
+def _init_users_db() -> None:
+    """Populate the in-memory user store from environment.
+
+    In **production** (``NEO_ENVIRONMENT=production``) the default
+    admin hash is rejected — the ``ADMIN_PASSWORD_HASH`` env var
+    **must** be set to a non-default bcrypt hash.
+
+    In dev/test the default is accepted with a warning so that
+    the app can still boot without extra configuration.
+    """
+    env = os.getenv("NEO_ENVIRONMENT", "development").lower()
+    admin_hash = os.getenv("ADMIN_PASSWORD_HASH", _DEFAULT_ADMIN_HASH)
+
+    if env == "production" and admin_hash == _DEFAULT_ADMIN_HASH:
+        raise RuntimeError(
+            "CRITICAL: ADMIN_PASSWORD_HASH env var must be set "
+            "to a non-default value in production. "
+            "Generate one with: python -c "
+            '"import bcrypt; print(bcrypt.hashpw('
+            "b'<password>', bcrypt.gensalt()).decode())\""
+        )
+
+    if admin_hash == _DEFAULT_ADMIN_HASH:
+        logger.warning(
+            "Using default admin credentials — "
+            "set ADMIN_PASSWORD_HASH for production use"
+        )
+
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@neo.ai")
+    admin_user = os.getenv("ADMIN_USERNAME", "admin")
+
+    _users_db[admin_user] = {
+        "username": admin_user,
+        "email": admin_email,
         "full_name": "Admin User",
         "roles": [UserRole.ADMIN],
         "disabled": False,
-        "hashed_password": (
-            # Default password: "admin123" - CHANGE IN PRODUCTION
-            "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4"  # nosec: B105
-            ".FVttYxVE9KW3QG"
-        ),
-    },
-}
+        "hashed_password": admin_hash,
+    }
+
+
+# Bootstrap on import (test suites can call _init_users_db() to reset)
+_init_users_db()
 
 
 def get_user(username: str) -> Optional[User]:

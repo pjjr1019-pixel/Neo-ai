@@ -7,6 +7,7 @@ Supports both synthetic demo training and real market data training.
 """
 
 import hashlib
+import hmac
 import logging
 import os
 import warnings
@@ -21,10 +22,18 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from python_ai.data_pipeline import FEATURE_NAMES
+
 # Suppress sklearn warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
 logger = logging.getLogger(__name__)
+
+# ── HMAC key for model file integrity ─────────────────────────
+# In production, set MODEL_HMAC_KEY to a strong random secret.
+_MODEL_HMAC_KEY: bytes = os.getenv(
+    "MODEL_HMAC_KEY", "neo-model-integrity-default-key"
+).encode()
 
 
 class MLModel:
@@ -213,15 +222,25 @@ class MLModel:
         return ensemble_pred, confidence, signal
 
     def _dict_to_array(self, features: Dict[str, float]) -> np.ndarray:
-        """Convert feature dict to array (10 features, padded with 0s)."""
-        arr = np.zeros(10)
-        for i, (key, value) in enumerate(features.items()):
-            if i < 10:
-                arr[i] = float(value)
+        """Convert feature dict to array using canonical feature order.
+
+        Maps feature values by name from ``FEATURE_NAMES`` so that the
+        array order always matches what the model was trained on,
+        regardless of dict insertion order.
+
+        Unknown keys are logged as warnings and ignored.
+        """
+        arr = np.zeros(len(FEATURE_NAMES))
+        known_keys = set(FEATURE_NAMES)
+        for i, name in enumerate(FEATURE_NAMES):
+            arr[i] = float(features.get(name, 0.0))
+        unknown = set(features.keys()) - known_keys
+        if unknown:
+            logger.warning("Ignoring unknown feature keys: %s", unknown)
         return arr
 
     def save(self) -> None:
-        """Save model to disk using joblib (safe serializer)."""
+        """Save model to disk using joblib with HMAC integrity tag."""
         data = {
             "rf_model": self.rf_model,
             "gb_model": self.gb_model,
@@ -232,21 +251,24 @@ class MLModel:
         }
         joblib.dump(data, self.model_path, compress=3)
 
-        # Write integrity hash next to model file
-        hash_path = self.model_path + ".sha256"
-        file_hash = self._file_hash(self.model_path)
-        with open(hash_path, "w") as hf:
-            hf.write(file_hash)
+        # Write HMAC-SHA256 tag (keyed hash, not plain SHA-256)
+        tag_path = self.model_path + ".hmac"
+        file_tag = self._file_hmac(self.model_path)
+        with open(tag_path, "w") as hf:
+            hf.write(file_tag)
 
     def load(self) -> None:
-        """Load model from disk using joblib (safe deserializer).
+        """Load model from disk using joblib.
 
-        Verifies SHA-256 integrity hash.  If no ``.sha256`` sidecar
-        exists the hash is generated on first load so that future
-        loads are protected.
+        Verifies an HMAC-SHA256 integrity tag so that file
+        tampering is detected even if the attacker can write to
+        the model directory (unlike a plain SHA-256 sidecar).
+
+        Falls back to legacy ``.sha256`` sidecars for existing
+        models, upgrading them to HMAC on load.
 
         Raises:
-            NeoModelIntegrityError: When the hash check fails.
+            NeoModelIntegrityError: When the integrity check fails.
             NeoModelError: On any other load failure.
         """
         from python_ai.exceptions import (
@@ -255,25 +277,45 @@ class MLModel:
         )
 
         try:
-            hash_path = self.model_path + ".sha256"
-            actual = self._file_hash(self.model_path)
+            tag_path = self.model_path + ".hmac"
+            legacy_path = self.model_path + ".sha256"
+            actual_tag = self._file_hmac(self.model_path)
 
-            if os.path.exists(hash_path):
-                with open(hash_path, "r") as hf:
+            if os.path.exists(tag_path):
+                # HMAC tag found — verify
+                with open(tag_path, "r") as hf:
                     expected = hf.read().strip()
-                if actual != expected:
+                if not hmac.compare_digest(actual_tag, expected):
+                    raise NeoModelIntegrityError(
+                        "Model file HMAC check failed – "
+                        "file may have been tampered with",
+                        context={"path": self.model_path},
+                    )
+            elif os.path.exists(legacy_path):
+                # Legacy SHA-256 sidecar — verify then upgrade
+                actual_sha = self._file_hash(self.model_path)
+                with open(legacy_path, "r") as hf:
+                    expected_sha = hf.read().strip()
+                if actual_sha != expected_sha:
                     raise NeoModelIntegrityError(
                         "Model file integrity check failed – "
                         "file may have been tampered with",
                         context={"path": self.model_path},
                     )
+                # Upgrade to HMAC
+                with open(tag_path, "w") as hf:
+                    hf.write(actual_tag)
+                logger.info(
+                    "Upgraded model integrity from SHA-256 to HMAC " "for %s",
+                    self.model_path,
+                )
             else:
-                # First load without hash – generate sidecar
-                with open(hash_path, "w") as hf:
-                    hf.write(actual)
+                # No sidecar — generate HMAC for future loads
+                with open(tag_path, "w") as hf:
+                    hf.write(actual_tag)
                 logger.warning(
-                    "No .sha256 sidecar found for %s – "
-                    "generated one for future integrity checks",
+                    "No integrity sidecar found for %s – "
+                    "generated HMAC for future integrity checks",
                     self.model_path,
                 )
 
@@ -296,8 +338,17 @@ class MLModel:
             ) from e
 
     @staticmethod
+    def _file_hmac(path: str) -> str:
+        """Compute HMAC-SHA256 of a file using the model secret key."""
+        h = hmac.new(_MODEL_HMAC_KEY, digestmod=hashlib.sha256)
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    @staticmethod
     def _file_hash(path: str) -> str:
-        """Compute SHA-256 hash of a file."""
+        """Compute SHA-256 hash of a file (legacy compat)."""
         h = hashlib.sha256()
         with open(path, "rb") as f:
             for chunk in iter(lambda: f.read(8192), b""):

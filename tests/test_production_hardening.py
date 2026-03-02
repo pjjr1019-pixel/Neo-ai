@@ -918,16 +918,14 @@ class TestFastAPINewEndpoints:
     """Tests for new /health and /metrics/prometheus endpoints."""
 
     def test_health_endpoint(self):
-        """Test health endpoint."""
+        """Test health liveness endpoint returns ok status."""
         from python_ai.fastapi_service.fastapi_service import app
 
         client = TestClient(app)
         resp = client.get("/health")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["status"] in ("healthy", "degraded")
-        assert "uptime_seconds" in data
-        assert "checks" in data
+        assert data["status"] == "ok"
 
     def test_prometheus_endpoint(self):
         """Test prometheus endpoint."""

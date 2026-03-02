@@ -444,13 +444,19 @@ class DataPipeline:
             "atr_14": float(atr),
             "price_vs_sma": float(close[-1] - sma),  # Price vs SMA
             "return_1d": float(
-                (close[-1] - close[-2]) / close[-2] if len(close) > 1 else 0
+                (close[-1] - close[-2]) / close[-2]
+                if len(close) > 1 and abs(close[-2]) > 1e-10
+                else 0
             ),
             "return_5d": float(
-                (close[-1] - close[-5]) / close[-5] if len(close) > 5 else 0
+                (close[-1] - close[-5]) / close[-5]
+                if len(close) > 5 and abs(close[-5]) > 1e-10
+                else 0
             ),
             "return_10d": float(
-                (close[-1] - close[-10]) / close[-10] if len(close) > 10 else 0
+                (close[-1] - close[-10]) / close[-10]
+                if len(close) > 10 and abs(close[-10]) > 1e-10
+                else 0
             ),
         }
 

@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
 from python_ai.auth.dependencies import get_current_user
+from python_ai.auth.jwt_handler import decode_token
 from python_ai.auth.models import User
 from python_ai.config.settings import get_settings
 from python_ai.data_pipeline import DataPipeline, get_pipeline
@@ -35,7 +36,7 @@ from python_ai.ws_signal_stream import websocket_signal_handler
 logger = logging.getLogger(__name__)
 
 _settings = get_settings()
-_VERSION = "0.5.0"
+_VERSION = "0.6.0"
 
 
 # ── Lifespan (startup / shutdown) ─────────────────────────────
@@ -183,10 +184,26 @@ def root() -> Dict[str, str]:
 
 
 @app.get("/health")
-def health(
+def health() -> Dict[str, str]:
+    """Public liveness probe — returns only a status string.
+
+    Does **not** expose system details; use ``/health/details``
+    (auth-protected) for diagnostics.
+
+    Returns:
+        Dict with ``status`` key.
+    """
+    return {"status": "ok"}
+
+
+@app.get("/health/details")
+def health_details(
     model: MLModel = Depends(get_ml_model),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
-    """Health check with model, DB, and system status.
+    """Auth-protected health check with model, DB, and system status.
+
+    Requires authentication (JWT or API key).
 
     Returns:
         Dict with status, model info, uptime, and system details.
@@ -520,8 +537,17 @@ def explain(
 async def ws_signals(websocket: WebSocket) -> None:
     """Stream live trading signals over WebSocket.
 
-    Accepts the connection and delegates to the global
-    ``SignalBroadcaster`` for fan-out delivery.
+    Validates a JWT token from the ``token`` query parameter
+    before accepting the connection.  Returns close code 4001
+    if authentication fails.
     """
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=4001)
+        return
+    token_data = decode_token(token)
+    if token_data is None or not token_data.username:
+        await websocket.close(code=4001)
+        return
     await websocket.accept()
     await websocket_signal_handler(websocket)

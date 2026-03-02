@@ -51,14 +51,19 @@ class BacktestMetrics:
         """Calculate composite fitness score for evolution.
 
         Fitness combines:
-        - Return (40% weight)
+        - Return (40% weight, sigmoid-scaled so negatives are
+          preserved: -100% → 0.0, 0% → 0.5, +100% → 1.0)
         - Sharpe ratio (40% weight, normalized)
         - Win rate (20% weight)
 
         Returns:
             Fitness score (0-1 scale).
         """
-        return_score = min(self.total_return / 100.0, 1.0)
+        # Sigmoid-like linear mapping preserving gradient for
+        # negative returns: -100% → 0, 0% → 0.5, +100% → 1.0
+        return_score = float(
+            np.clip((self.total_return + 100.0) / 200.0, 0.0, 1.0)
+        )
         sharpe_score = min(abs(self.sharpe_ratio) / 3.0, 1.0)
         win_score = self.win_rate / 100.0
 
@@ -129,6 +134,7 @@ class BacktestingEngine:
         position = 0  # 0 = no position, 1 = long
         entry_price = 0.0
         shares = 0.0
+        cash = self.initial_capital
         trades: List[float] = []
         num_trades = 0
 
@@ -139,36 +145,33 @@ class BacktestingEngine:
                 signal = signals[i]
 
             current_price = close_prices[i]
-            portfolio_value = portfolio_values[pv_idx]
 
             if signal == "BUY" and position == 0:
-                cost = portfolio_value * self.transaction_cost_pct
-                net_value = portfolio_value - cost
+                cost = cash * self.transaction_cost_pct
+                net_value = cash - cost
                 shares = net_value / current_price
+                cash = 0.0
                 position = 1
                 entry_price = current_price
                 num_trades += 1
                 pv_idx += 1
-                portfolio_values[pv_idx] = net_value
+                portfolio_values[pv_idx] = cash + shares * current_price
             elif signal == "SELL" and position == 1:
                 proceeds = shares * current_price
                 cost = proceeds * self.transaction_cost_pct
                 net_proceeds = proceeds - cost
                 gain = net_proceeds - (shares * entry_price)
                 trades.append(gain)
+                cash = net_proceeds
                 position = 0
                 shares = 0.0
                 num_trades += 1
                 pv_idx += 1
-                portfolio_values[pv_idx] = portfolio_values[pv_idx - 1] + gain
+                portfolio_values[pv_idx] = cash
             else:
-                if position == 1:
-                    current_value = shares * current_price
-                    pv_idx += 1
-                    portfolio_values[pv_idx] = current_value
-                else:
-                    pv_idx += 1
-                    portfolio_values[pv_idx] = portfolio_values[pv_idx - 1]
+                # HOLD or invalid signal — portfolio = cash + position
+                pv_idx += 1
+                portfolio_values[pv_idx] = cash + shares * current_price
 
         values_array = portfolio_values[: pv_idx + 1]
 

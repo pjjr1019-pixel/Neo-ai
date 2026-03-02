@@ -83,9 +83,9 @@ class TestMLModelFeatures:
             model_path = os.path.join(tmpdir, "test_model.pkl")
             model = MLModel(model_path)
             features = {
-                "f0": 1.0,
-                "f1": 2.0,
-                "f2": 3.0,
+                "rsi_14": 1.0,
+                "macd_value": 2.0,
+                "macd_signal": 3.0,
             }
             arr = model._dict_to_array(features)
             assert len(arr) == 10
@@ -98,7 +98,7 @@ class TestMLModelFeatures:
         with tempfile.TemporaryDirectory() as tmpdir:
             model_path = os.path.join(tmpdir, "test_model.pkl")
             model = MLModel(model_path)
-            features = {"f0": 1.0}
+            features = {"rsi_14": 1.0}
             arr = model._dict_to_array(features)
             assert arr[0] == 1.0
             assert arr[1] == 0.0

@@ -13,6 +13,7 @@ from typing import Any, Callable, Dict, List, Optional
 import ccxt
 
 from python_ai.autonomous_trading_loop import MarketDataFeed
+from python_ai.resilience import external_api_call
 
 logger = logging.getLogger(__name__)
 
@@ -104,9 +105,12 @@ class LiveExchangeDataFeed(MarketDataFeed):
             Dict with open/high/low/close/volume keys, or None.
         """
         try:
-            ohlcv = self.exchange.fetch_ohlcv(
+            ohlcv = external_api_call(
+                self.exchange.fetch_ohlcv,
                 symbol,
                 self.timeframe,
+                max_attempts=2,
+                timeout=10.0,
                 limit=2,
             )
             if not ohlcv or len(ohlcv) < 2:
