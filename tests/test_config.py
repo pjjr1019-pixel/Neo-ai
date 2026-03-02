@@ -187,7 +187,10 @@ class TestSettings:
         """Test is_production property."""
         with patch.dict(
             os.environ,
-            {"AUTH_SECRET_KEY": "a-real-production-secret-key-here"},
+            {
+                "AUTH_SECRET_KEY": "a-real-production-secret-key-here",
+                "DB_PASSWORD": "Str0ng!Pr0d#Pass",
+            },
         ):
             settings = Settings(environment="production")
             assert settings.is_production is True

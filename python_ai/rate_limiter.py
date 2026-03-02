@@ -54,18 +54,21 @@ class TokenBucket:
     def consume(self, tokens: int = 1) -> bool:
         """Try to consume *tokens*.  Returns True on success."""
         with self._lock:
-            now = time.time()
-            elapsed = now - self._last_refill
-            self._tokens = min(
-                self.capacity,
-                self._tokens + elapsed * self.refill_rate,
-            )
-            self._last_refill = now
-
+            self._refill()
             if self._tokens >= tokens:
                 self._tokens -= tokens
                 return True
             return False
+
+    def _refill(self) -> None:
+        """Refill tokens based on elapsed time (call under lock)."""
+        now = time.time()
+        elapsed = now - self._last_refill
+        self._tokens = min(
+            self.capacity,
+            self._tokens + elapsed * self.refill_rate,
+        )
+        self._last_refill = now
 
     @property
     def available(self) -> float:
@@ -107,6 +110,23 @@ class RateLimiter:
                 )
         return self._buckets[key].consume()
 
+    def allow_with_info(self, key: str) -> tuple[bool, int, int]:
+        """Check rate limit and return (allowed, remaining, limit).
+
+        Returns:
+            Tuple of (allowed, remaining_tokens, capacity).
+        """
+        with self._lock:
+            if key not in self._buckets:
+                self._buckets[key] = TokenBucket(
+                    self.capacity,
+                    self.refill_rate,
+                )
+        bucket = self._buckets[key]
+        allowed = bucket.consume()
+        remaining = max(0, int(bucket.available))
+        return allowed, remaining, bucket.capacity
+
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Starlette middleware that applies per-IP rate limiting.
@@ -146,14 +166,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         """Check rate limit before forwarding the request."""
         client_ip = request.client.host if request.client else "unknown"
 
-        if not self.limiter.allow(client_ip):
+        allowed, remaining, limit = self.limiter.allow_with_info(client_ip)
+
+        if not allowed:
             logger.warning("Rate limit exceeded for %s", client_ip)
-            return JSONResponse(
+            reset_seconds = int(limit / self.limiter.refill_rate)
+            resp = JSONResponse(
                 status_code=429,
                 content={
                     "detail": "Rate limit exceeded. Try again later.",
                 },
             )
+            resp.headers["X-RateLimit-Limit"] = str(limit)
+            resp.headers["X-RateLimit-Remaining"] = "0"
+            resp.headers["X-RateLimit-Reset"] = str(reset_seconds)
+            resp.headers["Retry-After"] = str(reset_seconds)
+            return resp
 
         response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(limit)
+        response.headers["X-RateLimit-Remaining"] = str(remaining)
         return response

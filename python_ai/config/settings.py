@@ -6,11 +6,14 @@ API server) are defined here.  Trading-strategy-specific parameters
 :mod:`python_ai.strategy_config` and can be loaded from YAML/JSON.
 """
 
+import logging
 from functools import lru_cache
 from typing import List
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseSettings(BaseSettings):
@@ -44,6 +47,22 @@ class DatabaseSettings(BaseSettings):
         default=1800,
         description="Seconds before recycling connections",
     )
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        """Warn when the database password is empty or trivial."""
+        import os
+
+        _INSECURE = {"", "password", "postgres", "admin"}
+        env = os.getenv("NEO_ENVIRONMENT", "development").lower()
+        if v in _INSECURE and env == "production":
+            raise ValueError(
+                "DB_PASSWORD must be set to a non-trivial value "
+                "in production. Do not use defaults."
+            )
+        return v
+
     pool_size: int = Field(default=5, description="Connection pool size")
     max_overflow: int = Field(default=10, description="Max overflow")
     pool_timeout: int = Field(default=30, description="Pool timeout")
@@ -322,6 +341,23 @@ class Settings(BaseSettings):
         if v.lower() not in valid:
             raise ValueError(f"Invalid environment: {v}")
         return v.lower()
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self) -> "Settings":
+        """Reject placeholder secrets in production.
+
+        Ensures that AUTH_SECRET_KEY and DB_PASSWORD are set to
+        real values before the app can start in production.
+        """
+        if self.is_production:
+            if not self.auth.secret_key or len(self.auth.secret_key) < 16:
+                raise ValueError(
+                    "AUTH_SECRET_KEY must be ≥16 characters in production."
+                )
+            if not self.database.password:
+                raise ValueError("DB_PASSWORD must be set in production.")
+            logger.info("Production secret validation passed")
+        return self
 
     @property
     def is_production(self) -> bool:

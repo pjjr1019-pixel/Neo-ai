@@ -28,9 +28,9 @@ _TEST_USER = User(
         ),
         (
             {"features": [], "target": 0},
-            200,
-            "status",
-        ),  # edge: empty features
+            422,
+            None,
+        ),  # edge: empty features now rejected by schema
         (
             {"features": [1, 2, 3]},
             422,

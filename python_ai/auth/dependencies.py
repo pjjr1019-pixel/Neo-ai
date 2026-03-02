@@ -18,6 +18,7 @@ from fastapi.security import (
 from python_ai.auth.api_key import validate_api_key
 from python_ai.auth.jwt_handler import decode_token
 from python_ai.auth.models import User, UserRole
+from python_ai.auth.password_policy import get_account_lockout
 
 # OAuth2 scheme for JWT authentication
 oauth2_scheme = OAuth2PasswordBearer(
@@ -100,6 +101,13 @@ async def get_current_user(
     if token:
         token_data = decode_token(token)
         if token_data and token_data.username:
+            lockout = get_account_lockout()
+            if lockout.is_locked(token_data.username):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Account temporarily locked due to "
+                    "repeated failed login attempts",
+                )
             user = get_user(token_data.username)
             if user:
                 return user
@@ -108,6 +116,13 @@ async def get_current_user(
     if bearer and bearer.credentials:
         token_data = decode_token(bearer.credentials)
         if token_data and token_data.username:
+            lockout = get_account_lockout()
+            if lockout.is_locked(token_data.username):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Account temporarily locked due to "
+                    "repeated failed login attempts",
+                )
             user = get_user(token_data.username)
             if user:
                 return user

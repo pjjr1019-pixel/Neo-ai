@@ -16,12 +16,13 @@ from typing import Any, AsyncIterator, Dict, List
 import numpy as np
 from fastapi import Depends, FastAPI, Response, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from python_ai.auth.dependencies import get_current_user
 from python_ai.auth.models import User
 from python_ai.config.settings import get_settings
 from python_ai.data_pipeline import DataPipeline, get_pipeline
+from python_ai.logging import LogConfig, LogFormat, LogLevel, setup_logging
 from python_ai.middleware import (
     CorrelationIDMiddleware,
     RequestLoggingMiddleware,
@@ -53,6 +54,19 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
       - Log a clean shutdown message.
     """
     logger.info("NEO Hybrid AI v%s starting up", _VERSION)
+
+    # Configure structured logging from settings
+    log_settings = _settings.logging
+    log_config = LogConfig(
+        level=LogLevel(log_settings.level),
+        format=LogFormat(log_settings.format.lower()),
+        app_name=_settings.app_name,
+        enable_file_logging=log_settings.enable_file_logging,
+        max_file_size_mb=log_settings.max_file_size_mb,
+        backup_count=log_settings.backup_count,
+    )
+    setup_logging(log_config)
+
     # Pre-load model on startup
     get_model()
     logger.info("Model loaded, service ready")
@@ -80,13 +94,18 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=_settings.api.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "X-API-Key",
+        "X-Correlation-ID",
+    ],
 )
 
 app.add_middleware(
     RateLimitMiddleware,  # type: ignore[arg-type]
-    requests_per_minute=120,
+    requests_per_minute=_settings.api.rate_limit_per_minute,
 )
 
 app.add_middleware(RequestLoggingMiddleware)
@@ -139,6 +158,22 @@ class PredictInput(BaseModel):
         min_length=1,
         description="Feature dict with at least one entry",
     )
+
+    @field_validator("features")
+    @classmethod
+    def validate_feature_values(cls, v: Dict[str, float]) -> Dict[str, float]:
+        """Reject NaN, Inf, and extreme values."""
+        import math
+
+        for key, val in v.items():
+            if math.isnan(val) or math.isinf(val):
+                raise ValueError(f"Feature '{key}' contains NaN or Inf")
+            if abs(val) > 1e12:
+                raise ValueError(
+                    f"Feature '{key}' value {val} exceeds "
+                    f"allowed range (±1e12)"
+                )
+        return v
 
 
 @app.get("/")
@@ -296,10 +331,36 @@ def learning_logic(data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class LearnInput(BaseModel):
-    """Input schema for /learn endpoint."""
+    """Input schema for /learn endpoint.
 
-    features: list
-    target: float
+    Attributes:
+        features: List of numeric feature values.
+        target: Target value for supervised learning.
+    """
+
+    features: List[float] = Field(
+        ...,
+        min_length=1,
+        max_length=1000,
+        description="Feature vector (list of floats)",
+    )
+    target: float = Field(
+        ...,
+        ge=-1e6,
+        le=1e6,
+        description="Target value for training",
+    )
+
+    @field_validator("features")
+    @classmethod
+    def validate_features_finite(cls, v: List[float]) -> List[float]:
+        """Reject NaN and Inf in feature vector."""
+        import math
+
+        for i, val in enumerate(v):
+            if math.isnan(val) or math.isinf(val):
+                raise ValueError(f"Feature at index {i} contains NaN or Inf")
+        return v
 
 
 @app.post("/learn")

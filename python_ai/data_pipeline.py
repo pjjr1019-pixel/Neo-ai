@@ -5,9 +5,13 @@ Computes technical indicators (RSI, MACD, Bollinger Bands, ATR, etc.)
 from OHLCV data and prepares feature vectors for model inference.
 """
 
+import logging
+import math
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 # ── Canonical feature names ───────────────────────────────────
 # Order matters: the ML model sees values in this order.
@@ -29,7 +33,106 @@ __all__ = [
     "FEATURE_NAMES",
     "TechnicalIndicators",
     "get_pipeline",
+    "validate_features",
+    "validate_ohlcv",
 ]
+
+
+# ── Data quality validation ───────────────────────────────────
+
+
+def validate_ohlcv(
+    ohlcv: Dict[str, List[float]],
+) -> List[str]:
+    """Validate OHLCV data for consistency and completeness.
+
+    Checks:
+    - All required columns present (open, high, low, close, volume).
+    - All columns the same length.
+    - high >= low, high >= open, high >= close for each bar.
+    - volume >= 0.
+    - No NaN or Inf values.
+
+    Args:
+        ohlcv: Dict with 'open', 'high', 'low', 'close', 'volume'.
+
+    Returns:
+        List of error strings.  Empty list means valid.
+    """
+    errors: List[str] = []
+    required = {"open", "high", "low", "close"}
+    missing = required - set(ohlcv.keys())
+    if missing:
+        errors.append(f"Missing OHLCV columns: {sorted(missing)}")
+        return errors
+
+    lengths = {k: len(v) for k, v in ohlcv.items()}
+    unique_lengths = set(lengths.values())
+    if len(unique_lengths) > 1:
+        errors.append(f"Column length mismatch: {lengths}")
+        return errors
+
+    n = lengths.get("close", 0)
+    if n == 0:
+        errors.append("OHLCV data is empty")
+        return errors
+
+    o = ohlcv["open"]
+    h = ohlcv["high"]
+    lo = ohlcv["low"]
+    c = ohlcv["close"]
+    v = ohlcv.get("volume", [0.0] * n)
+
+    for i in range(n):
+        # NaN / Inf check
+        vals = [o[i], h[i], lo[i], c[i]]
+        if any(math.isnan(x) or math.isinf(x) for x in vals):
+            errors.append(f"Bar {i}: NaN or Inf in OHLC values")
+            continue
+        if h[i] < lo[i]:
+            errors.append(f"Bar {i}: high ({h[i]}) < low ({lo[i]})")
+        if h[i] < c[i]:
+            errors.append(f"Bar {i}: high ({h[i]}) < close ({c[i]})")
+        if h[i] < o[i]:
+            errors.append(f"Bar {i}: high ({h[i]}) < open ({o[i]})")
+        if len(v) > i and v[i] < 0:
+            errors.append(f"Bar {i}: negative volume ({v[i]})")
+
+        # Cap errors to avoid log explosion
+        if len(errors) >= 20:
+            errors.append("... truncated (too many errors)")
+            break
+
+    return errors
+
+
+def validate_features(
+    features: Dict[str, float],
+) -> List[str]:
+    """Validate a feature dict against the canonical schema.
+
+    Checks:
+    - All expected feature names present.
+    - All values are finite floats (no NaN/Inf).
+
+    Args:
+        features: Feature dict from ``compute_features``.
+
+    Returns:
+        List of error strings.  Empty list means valid.
+    """
+    errors: List[str] = []
+    for name in FEATURE_NAMES:
+        if name not in features:
+            errors.append(f"Missing feature: {name}")
+    for key, val in features.items():
+        if not isinstance(val, (int, float)):
+            errors.append(
+                f"Feature '{key}' is not numeric: {type(val).__name__}"
+            )
+        elif math.isnan(val) or math.isinf(val):
+            errors.append(f"Feature '{key}' is NaN or Inf")
+    return errors
 
 
 class TechnicalIndicators:
@@ -210,10 +313,21 @@ class DataPipeline:
     ) -> None:
         """Update OHLCV data for a symbol.
 
+        Runs :func:`validate_ohlcv` and logs warnings for any
+        data-quality issues (but still stores the data so the
+        pipeline is not blocked by minor glitches).
+
         Args:
             symbol: Trading symbol (e.g., 'BTC/USD').
             ohlcv: Dict with 'open', 'high', 'low', 'close', 'volume' lists.
         """
+        issues = validate_ohlcv(ohlcv)
+        if issues:
+            logger.warning(
+                "OHLCV quality issues for %s: %s",
+                symbol,
+                "; ".join(issues[:5]),
+            )
         self.price_history[symbol] = ohlcv.copy()
         # Invalidate feature cache
         self.feature_cache.clear()
