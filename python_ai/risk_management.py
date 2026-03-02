@@ -8,7 +8,7 @@ Provides:
 """
 
 import logging
-from typing import List
+from typing import List, Literal
 
 import numpy as np
 
@@ -77,7 +77,12 @@ def kelly_position_size(
 
     Returns:
         Quantity to buy in base currency.
+
+    Raises:
+        ValueError: If equity is non-positive.
     """
+    if equity <= 0:
+        raise ValueError(f"equity must be positive, got {equity}")
     fraction = kelly_fraction(win_rate, avg_win, avg_loss, cap)
     notional = equity * fraction
     if price <= 0:
@@ -92,7 +97,7 @@ def atr_stop_loss(
     entry_price: float,
     atr_value: float,
     multiplier: float = 2.0,
-    side: str = "long",
+    side: Literal["long", "short"] = "long",
 ) -> float:
     """Calculate a dynamic stop-loss based on ATR.
 
@@ -100,13 +105,18 @@ def atr_stop_loss(
 
     Args:
         entry_price: Position entry price.
-        atr_value: Current Average True Range value.
+        atr_value: Current Average True Range value (must be > 0).
         multiplier: ATR multiplier (default 2.0).
         side: ``long`` or ``short``.
 
     Returns:
         Stop-loss price level.
+
+    Raises:
+        ValueError: If atr_value is non-positive.
     """
+    if atr_value <= 0:
+        raise ValueError(f"atr_value must be positive, got {atr_value}")
     offset = atr_value * multiplier
     if side == "long":
         return entry_price - offset
@@ -117,19 +127,24 @@ def atr_take_profit(
     entry_price: float,
     atr_value: float,
     multiplier: float = 3.0,
-    side: str = "long",
+    side: Literal["long", "short"] = "long",
 ) -> float:
     """Calculate a dynamic take-profit based on ATR.
 
     Args:
         entry_price: Position entry price.
-        atr_value: Current ATR value.
+        atr_value: Current ATR value (must be > 0).
         multiplier: ATR multiplier (default 3.0).
         side: ``long`` or ``short``.
 
     Returns:
         Take-profit price level.
+
+    Raises:
+        ValueError: If atr_value is non-positive.
     """
+    if atr_value <= 0:
+        raise ValueError(f"atr_value must be positive, got {atr_value}")
     offset = atr_value * multiplier
     if side == "long":
         return entry_price + offset
@@ -140,7 +155,7 @@ def atr_trailing_stop(
     highest_since_entry: float,
     atr_value: float,
     multiplier: float = 2.0,
-    side: str = "long",
+    side: Literal["long", "short"] = "long",
 ) -> float:
     """Trailing stop that follows the price using ATR.
 
@@ -207,3 +222,72 @@ def should_halt_trading(
         )
         return True
     return False
+
+
+# ── Daily Loss Limit ──────────────────────────────────────────
+
+
+def check_daily_loss_limit(
+    starting_equity: float,
+    current_equity: float,
+    max_daily_loss_pct: float = 0.05,
+) -> bool:
+    """Check whether today's losses exceed the daily limit.
+
+    Args:
+        starting_equity: Equity at the start of the trading day.
+        current_equity: Current equity.
+        max_daily_loss_pct: Maximum allowed daily loss as a
+            fraction (e.g. 0.05 = 5 %).
+
+    Returns:
+        True if the daily loss limit has been breached.
+
+    Raises:
+        ValueError: If starting_equity is non-positive.
+    """
+    if starting_equity <= 0:
+        raise ValueError(
+            f"starting_equity must be positive, got {starting_equity}"
+        )
+    loss_pct = (starting_equity - current_equity) / starting_equity
+    if loss_pct >= max_daily_loss_pct:
+        logger.warning(
+            "Daily loss %.2f%% exceeds limit %.2f%% \u2014 freeze trading",
+            loss_pct * 100,
+            max_daily_loss_pct * 100,
+        )
+        return True
+    return False
+
+
+# ── Position Size Cap ─────────────────────────────────────────
+
+
+def max_position_size(
+    equity: float,
+    price: float,
+    max_pct_of_equity: float = 0.10,
+) -> float:
+    """Compute the maximum position size as a fraction of equity.
+
+    Ensures no single position exceeds a configurable
+    percentage of total equity.
+
+    Args:
+        equity: Current portfolio equity.
+        price: Current asset price.
+        max_pct_of_equity: Maximum fraction of equity per
+            position (e.g. 0.10 = 10 %).
+
+    Returns:
+        Maximum quantity in base currency.
+
+    Raises:
+        ValueError: If equity or price is non-positive.
+    """
+    if equity <= 0:
+        raise ValueError(f"equity must be positive, got {equity}")
+    if price <= 0:
+        raise ValueError(f"price must be positive, got {price}")
+    return (equity * max_pct_of_equity) / price

@@ -68,10 +68,15 @@ def test_learn_dependency_override():
     app.dependency_overrides[get_current_user] = lambda: _TEST_USER
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    response = client.post("/learn", json={"features": [1, 2, 3], "target": 1})
-    assert response.status_code == 200
-    app.dependency_overrides.pop(get_learning_logic, None)
-    app.dependency_overrides.pop(get_current_user, None)
+    try:
+        response = client.post(
+            "/learn",
+            json={"features": [1, 2, 3], "target": 1},
+        )
+        assert response.status_code == 200
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
+        app.dependency_overrides.pop(get_current_user, None)
 
 
 def test_learn_error_handling():
@@ -79,11 +84,13 @@ def test_learn_error_handling():
     app.dependency_overrides[get_current_user] = lambda: _TEST_USER
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    payload = {"features": "notalist", "target": None}
-    response = client.post("/learn", json=payload)
-    assert response.status_code == 422
-    app.dependency_overrides.pop(get_learning_logic, None)
-    app.dependency_overrides.pop(get_current_user, None)
+    try:
+        payload = {"features": "notalist", "target": None}
+        response = client.post("/learn", json=payload)
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
+        app.dependency_overrides.pop(get_current_user, None)
 
 
 def test_learn_invalid_type():
@@ -91,10 +98,15 @@ def test_learn_invalid_type():
     app.dependency_overrides[get_current_user] = lambda: _TEST_USER
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    response = client.post("/learn", json={"features": 123, "target": "abc"})
-    assert response.status_code == 422
-    app.dependency_overrides.pop(get_learning_logic, None)
-    app.dependency_overrides.pop(get_current_user, None)
+    try:
+        response = client.post(
+            "/learn",
+            json={"features": 123, "target": "abc"},
+        )
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
+        app.dependency_overrides.pop(get_current_user, None)
 
 
 def test_learn_non_dict_payload():
@@ -102,10 +114,12 @@ def test_learn_non_dict_payload():
     app.dependency_overrides[get_current_user] = lambda: _TEST_USER
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    response = client.post("/learn", json=None)
-    assert response.status_code == 422
-    app.dependency_overrides.pop(get_learning_logic, None)
-    app.dependency_overrides.pop(get_current_user, None)
+    try:
+        response = client.post("/learn", json=None)
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
+        app.dependency_overrides.pop(get_current_user, None)
 
 
 def test_learn_missing_features_and_target():
@@ -113,7 +127,9 @@ def test_learn_missing_features_and_target():
     app.dependency_overrides[get_current_user] = lambda: _TEST_USER
     app.dependency_overrides[get_learning_logic] = lambda: learning_logic
     client = TestClient(app)
-    response = client.post("/learn", json={})
-    assert response.status_code == 422
-    app.dependency_overrides.pop(get_learning_logic, None)
-    app.dependency_overrides.pop(get_current_user, None)
+    try:
+        response = client.post("/learn", json={})
+        assert response.status_code == 422
+    finally:
+        app.dependency_overrides.pop(get_learning_logic, None)
+        app.dependency_overrides.pop(get_current_user, None)

@@ -11,7 +11,7 @@ import logging
 import platform
 import time
 from contextlib import asynccontextmanager
-from typing import Any, AsyncIterator, Dict, List
+from typing import Any, AsyncIterator, Callable, Dict, List
 
 import numpy as np
 from fastapi import Depends, FastAPI, Response, WebSocket
@@ -35,7 +35,7 @@ from python_ai.ws_signal_stream import websocket_signal_handler
 logger = logging.getLogger(__name__)
 
 _settings = get_settings()
-_VERSION = "0.4.0"
+_VERSION = "0.5.0"
 
 
 # ── Lifespan (startup / shutdown) ─────────────────────────────
@@ -123,7 +123,7 @@ _start_time = time.time()
 # ── Sample buffer for incremental learning ────────────────────
 _learn_buffer: List[Dict[str, Any]] = []
 _learn_lock = asyncio.Lock()
-_RETRAIN_THRESHOLD = 50  # retrain after this many samples
+_RETRAIN_THRESHOLD: int = _settings.model.retrain_threshold
 
 
 # ── Dependency-injection helpers ──────────────────────────────
@@ -269,7 +269,7 @@ def predict(
     }
 
 
-def get_learning_logic():
+def get_learning_logic() -> Callable[..., Dict[str, Any]]:
     """Get learning logic dependency for /learn endpoint."""
     return learning_logic
 

@@ -14,6 +14,15 @@ import numpy as np
 class BacktestMetrics:
     """Container for backtest performance metrics."""
 
+    __slots__ = (
+        "total_return",
+        "sharpe_ratio",
+        "max_drawdown",
+        "win_rate",
+        "num_trades",
+        "fitness_score",
+    )
+
     def __init__(
         self,
         total_return: float,
@@ -114,11 +123,13 @@ class BacktestingEngine:
         if num_bars < 2:
             return BacktestMetrics(0.0, 0.0, 0.0, 0.0, 0)
 
-        portfolio_values = [self.initial_capital]
+        portfolio_values = np.empty(num_bars + 1, dtype=float)
+        portfolio_values[0] = self.initial_capital
+        pv_idx = 0  # tracks current write index
         position = 0  # 0 = no position, 1 = long
         entry_price = 0.0
         shares = 0.0
-        trades = []
+        trades: List[float] = []
         num_trades = 0
 
         for i in range(num_bars):
@@ -128,7 +139,7 @@ class BacktestingEngine:
                 signal = signals[i]
 
             current_price = close_prices[i]
-            portfolio_value = portfolio_values[-1]
+            portfolio_value = portfolio_values[pv_idx]
 
             if signal == "BUY" and position == 0:
                 cost = portfolio_value * self.transaction_cost_pct
@@ -137,7 +148,8 @@ class BacktestingEngine:
                 position = 1
                 entry_price = current_price
                 num_trades += 1
-                portfolio_values.append(net_value)
+                pv_idx += 1
+                portfolio_values[pv_idx] = net_value
             elif signal == "SELL" and position == 1:
                 proceeds = shares * current_price
                 cost = proceeds * self.transaction_cost_pct
@@ -147,15 +159,18 @@ class BacktestingEngine:
                 position = 0
                 shares = 0.0
                 num_trades += 1
-                portfolio_values.append(portfolio_values[-1] + gain)
+                pv_idx += 1
+                portfolio_values[pv_idx] = portfolio_values[pv_idx - 1] + gain
             else:
                 if position == 1:
                     current_value = shares * current_price
-                    portfolio_values.append(current_value)
+                    pv_idx += 1
+                    portfolio_values[pv_idx] = current_value
                 else:
-                    portfolio_values.append(portfolio_values[-1])
+                    pv_idx += 1
+                    portfolio_values[pv_idx] = portfolio_values[pv_idx - 1]
 
-        values_array = np.array(portfolio_values, dtype=float)
+        values_array = portfolio_values[: pv_idx + 1]
 
         total_return = (
             (values_array[-1] - self.initial_capital)
@@ -243,6 +258,15 @@ def get_backtesting_engine() -> BacktestingEngine:
     if _backtesting_engine is None:
         _backtesting_engine = BacktestingEngine()
     return _backtesting_engine
+
+
+def reset_backtesting_engine() -> None:
+    """Reset the global backtesting engine singleton.
+
+    Use in tests to prevent state leaking between test cases.
+    """
+    global _backtesting_engine
+    _backtesting_engine = None
 
 
 _backtesting_engine: Optional[BacktestingEngine] = None

@@ -43,7 +43,7 @@ class Strategy:
                 new_params[k] += random.uniform(-0.1, 0.1) * v  # nosec: B311
         return Strategy(new_params)
 
-    def evaluate(self, data: Dict[str, Any]) -> float:
+    def evaluate(self, data: Optional[Dict[str, Any]]) -> float:
         """Evaluate strategy performance using backtesting engine.
 
         Args:
@@ -72,6 +72,11 @@ class Strategy:
             )
             self.performance = metrics.fitness_score
         except Exception:
+            logger.warning(
+                "Strategy evaluation failed for params=%s",
+                self.params,
+                exc_info=True,
+            )
             self.performance = 0.0
 
         return self.performance
@@ -80,26 +85,20 @@ class Strategy:
 class EvolutionEngine:
     """Engine for running evolutionary optimization of strategies."""
 
-    def explainable_evolution_report(self, previous_population=None) -> str:
+    def explainable_evolution_report(
+        self, previous_population: Optional[List[Strategy]] = None
+    ) -> str:
         """
         Generate a human-readable report of the evolution process and
         strategy changes.
+
         Args:
-            previous_population: Optional list of previous strategies for
-            comparison.
+            previous_population: Optional list of previous strategies
+                for comparison.
+
         Returns:
-            String report summarizing evolution, performance, and parameter
-            changes.
-        """
-        """
-        Generate a human-readable report of the evolution process and
-        strategy changes.
-        Args:
-            previous_population: Optional list of previous strategies for
-            comparison.
-        Returns:
-            String report summarizing evolution, performance, and parameter
-            changes.
+            String report summarizing evolution, performance, and
+            parameter changes.
         """
         lines = []
         lines.append("Evolution Report\n====================")
@@ -131,22 +130,18 @@ class EvolutionEngine:
         return "\n".join(lines)
 
     def self_play_and_coevolution(
-        self, data, rounds: int = 5
+        self, data: Optional[Dict[str, Any]], rounds: int = 5
     ) -> Dict[Strategy, float]:
         """
         Simulate self-play and co-evolution between strategies.
+
+        Each strategy is evaluated against others in a
+        round-robin tournament.
+
         Args:
             data: Input data for evaluation.
             rounds: Number of self-play rounds.
-        Returns:
-            Dict mapping strategy to average score.
-        """
-        """
-        Simulate self-play and co-evolution between strategies.
-        Each strategy is evaluated against others in a round-robin tournament.
-        Args:
-            data: Input data for evaluation.
-            rounds: Number of self-play rounds.
+
         Returns:
             Dict mapping strategy to average score.
         """
@@ -158,6 +153,13 @@ class EvolutionEngine:
                 strat.performance = 0.0
             return {strat: 0.0 for strat in self.population}
 
+        # Memoize evaluations: each strategy evaluated once
+        eval_cache: Dict[int, float] = {}
+        for strat in self.population:
+            sid = id(strat)
+            if sid not in eval_cache:
+                eval_cache[sid] = strat.evaluate(data)
+
         scores: Dict[Strategy, float] = {
             strat: 0.0 for strat in self.population
         }
@@ -166,16 +168,13 @@ class EvolutionEngine:
                 for j, strat_b in enumerate(self.population):
                     if i == j:
                         continue
-                    # Simulate a match:
-                    # higher performance wins (random if equal)
-                    perf_a: float = strat_a.evaluate(data)
-                    perf_b: float = strat_b.evaluate(data)
+                    perf_a: float = eval_cache[id(strat_a)]
+                    perf_b: float = eval_cache[id(strat_b)]
                     if perf_a > perf_b:
                         scores[strat_a] += 1
                     elif perf_b > perf_a:
                         scores[strat_b] += 1
                     else:
-                        # Tie: both get half a point
                         scores[strat_a] += 0.5
                         scores[strat_b] += 0.5
         # Normalize scores by number of matches
@@ -192,24 +191,16 @@ class EvolutionEngine:
 
     def dynamic_resource_allocation(
         self, total_resource: float = 1.0, min_alloc: float = 0.0
-    ):
+    ) -> Dict[Strategy, float]:
         """
-        Dynamically allocate resources to strategies based on their
-        performance.
+        Dynamically allocate resources to strategies based on
+        their performance.
+
         Args:
-            total_resource: Total resource to allocate (e.g., capital,
-            CPU time).
+            total_resource: Total resource to allocate
+                (e.g., capital, CPU time).
             min_alloc: Minimum allocation per strategy.
-        Returns:
-            Dict mapping strategy to allocated resource.
-        """
-        """
-        Dynamically allocate resources to strategies based on their
-        performance.
-        Args:
-            total_resource: Total resource to allocate (e.g., capital,
-            CPU time).
-            min_alloc: Minimum allocation per strategy.
+
         Returns:
             Dict mapping strategy to allocated resource.
         """
@@ -246,25 +237,17 @@ class EvolutionEngine:
         return allocs
 
     def ensemble_strategy_selection(
-        self, data, top_n: int = 3, aggregation: str = "mean"
-    ):
+        self, data: Any, top_n: int = 3, aggregation: str = "mean"
+    ) -> List[float]:
         """
-        Selects an ensemble of top-N strategies and aggregates their
-        predictions.
+        Select an ensemble of top-N strategies and aggregate
+        their predictions.
+
         Args:
             data: Input data to evaluate strategies.
-            top_n: Number of top strategies to include in the ensemble.
+            top_n: Number of top strategies to include.
             aggregation: Aggregation method ('mean' or 'median').
-        Returns:
-            Aggregated prediction for each data point.
-        """
-        """
-        Selects an ensemble of top-N strategies and aggregates their
-        predictions.
-        Args:
-            data: Input data to evaluate strategies.
-            top_n: Number of top strategies to include in the ensemble.
-            aggregation: Aggregation method ('mean' or 'median').
+
         Returns:
             Aggregated prediction for each data point.
         """
@@ -294,7 +277,7 @@ class EvolutionEngine:
             agg = np.median(pred_matrix, axis=0)
         else:
             raise ValueError(f"Unknown aggregation method: {aggregation}")
-        return agg.tolist()
+        return list(agg.tolist())
 
     def __init__(self, base_strategies: List[Strategy]) -> None:
         """
@@ -305,7 +288,7 @@ class EvolutionEngine:
         self.base_strategies: List[Strategy] = base_strategies
         self.population: List[Strategy] = base_strategies
 
-    def run_generation(self, data) -> None:
+    def run_generation(self, data: Optional[Dict[str, Any]]) -> None:
         """
         Mutate and evaluate all strategies in the population.
         Args:
@@ -333,8 +316,8 @@ class EvolutionEngine:
         )[:n]
 
     def meta_learn(
-        self, data, method: str = "crossval", k_folds: int = 5
-    ) -> List[float] | None:
+        self, data: Any, method: str = "crossval", k_folds: int = 5
+    ) -> Optional[List[float]]:
         """Meta-learning with cross-validation support.
 
         Args:
@@ -390,20 +373,17 @@ class EvolutionEngine:
     def genetic_hyperparameter_evolution(
         self,
         generations: int,
-        data=None,
+        data: Optional[Dict[str, Any]] = None,
         population_size: int = 10,
         mutation_rate: float = 0.2,
     ) -> None:
-        """
-        Evolve hyperparameters using a simple genetic algorithm.
+        """Evolve hyperparameters using a simple genetic algorithm.
+
         Args:
             generations: Number of generations to run.
             data: Input data for evaluation.
             population_size: Size of population.
             mutation_rate: Probability of mutation.
-        """
-        """
-        Evolve hyperparameters using a simple genetic algorithm.
         """
         population: List[Strategy] = [
             Strategy(
@@ -433,7 +413,7 @@ class EvolutionEngine:
         self.population = population
 
     def bayesian_hyperparameter_optimization(
-        self, data=None, n_iter: int = 10
+        self, data: Optional[Dict[str, Any]] = None, n_iter: int = 10
     ) -> None:
         """Bayesian optimization of strategy hyperparameters via Optuna TPE.
 
@@ -479,15 +459,16 @@ class EvolutionEngine:
             len(study.trials),
         )
 
-    # Example usage
-    if __name__ == "__main__":
-        from python_ai.evolution_engine import EvolutionEngine
 
-        base: List[Strategy] = [
-            Strategy({"threshold": 0.5, "stop_loss": 0.1}) for _ in range(5)
-        ]
-        engine = EvolutionEngine(base)
-        for _ in range(3):
-            engine.run_generation(data=None)
-            top: List[Strategy] = engine.select_top(2)
-            logger.info("Top strategies: %s", [s.params for s in top])
+if __name__ == "__main__":  # pragma: no cover
+    base: List[Strategy] = [
+        Strategy({"threshold": 0.5, "stop_loss": 0.1}) for _ in range(5)
+    ]
+    engine = EvolutionEngine(base)
+    for _ in range(3):
+        engine.run_generation(data=None)
+        top: List[Strategy] = engine.select_top(2)
+        logger.info(
+            "Top strategies: %s",
+            [s.params for s in top],
+        )

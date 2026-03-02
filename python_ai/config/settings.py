@@ -246,6 +246,12 @@ class ModelSettings(BaseSettings):
         description="Validation split",
     )
     random_seed: int = Field(default=42, description="Random seed")
+    retrain_threshold: int = Field(
+        default=50,
+        ge=1,
+        le=10000,
+        description="Retrain after N buffered samples",
+    )
 
     @field_validator("validation_split")
     @classmethod

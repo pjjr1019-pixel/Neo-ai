@@ -32,6 +32,8 @@ __all__ = [
     "DataPipeline",
     "FEATURE_NAMES",
     "TechnicalIndicators",
+    "check_data_freshness",
+    "detect_timestamp_gaps",
     "get_pipeline",
     "validate_features",
     "validate_ohlcv",
@@ -104,6 +106,71 @@ def validate_ohlcv(
             break
 
     return errors
+
+
+def detect_timestamp_gaps(
+    timestamps: List[float],
+    expected_interval: float = 60.0,
+    tolerance: float = 1.5,
+) -> List[Dict[str, Any]]:
+    """Detect gaps in timestamp sequences.
+
+    Finds intervals that are longer than
+    ``expected_interval * tolerance``.
+
+    Args:
+        timestamps: Unix timestamps in ascending order.
+        expected_interval: Expected bar interval in seconds
+            (default 60 = 1-minute bars).
+        tolerance: Multiplier for gap detection (default 1.5×).
+
+    Returns:
+        List of dicts with ``index``, ``gap_seconds``, and
+        ``expected_seconds`` for each gap found.
+    """
+    gaps: List[Dict[str, Any]] = []
+    threshold = expected_interval * tolerance
+    for i in range(1, len(timestamps)):
+        delta = timestamps[i] - timestamps[i - 1]
+        if delta > threshold:
+            gaps.append(
+                {
+                    "index": i,
+                    "gap_seconds": delta,
+                    "expected_seconds": expected_interval,
+                }
+            )
+    return gaps
+
+
+def check_data_freshness(
+    latest_timestamp: float,
+    max_age_seconds: float = 300.0,
+    current_time: Optional[float] = None,
+) -> bool:
+    """Check whether the latest data point is fresh enough.
+
+    Args:
+        latest_timestamp: Unix timestamp of the most recent bar.
+        max_age_seconds: Maximum acceptable age in seconds
+            (default 300 = 5 minutes).
+        current_time: Override for current time (for testing).
+
+    Returns:
+        True if data is fresh; False if stale.
+    """
+    import time
+
+    now = current_time if current_time is not None else time.time()
+    age = now - latest_timestamp
+    if age > max_age_seconds:
+        logger.warning(
+            "Data is stale: age=%.1fs exceeds limit=%.1fs",
+            age,
+            max_age_seconds,
+        )
+        return False
+    return True
 
 
 def validate_features(

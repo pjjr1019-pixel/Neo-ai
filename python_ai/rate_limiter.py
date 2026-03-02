@@ -110,6 +110,14 @@ class RateLimiter:
                 )
         return self._buckets[key].consume()
 
+    def reset(self) -> None:
+        """Clear all token buckets.
+
+        Use in tests to prevent state leaking between test cases.
+        """
+        with self._lock:
+            self._buckets.clear()
+
     def allow_with_info(self, key: str) -> tuple[bool, int, int]:
         """Check rate limit and return (allowed, remaining, limit).
 
