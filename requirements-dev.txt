@@ -1,12 +1,11 @@
 pytest
 pytest-asyncio
 pytest-cov
-fastapi
 httpx
-numpy
 mypy
 types-psutil
 black
 flake8
+isort
 bandit
 coverage

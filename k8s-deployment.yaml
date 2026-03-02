@@ -69,7 +69,7 @@ spec:
       serviceAccountName: neo-sa
       containers:
       - name: neo-ai-service
-        image: neo-ai-service:latest
+        image: ghcr.io/neo-ai/neo-ai-service:0.3.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
@@ -99,21 +99,17 @@ spec:
             memory: "1Gi"
             cpu: "500m"
         livenessProbe:
-          exec:
-            command:
-            - python
-            - -c
-            - "import sys; sys.exit(0)"
+          httpGet:
+            path: /health
+            port: 8000
           initialDelaySeconds: 15
           periodSeconds: 20
           timeoutSeconds: 5
           failureThreshold: 3
         readinessProbe:
-          exec:
-            command:
-            - python
-            - -c
-            - "import sys; sys.exit(0)"
+          httpGet:
+            path: /health
+            port: 8000
           initialDelaySeconds: 10
           periodSeconds: 10
           timeoutSeconds: 5

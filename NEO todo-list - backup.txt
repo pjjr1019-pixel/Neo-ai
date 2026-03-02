@@ -1,40 +1,40 @@
 ﻿---
 
-## PHASE 0 â€” FOUNDATION & ARCHITECTURE ✅ COMPLETE
-1. [x] **Define Modular Microservices Architecture**
+## PHASE 0 â€” FOUNDATION & ARCHITECTURE
+1. **Define Modular Microservices Architecture**
    - Decompose system into services: data ingestion, AI engine, risk management, dashboard, etc.
    - Document APIs (REST/gRPC) for each service.
    - **Success:** Architecture diagram, API docs, modular repo structure.
 
 
-2. [x] **Set Up Automated CI/CD Pipeline**
+2. **Set Up Automated CI/CD Pipeline**
    - Integrate CI/CD (GitHub Actions, GitLab CI, Jenkins) for all services.
    - Enable automated testing, linting, and staged deployments (canary/blue-green).
    - **Success:** All code changes auto-tested/deployed, rollback on failure.
 
-3. [x] **Establish Security & Compliance Baseline**
+3. **Establish Security & Compliance Baseline**
    - Implement secrets management, RBAC, and dependency scanning.
    - Plan for GDPR/SOC2 compliance.
    - **Success:** No hardcoded secrets, security audit logs, compliance checklist.
 
 ---
 
-## PHASE 1 â€” PROJECT INITIALIZATION ✅ COMPLETE
+## PHASE 1 â€” PROJECT INITIALIZATION
 
-4. [x] Create Git repository â†’ `neo-ai`
+4. Create Git repository â†’ `neo-ai`
    - **Success:** Repo created, initial commit, README added.
-5. [x] Initialize project folders: `/java_core`, `/python_ai`
+5. Initialize project folders: `/java_core`, `/python_ai`
    - **Success:** Folders created, structure documented.
-6. [x] Add .gitignore â†’ Java `/bin,/out,/target`, Python `__pycache__, *.pyc, /venv`
+6. Add .gitignore â†’ Java `/bin,/out,/target`, Python `__pycache__, *.pyc, /venv`
    - **Success:** .gitignore present and verified.
-7. [x] Setup project board / management tool â†’ Trello/Jira/Notion
+7. Setup project board / management tool â†’ Trello/Jira/Notion
    - **Success:** Board created, tasks added, user access confirmed.
 
 ---
 
-## PHASE 2 â€” ENVIRONMENT & TOOLING ✅ COMPLETE
+## PHASE 2 â€” ENVIRONMENT & TOOLING
 
-8. [x] Install JDK 17+ and Maven/Gradle for Java
+8. Install JDK 17+ and Maven/Gradle for Java
    - **Success:** Java tools installed, version check logged.
 
 ---
@@ -47,35 +47,35 @@
 - Split tests: fast unit tests vs. slow integration tests
 - Only install new dependencies, avoid full environment rebuilds
 
-9. [x] Install Python & libraries: PyTorch, FastAPI, Pandas, NumPy, Scikit-learn, ONNX
+9. Install Python & libraries: PyTorch, FastAPI, Pandas, NumPy, Scikit-learn, ONNX
     - **Success:** Python env created, dependencies installed, requirements.txt updated.
-10. [x] Setup database: PostgreSQL for historical/log data
+10. Setup database: PostgreSQL for historical/log data
     - **Success:** DB running, connection tested, schema documented. (Docker: neo-postgres, user: neoai, db: neoai_db)
-11. [x] Setup Redis: real-time caching
+11. Setup Redis: real-time caching
     - **Success:** Redis running, connection tested, usage documented.
 
-[extra1] [x] Integration test: Python/Java connectivity to PostgreSQL & Redis
+[extra1] Integration test: Python/Java connectivity to PostgreSQL & Redis
     - **Success:** Sample connection code documented in /docs, connectivity verified.
-[extra2] [x] Basic logging for all services (database logs, service logs)
+[extra2] Basic logging for all services (database logs, service logs)
     - **Success:** Logging setup and documented.
 
 ---
 
-## PHASE 3 â€” DATA & OBSERVABILITY ✅ COMPLETE
+## PHASE 3 â€” DATA & OBSERVABILITY
 
-12. [x] Implement Java data ingestion service â†’ fetch real-time data
+12. Implement Java data ingestion service â†’ fetch real-time data
     - API integration, error handling, logging.
     - **Success:** Service fetches and logs sample data.
-13. [x] Normalize and store features â†’ PostgreSQL + Redis
+13. Normalize and store features â†’ PostgreSQL + Redis
     - **Success:** Data normalized, stored, and retrievable.
-14. [x] Compute technical indicators â†’ RSI, MACD, SMA, EMA, Volatility
+14. Compute technical indicators â†’ RSI, MACD, SMA, EMA, Volatility
     - **Success:** Indicators computed, validated, and logged.
-15. [x] Implement historical data loader â†’ import CSV/API historical data
+15. Implement historical data loader â†’ import CSV/API historical data
     - **Success:** Loader imports and validates sample data.
-16. [!] Integrate advanced observability: tracing, explainability (LIME, SHAP), dashboards
+16. Integrate advanced observability: tracing, explainability (LIME, SHAP), dashboards
     - **Success:** Real-time monitoring, feature importances visible.
 
-[extra4] [x] Automated Feature Engineering
+[extra4] Automated Feature Engineering
     - Add scripts to generate new features (e.g., rolling averages, percent changes, lagged values).
     - Document feature engineering logic and impact.
 
@@ -85,131 +85,91 @@
     - Write down where the data came from and what steps were taken to process it.
     - This helps you always know which data was used, and makes it easy to repeat or check your work later.
 
-# --- PHASE 3 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R3-1] Advanced Feature Factory
-    - [ ] Auto-generate features from raw OHLCV (all rolling windows: 5/10/14/20/50/100/200, lags 1-10, pct diffs)
-    - [ ] Implement feature importance ranking with periodic pruning (remove features that lose predictive power)
-    - [ ] Add cross-asset features (BTC volatility as feature for ETH model, SPY correlation)
-    - [ ] Build custom indicator builder (user-defined formulas via config YAML)
-    - [ ] Implement feature versioning (track which feature set was used for each model)
-    - **Success:** Feature pipeline generates 200+ features automatically, prunes to top-N.
-
-[R3-2] Orderflow & Microstructure Features
-    - [ ] Add bid-ask spread features (mean, std, trend)
-    - [ ] Implement trade aggression ratio (taker buy volume / total volume)
-    - [ ] Add order book imbalance features (bid depth vs ask depth at N levels)
-    - [ ] Compute VWAP deviation features (price distance from VWAP)
-    - [ ] Add volume profile features (point of control, value area)
-    - **Success:** Microstructure features improve model accuracy on short timeframes.
-
-[R3-3] Sentiment & On-Chain Features
-    - [ ] Integrate Fear & Greed Index API as daily feature
-    - [ ] Add funding rate features (perpetual swap funding rates from exchanges)
-    - [ ] Implement open interest change features (derivatives positioning)
-    - [ ] Add blockchain metrics (active addresses, exchange inflows/outflows) via Glassnode/CryptoQuant API
-    - [ ] Compute social volume features (Reddit/Twitter mention frequency via LunarCrush or custom scraper)
-    - **Success:** Alternative data features integrated, model has multi-signal view.
-
-
 ---
 
-## PHASE 4 â€” PYTHON AI ENGINE ✅ COMPLETE
+## PHASE 4 â€” PYTHON AI ENGINE
 
-17. [x] Setup FastAPI endpoints â†’ `/predict`, `/learn`
+17. Setup FastAPI endpoints â†’ `/predict`, `/learn`
     - **Success:** Endpoints live, tested with sample requests.
-18. [x] Define input/output JSON schemas â†’ features, position, risk, action, confidence
+18. Define input/output JSON schemas â†’ features, position, risk, action, confidence
     - **Success:** Schemas documented and validated.
-19. [x] Implement feature processing pipeline â†’ normalize, windowing, handle missing values
+19. Implement feature processing pipeline â†’ normalize, windowing, handle missing values
     - **Success:** Pipeline processes and logs sample data.
-20. [x] Design model architecture for advanced pattern recognition:
+20. Design model architecture for advanced pattern recognition:
     - Integrate Transformers (BERT, GPT, ViT), LSTM/GRU with attention, self-supervised/contrastive learning.
     - **Success:** Model code, diagrams, and documentation complete.
-21. [ ] Add automated data/model lineage tracking (MLflow/DVC)
+21. Add automated data/model lineage tracking (MLflow/DVC)
     - **Success:** All model/data changes tracked and reproducible.
 
-[extra6] [x] Unit & Integration Tests for FastAPI
+[extra6] Unit & Integration Tests for FastAPI
     - Add automated tests for /predict and /learn endpoints.
     - Validate input/output schemas and edge cases.
 
 ---
 
-## PHASE 5 â€” MODEL TRAINING & SELECTION ✅ COMPLETE
+## PHASE 5 â€” MODEL TRAINING & SELECTIONff
 
-22. [x] Implement backtesting simulator â†’ simulate past X years
+22. Implement backtesting simulator â†’ simulate past X years
     - **Success:** Simulator runs, results logged.
-23. [x] Score model performance â†’ Sharpe ratio, max drawdown, win rate
+
+22a. Enhance Backtesting Engine for Realistic Simulation
+    - [ ] Add stop_loss_pct parameter â€” exit position when price drops X% from entry
+    - [ ] Add take_profit_pct parameter â€” exit position when price rises X% from entry
+    - [ ] Add position_size_pct parameter â€” risk only X% of capital per trade (replace all-in default)
+    - [ ] Check stop-loss / take-profit against intra-bar high/low (not just close price)
+    - [ ] Track per-trade entry price, exit price, exit reason (signal / stop / take-profit)
+    - [ ] Add commission/slippage cost modeling (configurable bps per trade)
+    - [ ] Support short positions (SELL signal opens short, BUY closes it)
+    - [ ] Return extended BacktestMetrics with avg_trade_duration, profit_factor, expectancy
+    - [ ] Add equity curve output (list of portfolio values per bar) for visualization
+    - **Success:** Backtester matches real-world conditions, stop-loss/take-profit enforced, position sizing active.
+    - **Depends on:** Item 22 (backtesting simulator exists)
+
+23. Score model performance â†’ Sharpe ratio, max drawdown, win rate
     - **Success:** Metrics computed and documented.
-24. [x] Automatic model selection â†’ top-N models
+24. Automatic model selection â†’ top-N models
     - Integrate hyperparameter optimization (Optuna, Ray Tune, Hyperopt), Bayesian/evolutionary strategies.
     - **Success:** Selection logic implemented, results logged.
-25. [!] Save models â†’ PyTorch/ONNX for Java inference
+25. Save models â†’ PyTorch/ONNX for Java inference
     - Use pruning/distillation for efficiency.
 
-[extra7] [x] Automated Test Scripts
+[extra7] Automated Test Scripts
     - Write unit tests for backtesting, metric calculations, and model selection logic.
     - Use pytest or unittest to ensure all functions work as expected.
 
-# --- PHASE 5 RECOMMENDATIONS (from deep codebase analysis) ---
+---## PHASE 5.5 â€” SYSTEM HARDENING & VALIDATION EXTRAS
 
-[R5-1] Backtesting Rigor & Validation
-    - [ ] Implement purged walk-forward cross-validation (prevent lookahead bias with embargo periods)
-    - [ ] Add regime-aware backtesting (separate evaluation per bull/bear/sideways market regime)
-    - [ ] Model transaction costs realistically (bid-ask spread, slippage, market impact, commission)
-    - [ ] Add multi-timeframe strategy evaluation (1m, 5m, 1h, 4h, 1d simultaneously)
-    - [ ] Implement statistical significance testing (bootstrapped p-values for strategy alpha)
-    - [ ] Add strategy staleness detection (auto-retire strategies whose performance degrades over rolling window)
-    - **Success:** Backtests are statistically rigorous, no lookahead bias, realistic cost modeling.
-
-[R5-2] Advanced Position Sizing & Risk
-    - [ ] Implement drawdown-based position sizing (reduce size during losing streaks)
-    - [ ] Add Kelly Criterion with half-Kelly safety factor
-    - [ ] Compute per-trade risk/reward ratio and enforce minimum thresholds
-    - [ ] Add trailing stop-loss with volatility-adjusted levels (ATR-based)
-    - [ ] Implement portfolio heat tracking (total risk across all open positions)
-    - **Success:** Position sizing adapts to drawdown state, risk managed dynamically.
-
-[R5-3] Seasonal & Calendar Effects
-    - [ ] Detect seasonal patterns (time-of-day, day-of-week, month-of-year edge)
-    - [ ] Add economic calendar event features (FOMC, CPI, NFP impact windows)
-    - [ ] Implement pre/post-event volatility adjustment
-    - [ ] Model intraday session effects (London open, NY open, Asia close)
-    - **Success:** Model accounts for temporal patterns and scheduled events.
-
-
----## PHASE 5.5 â€” SYSTEM HARDENING & VALIDATION EXTRAS ✅ COMPLETE
-
-[extra8] [x] Run Full Integration Tests
+[extra8] Run Full Integration Tests
     - Test all components (Java, Python, DB, Redis) together to catch hidden issues.
 
-[extra9] [x] Review and Refactor Code
+[extra9] Review and Refactor Code
     - Clean up code, remove unused files, and ensure modularity.
 
-[extra10] [x] Update and Validate Documentation
+[extra10] Update and Validate Documentation
     - Make sure all docs are current, clear, and cover edge cases.
 
-[extra11] [x] Backup Everything
+[extra11] Backup Everything
     - Backup code, data, and configs before major changes.
 
-[extra12] [x] Security Audit
+[extra12] Security Audit
     - Check for hardcoded secrets, validate access controls, and run vulnerability scans.
 
-[extra13] [x] Performance Benchmarking
+[extra13] Performance Benchmarking
     - Measure latency, throughput, and resource usage for all services.
 
-[extra14] [x] CI/CD Pipeline Review
+[extra14] CI/CD Pipeline Review
     - Ensure automated tests, linting, and deployment scripts are working and up-to-date.
 
-## PHASE 6 â€” JAVA ORCHESTRATOR CORE (PARTIAL)
+## PHASE 6 â€” JAVA ORCHESTRATOR CORE
 
-26. [x] Implement API client â†’ send features â†’ `/predict`, receive action & confidence
+26. Implement API client â†’ send features â†’ `/predict`, receive action & confidence
     - **Success:** Client sends/receives, logs responses.
-27. [x] Implement risk management engine â†’ thresholds, confidence filter, volatility check
+27. Implement risk management engine â†’ thresholds, confidence filter, volatility check
     - **Success:** Engine enforces rules, logs actions.
-28. [x] Implement autonomous loop â†’ fetch â†’ features â†’ AI â†’ risk â†’ execute â†’ log â†’ feedback
+28. Implement autonomous loop â†’ fetch â†’ features â†’ AI â†’ risk â†’ execute â†’ log â†’ feedback
     - Enable online learning, replay buffers, regularization.
     - **Success:** Loop runs end-to-end, logs all steps.
-29. [!] Optional dashboard / GUI â†’ real-time signals, strategy visualization, model version
+29. Optional dashboard / GUI â†’ real-time signals, strategy visualization, model version
     - Visualize learned patterns and feature importances.
 
     - **Success:** Dashboard live, displays real-time data.
@@ -217,153 +177,218 @@
 [extra8] Run Full Integration Tests
     - Test all components (Java, Python, DB, Redis) together to catch hidden issues.
 
-[extra9] [x] Review and Refactor Code
+[extra9] Review and Refactor Code
     - Clean up code, remove unused files, and ensure modularity.
 
-[extra10] [x] Update and Validate Documentation
+[extra10] Update and Validate Documentation
     - Make sure all docs are current, clear, and cover edge cases.
 
-[extra11] [x] Backup Everything
+[extra11] Backup Everything
     - Backup code, data, and configs before major changes.
 
-[extra12] [x] Security Audit
+[extra12] Security Audit
     - Check for hardcoded secrets, validate access controls, and run vulnerability scans.
 
-[extra13] [x] Performance Benchmarking
+[extra13] Performance Benchmarking
     - Measure latency, throughput, and resource usage for all services.
 
-[extra14] [x] CI/CD Pipeline Review
+[extra14] CI/CD Pipeline Review
     - Ensure automated tests, linting, and deployment scripts are working and up-to-date.
 
-## PHASE 7 â€” STRATEGY EVOLUTION & META-LEARNING ✅ COMPLETE
+## PHASE 7 â€” STRATEGY EVOLUTION & META-LEARNING
 
-30. [x] Implement evolution engine (Python) â†’ mutate strategies (thresholds, sizing, stop-loss)
+
+29a. Implement TradableStrategy â€” Signal-Generating Strategy Class
+    - [ ] Create tradable_strategy.py with TradableStrategy class that generates BUY/SELL/HOLD signals from raw OHLCV data
+    - [ ] Implement indicator-based signal templates: RSI overbought/oversold, MACD crossover, Bollinger Band bounce, combined multi-indicator
+    - [ ] Parameterize all indicator periods (rsi_period, macd_fast, macd_slow, macd_signal, bb_period, bb_std) as mutable strategy genes
+    - [ ] Parameterize entry/exit thresholds (rsi_buy_threshold, rsi_sell_threshold, etc.) as mutable strategy genes
+    - [ ] Implement generate_signals(ohlcv_data) â†’ List[str] method â€” applies indicators + thresholds to produce trade signals
+    - [ ] Implement evaluate(ohlcv_data) â†’ BacktestMetrics method â€” generate signals then run through BacktestingEngine
+    - [ ] Implement domain-aware mutate() â€” integer periods stay integer, thresholds bounded to valid ranges (e.g., RSI 0-100)
+    - [ ] Implement crossover(other_strategy) â†’ child â€” blend two parent strategies' parameters
+    - [ ] Bridge gap between strategy_config.py (static config) and evolution_engine.py (no signal generation)
+    - [ ] Support pluggable signal templates (register new strategies without modifying core code)
+    - **Success:** Strategies autonomously generate trade signals from raw data, mutate intelligently, and evaluate themselves.
+    - **Depends on:** Item 14 (technical indicators), Item 22a (enhanced backtester)
+
+30. Implement evolution engine (Python) â†’ mutate strategies (thresholds, sizing, stop-loss)
     - Use meta-learning (MAML, Reptile) for rapid adaptation.
     - **Success:** Engine mutates and logs strategies.
-31. [x] Evaluate mutated strategies â†’ run backtesting
+31. Evaluate mutated strategies â†’ run backtesting
     - Apply ensemble methods (bagging, boosting, stacking).
     - **Success:** Backtests run, results logged.
-32. [x] Replace weak strategies automatically
+32. Replace weak strategies automatically
     - **Success:** Replacement logic works, logs changes.
 
-33. [x] Log metrics â†’ performance, reward, confidence, trade outcomes
+33. Log metrics â†’ performance, reward, confidence, trade outcomes
     - Integrate explainability tools (LIME, SHAP).
     - **Success:** All metrics logged and visualized.
 
 # --- PHASE 7 EXTRAS ---
 
-[extra7-1] [x] Automated Hyperparameter Evolution
+[extra7-1] Automated Hyperparameter Evolution
     - Use genetic algorithms or Bayesian optimization to evolve strategies and model hyperparameters.
 
-[extra7-2] [x] Meta-Learning with Cross-Validation
+[extra7-2] Meta-Learning with Cross-Validation
     - Implement meta-learning loops using k-fold cross-validation for strategy selection.
 
-[extra7-3] [x] Strategy Diversity Metrics
+[extra7-3] Strategy Diversity Metrics
     - Track and enforce diversity among strategies to avoid overfitting.
 
-[extra7-4] [x] Online Adaptation & Lifelong Learning
+[extra7-4] Online Adaptation & Lifelong Learning
     - Enable live adaptation of strategies based on feedback and performance drift.
 
-[extra7-5] [x] Explainability for Strategy Changes
+[extra7-5] Explainability for Strategy Changes
     - Log and visualize why a strategy was replaced or mutated (e.g., SHAP/LIME explanations).
 
-[extra7-6] [x] Automated Rollback
+[extra7-6] Automated Rollback
     - Automatically revert to previous best strategies if new ones underperform.
 
-[extra7-7] [x] Ensemble & Stacking Framework
+[extra7-7] Ensemble & Stacking Framework
     - Allow multiple strategies to vote/blend predictions, with meta-models for combination.
 
-[extra7-8] [x] Simulation of Adversarial/Market Regimes
+[extra7-8] Simulation of Adversarial/Market Regimes
     - Test strategies against simulated regime shifts or adversarial conditions.
 
-[extra7-9] [x] Self-Play or Co-Evolution
+[extra7-9] Self-Play or Co-Evolution
     - Let strategies compete or cooperate in simulated environments.
 
-[extra7-10] [x] Automated Reporting & Alerts
+[extra7-10] Automated Reporting & Alerts
     - Generate periodic reports and alerts for strategy evolution, performance, and risk.
 
-# --- PHASE 7 RECOMMENDATIONS (from deep codebase analysis) ---
+---
+## PHASE 7.5 â€” AUTONOMOUS STRATEGY TRAINING (Self-Learning Loop)
 
-[R7-1] Neuroevolution & Architecture Search
-    - [ ] Evolve neural network architectures alongside strategy parameters (NEAT/HyperNEAT)
-    - [ ] Implement multi-objective Pareto optimization (Sharpe vs drawdown vs win rate frontiers)
-    - [ ] Add novelty search (reward strategies that explore new behavior spaces, not just high fitness)
-    - [ ] Implement speciation (protect young innovations from premature elimination)
-    - **Success:** Evolution discovers novel architectures and diverse strategy niches.
+> **Goal:** Neo autonomously discovers profitable trading strategies through
+> trial and error â€” generating populations of strategies, backtesting them
+> against historical market data, evolving the best performers, and repeating
+> until convergence on consistently profitable strategies.
+> **Depends on:** Phase 5 items 22/22a (backtesting), Phase 7 item 29a (TradableStrategy),
+> Phase 3 item 15 (historical data)
 
-[R7-2] Co-Evolution & Competition
-    - [ ] Implement adversarial co-evolution (strategies compete against simulated market makers)
-    - [ ] Add predator-prey dynamics (trend strategies vs mean-reversion strategies coexist)
-    - [ ] Build tournament selection with Elo-style rating system (replace round-robin O(n^2) tournament)
-    - [ ] Implement island model (parallel sub-populations with migration)
-    - **Success:** Evolution produces robust strategies via competitive pressure.
+33a. Autonomous Training Loop (AutoTrainer)
+    - [ ] Create auto_trainer.py with AutoTrainer class â€” the main self-learning engine
+    - [ ] Initialize random population of TradableStrategies (configurable population_size, default 50)
+    - [ ] Implement fitness evaluation â€” run each strategy through BacktestingEngine on training data window
+    - [ ] Use composite fitness score: Sharpe ratio x sqrt(win_rate) x (1 - max_drawdown) for ranking
+    - [ ] Implement tournament selection (tournament_size=5) to pick parents for next generation
+    - [ ] Implement reproduction: crossover two parents + mutate child to create next generation
+    - [ ] Implement elitism â€” carry top N% of strategies unchanged into next generation (default 10%)
+    - [ ] Track generation statistics: best/worst/mean fitness, diversity score, convergence rate
+    - [ ] Implement convergence detection â€” stop when fitness plateau detected (no improvement for N generations)
+    - [ ] Add maximum generation limit as safety stop (default 200)
+    - [ ] Save best strategy from each generation to JSON/YAML for reproducibility
+    - [ ] CLI entry point: python -m python_ai.auto_trainer --data <csv> --generations 100 --pop-size 50
+    - **Success:** AutoTrainer runs end-to-end, evolves strategies over generations, converges on profitable strategy.
 
-[R7-3] Strategy Lifecycle Management
-    - [ ] Implement strategy aging (exponentially decay fitness of old strategies to encourage freshness)
-    - [ ] Add strategy lineage tracking (family tree of mutations, which parent produced best offspring)
-    - [ ] Build strategy museum (archive retired strategies with full performance history)
-    - [ ] Implement strategy warm-start (seed new populations with top-N historical strategies)
-    - [ ] Add strategy complexity penalty (prefer simpler strategies at similar fitness levels)
-    - **Success:** Strategy evolution has institutional memory and bias toward simplicity.
+33b. Walk-Forward Validation for AutoTrainer
+    - [ ] Split historical data into rolling train/validate/test windows (e.g., 70/15/15)
+    - [ ] Train (evolve) strategies on training window only
+    - [ ] Validate best strategy on unseen validation window after each evolution run
+    - [ ] Final out-of-sample test on held-out test window (never seen during training or validation)
+    - [ ] Detect and reject overfitted strategies (train Sharpe > 2x validate Sharpe = overfit)
+    - [ ] Implement anchored walk-forward (expanding training window) and sliding walk-forward (fixed window)
+    - [ ] Report in-sample vs out-of-sample performance gap for transparency
+    - **Success:** Strategies validated on unseen data, overfitting detected and rejected.
+    - **Depends on:** Item 33a (AutoTrainer)
 
+33c. Market Regime Awareness in Training
+    - [ ] Integrate regime_detector.py (GMM-based regime classification) into AutoTrainer
+    - [ ] Classify historical data into regimes: trending-up, trending-down, sideways/choppy, high-volatility
+    - [ ] Evolve regime-specific strategies (different strategy for each market condition)
+    - [ ] Implement regime-switching selector â€” detect current regime and activate matching strategy
+    - [ ] Penalize strategies that only work in one regime (reward robustness across regimes)
+    - [ ] Log regime distribution in training data to detect regime bias
+    - **Success:** System adapts strategy based on detected market regime, no single-regime overfitting.
+    - **Depends on:** Items 33a, 33b, regime_detector.py
+
+33d. Synthetic Data Generation for Training
+    - [ ] Create synthetic_data.py â€” generate artificial OHLCV data for strategy stress-testing
+    - [ ] Implement trending market generator (configurable drift, noise, duration)
+    - [ ] Implement mean-reverting market generator (Ornstein-Uhlenbeck process)
+    - [ ] Implement volatile/crisis market generator (fat tails, sudden gaps, flash crashes)
+    - [ ] Implement sideways/range-bound market generator (low drift, bounded price channel)
+    - [ ] Combine generators to create multi-regime synthetic histories (e.g., 6 months trend â†’ 3 months crash â†’ 6 months recovery)
+    - [ ] Add configurable parameters: volatility, trend strength, gap probability, mean-reversion speed
+    - [ ] Use synthetic data to augment real historical data during training (expand training set)
+    - [ ] Validate that strategies trained on synthetic + real data generalize better than real-only
+    - **Success:** Synthetic data generator produces realistic market scenarios, strategies stress-tested against edge cases.
+
+33e. Training Progress & Reporting
+    - [ ] Implement real-time progress callback during training (generation N/M, best fitness, ETA)
+    - [ ] Generate training summary report after completion (JSON + human-readable)
+    - [ ] Include in report: best strategy parameters, fitness curve, regime performance breakdown
+    - [ ] Include in report: train vs validation vs test performance comparison
+    - [ ] Include in report: top-5 strategies with parameter details for manual review
+    - [ ] Save fitness curve plot (matplotlib) showing evolution progress over generations
+    - [ ] Log all training runs to MLflow/local database for experiment tracking
+    - [ ] Add --verbose and --quiet CLI flags for output control
+    - **Success:** Training progress visible in real-time, comprehensive report generated, results reproducible.
+    - **Depends on:** Item 33a (AutoTrainer)
+
+33f. Strategy Population Diversity & Anti-Overfitting
+    - [ ] Track population diversity metric (parameter variance across strategies)
+    - [ ] Inject random immigrants (new random strategies) when diversity drops below threshold
+    - [ ] Implement fitness sharing â€” penalize strategies too similar to each other (niche penalty)
+    - [ ] Add regularization: penalize overly complex strategies (too many active indicators)
+    - [ ] Implement early stopping per strategy â€” discard strategies with >50% max drawdown immediately
+    - [ ] Minimum trade count filter â€” reject strategies that trade fewer than N times (avoids lucky-few-trades bias)
+    - **Success:** Population stays diverse, no premature convergence, overfitting actively discouraged.
+    - **Depends on:** Item 33a (AutoTrainer)
+
+33g. AutoTrainer Testing & Validation
+    - [ ] Write unit tests for TradableStrategy signal generation (each template type)
+    - [ ] Write unit tests for TradableStrategy mutate/crossover (bounds respected, types preserved)
+    - [ ] Write unit tests for AutoTrainer population initialization and generation stepping
+    - [ ] Write unit tests for tournament selection, elitism, and convergence detection
+    - [ ] Write unit tests for walk-forward data splitting (no data leakage between windows)
+    - [ ] Write unit tests for synthetic data generators (correct shape, valid OHLCV invariants)
+    - [ ] Write integration test: 5 generations on synthetic data, verify fitness improves
+    - [ ] Write integration test: walk-forward on real historical CSV, verify no future data leakage
+    - [ ] Write regression test: known-good strategy parameters produce expected signals
+    - [ ] Achieve 90%+ test coverage on auto_trainer.py, tradable_strategy.py, synthetic_data.py
+    - **Success:** All auto-training components thoroughly tested, no data leakage, reproducible results.
+
+33h. AutoTrainer Documentation
+    - [ ] Write docs/phase-7.5-autonomous-training.md â€” architecture, usage, configuration
+    - [ ] Document all CLI arguments with examples
+    - [ ] Create quickstart guide: "Train a profitable strategy in 5 minutes" with sample data
+    - [ ] Document strategy template system â€” how to add custom signal generators
+    - [ ] Document fitness function design and how to customize scoring weights
+    - [ ] Document interpretation of training report (what is a good Sharpe? what is overfit?)
+    - [ ] Add architecture diagram: population â†’ evaluate â†’ select â†’ reproduce â†’ validate â†’ repeat
+    - **Success:** New users can run autonomous training and interpret results from docs alone.
 
 ---
 
-## PHASE 8 â€” DEPLOYMENT, SCALABILITY & RESOURCE MGMT (PARTIAL)
+## PHASE 8 â€” DEPLOYMENT, SCALABILITY & RESOURCE MGMT
 
-34. [x] Local deployment setup â†’ Java + Python + Redis + PostgreSQL
+34. Local deployment setup â†’ Java + Python + Redis + PostgreSQL
     - **Success:** All services run locally, integration tested.
-35. [!] Optional cloud deployment â†’ Python GPU server + Java VPS + HTTPS API + cloud DB
+35. Optional cloud deployment â†’ Python GPU server + Java VPS + HTTPS API + cloud DB
     - **Success:** Cloud deployment scripts work, endpoints live.
-36. [x] Configure deployment scripts â†’ start, stop, restart, monitor
+36. Configure deployment scripts â†’ start, stop, restart, monitor
     - **Success:** Scripts tested, logs available.
-37. [x] Implement monitoring/logging â†’ performance, errors, system metrics
+37. Implement monitoring/logging â†’ performance, errors, system metrics
     - Implement active learning for uncertain/novel samples.
     - **Success:** Monitoring live, alerts configured, notification protocol documented.
-38. [!] Self-adaptive resource management (K8s auto-scaling, cost monitoring)
+38. Self-adaptive resource management (K8s auto-scaling, cost monitoring)
     - **Success:** System scales resources based on load/cost.
 
 ---
 
-## PHASE 9 â€” TESTING & VALIDATION ✅ MOSTLY COMPLETE
+## PHASE 9 â€” TESTING & VALIDATION
 
-39. [x] Write unit tests â†’ Java and Python modules
+39. Write unit tests â†’ Java and Python modules
     - **Success:** â‰¥90% coverage, all tests pass.
-40. [x] Write integration tests â†’ API + DB + AI engine
+40. Write integration tests â†’ API + DB + AI engine
     - **Success:** Integration tests pass, results logged.
-41. [!] Run stress tests â†’ high-frequency feeds, delays, anomalies
+41. Run stress tests â†’ high-frequency feeds, delays, anomalies
     - Use data augmentation and synthetic data for rare scenarios.
     - **Success:** System stable under load, metrics logged.
-42. [x] Simulate edge cases & failures â†’ confirm system stability
+42. Simulate edge cases & failures â†’ confirm system stability
     - **Success:** System recovers, logs all incidents.
-
-# --- PHASE 9 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R9-1] Advanced Testing Strategies
-    - [ ] Add property-based testing with Hypothesis for indicator calculations (auto-generate edge cases)
-    - [ ] Implement mutation testing (mutmut) to verify test quality — tests should catch code mutations
-    - [ ] Add snapshot testing for API response schemas (detect unintended response changes)
-    - [ ] Implement fuzz testing for data parsers and CSV loaders (malformed input resilience)
-    - [ ] Add test order randomization (pytest-randomly) to catch hidden state leaks between tests
-    - [ ] Build flaky test detection and quarantine workflow (auto-retry + tag flaky tests)
-    - **Success:** Test suite catches subtle bugs, no flaky tests, mutation score >80%.
-
-[R9-2] Integration & Contract Testing
-    - [ ] Implement contract tests between Python AI and Java orchestrator (Pact framework)
-    - [ ] Add end-to-end pipeline test (ingest -> features -> predict -> learn -> metrics -> evolve)
-    - [ ] Build test data factories with factory_boy for complex test scenarios
-    - [ ] Add database migration testing (verify Alembic migrations up/down without data loss)
-    - [ ] Implement API backward compatibility tests (old client SDK vs new API version)
-    - **Success:** Service contracts verified, full pipeline tested, migrations safe.
-
-[R9-3] Performance & Chaos Testing
-    - [ ] Add continuous performance benchmarks in CI (fail build if latency regresses >10%)
-    - [ ] Implement chaos testing (randomly kill services, inject latency, drop packets)
-    - [ ] Build soak tests (72+ hour continuous operation stability)
-    - [ ] Add memory leak detection in CI (compare heap before/after long test runs)
-    - [ ] Implement concurrency stress tests (100+ concurrent predictions)
-    - **Success:** System proven stable under duress, performance regression detected early.
-
 
 ---
 
@@ -381,34 +406,6 @@
     - **Success:** Models improve using distributed data, privacy logs.
 48. Multi-agent collaboration & swarm intelligence (advanced)
     - **Success:** Ensemble outperforms single models.
-
-# --- PHASE 10 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R10-1] Advanced Training Techniques
-    - [ ] Implement curriculum learning (train on easy patterns first, then progressively harder ones)
-    - [ ] Add self-supervised pre-training on unlabeled market data (predict next bar, mask & reconstruct)
-    - [ ] Implement knowledge distillation (compress ensemble to single fast model for inference)
-    - [ ] Add continual learning without catastrophic forgetting (EWC or Synaptic Intelligence)
-    - [ ] Implement online feature selection (periodically drop features losing predictive power)
-    - [ ] Add transfer learning across asset classes and timeframes
-    - **Success:** Models learn faster, retain knowledge, and adapt to new domains.
-
-[R10-2] Hyperparameter & Training Automation
-    - [ ] Implement automated learning rate scheduling (warmup, cosine decay, cyclic LR)
-    - [ ] Add training data augmentation (synthetic regime shifts, noise injection, time warping)
-    - [ ] Build experiment tracking dashboard (MLflow or W&B integration)
-    - [ ] Implement early stopping with patience based on validation Sharpe (not just loss)
-    - [ ] Add multi-seed training (train 5 seeds, keep best, measure variance)
-    - **Success:** Training is fully automated, reproducible, and optimized.
-
-[R10-3] Model Quality & Monitoring
-    - [ ] Implement model confidence calibration (predicted probability matches actual hit rate)
-    - [ ] Add concept drift detection (monitor feature distribution shifts in production)
-    - [ ] Build model comparison framework (statistical tests for model A vs model B significance)
-    - [ ] Implement shadow deployment (run new model alongside old, compare before switching)
-    - [ ] Add model explainability reports generated after each retrain automatically
-    - **Success:** Model quality continuously monitored, drift detected early.
-
 
 ---
 
@@ -498,40 +495,38 @@
     - [ ] Remove default SECRET_KEY value from config/settings.py (force env var)
     - [ ] Remove default DATABASE_URL with embedded password from config/settings.py
     - [ ] Add startup validation that rejects placeholder/default secrets
-    - [x] Unified JWT_SECRET_KEY with AUTH_SECRET_KEY in jwt_handler.py ✅ Done (commit d29f202)
     - [ ] Document required environment variables in .env.example
     - **Success:** No hardcoded secrets, app refuses to start without proper env config.
 
-56b. Fix Pickle Deserialization RCE Risk ✅ COMPLETE
-    - [x] Replace pickle.load() in ml_model.py with joblib.load() (already a dependency) ✅ Done (commit d29f202)
-    - [x] Add file integrity check (hash verification) before loading any model ✅ Done (SHA-256 sidecar files)
-    - [x] Audit all pickle usage across codebase and replace with safe alternatives ✅ Done
+56b. Fix Pickle Deserialization RCE Risk
+    - [ ] Replace pickle.load() in ml_model.py with joblib.load() (already a dependency)
+    - [ ] Add file integrity check (hash verification) before loading any model
+    - [ ] Audit all pickle usage across codebase and replace with safe alternatives
     - **Success:** No arbitrary code execution risk from model loading.
 
-56c. Fix FastAPI Global State Issues ✅ COMPLETE
-    - [x] Replace Settings() instantiation with get_settings() DI ✅ Done (commit d29f202)
-    - [x] Add asyncio.Lock around all global state mutations in FastAPI routes ✅ Done
-    - [x] Ensure thread-safety for shared model instance across concurrent requests ✅ Done
+56c. Fix FastAPI Global State Issues
+    - [ ] Replace MLModel global singleton in fastapi_service.py with FastAPI dependency injection
+    - [ ] Add asyncio.Lock around all global state mutations in FastAPI routes
+    - [ ] Ensure thread-safety for shared model instance across concurrent requests
     - **Success:** No race conditions, clean DI pattern, safe concurrent access.
 
-56d. Wire Auth Middleware to Endpoints ✅ COMPLETE
-    - [x] Apply JWT/API-key auth to /compute-features, /explain, /metrics/prometheus ✅ Done (commit d29f202)
-    - [x] Keep /health and /docs endpoints public (no auth required) ✅ Done
-    - [x] Add integration tests verifying auth rejection on unauthenticated requests ✅ Done
+56d. Wire Auth Middleware to Endpoints
+    - [ ] Apply JWT/API-key auth dependency to all production endpoints (/predict, /learn, /metrics)
+    - [ ] Keep /health and /docs endpoints public (no auth required)
+    - [ ] Add integration tests verifying auth rejection on unauthenticated requests
     - **Success:** All sensitive endpoints require valid authentication.
 
-56e. Fix Technical Indicator Calculations ✅ MOSTLY COMPLETE
-    - [x] Fix RSI — Wilder's exponential smoothing via pd.ewm(com=window-1) ✅ Done (commit d29f202)
-    - [x] Fix Bollinger Bands — vectorized with pd.rolling().std() ✅ Done (commit d29f202)
-    - [x] Vectorize MACD with pandas ewm() ✅ Done (commit d29f202)
-    - [x] Vectorize SMA, EMA in data_pipeline.py and vectorized_indicators.py ✅ Done (commit d29f202)
-    - [ ] Add reference test cases with known-good indicator values (stockcharts.com golden data)
+56e. Fix Technical Indicator Calculations
+    - [ ] Fix RSI calculation in data_pipeline.py — use Wilder's exponential smoothing (not simple average)
+    - [ ] Fix Bollinger Bands — add configurable std deviation multiplier parameter (default=2.0)
+    - [ ] Validate MACD calculation against reference implementation (stockcharts.com)
+    - [ ] Add reference test cases with known-good indicator values
     - **Success:** All technical indicators match industry-standard calculations.
 
-56f. Consolidate Duplicate Configuration ✅ COMPLETE
-    - [x] Rewrite db/config.py as thin shim over settings.py DatabaseSettings ✅ Done (commit d29f202)
-    - [x] Use Pydantic Settings with @lru_cache on get_settings() ✅ Done (commit d29f202)
-    - [x] Implement settings validation on startup (Pydantic validators) ✅ Done (commit d29f202)
+56f. Consolidate Duplicate Configuration
+    - [ ] Merge config/settings.py and strategy_config.py into single source of truth
+    - [ ] Use Pydantic Settings with env_prefix for all configuration
+    - [ ] Implement settings validation on startup (ranges, types, required fields)
     - **Success:** One config system, no duplication, validated on boot.
 
 ---
@@ -567,7 +562,7 @@
     - [ ] Implement error recovery automation (auto-retry, auto-heal)
     - [ ] Add retry logic with backoff for all database operations in repository.py
     - [ ] Implement graceful shutdown handler for FastAPI (cleanup connections, flush logs)
-    - [x] Create consistent exception hierarchy (NeoBaseError -> NeoDataError, NeoModelError, NeoAPIError, etc.) ✅ Done (python_ai/exceptions.py, commit d29f202)
+    - [ ] Create consistent exception hierarchy (NeoBaseError -> NeoDataError, NeoModelError, NeoAPIError, etc.)
     - **Success:** System survives failures gracefully, errors logged comprehensively, no cascading failures.
 
 ---
@@ -632,53 +627,11 @@
     - [ ] Enforce minimum coverage threshold (>=80%) in CI pipeline with --cov-fail-under
     - [ ] Add full pipeline integration test (ingest -> features -> predict -> learn -> metrics)
     - [ ] Add reference-value test cases for all technical indicators (RSI, MACD, Bollinger)
+    - [ ] Add integration tests for AutoTrainer end-to-end (Phase 7.5 items 33a-33h)
+    - [ ] Add regression tests for TradableStrategy signal correctness (known inputs → expected signals)
+    - [ ] Add walk-forward data leakage tests (verify train/validate/test windows never overlap)
+    - [ ] Add backtester enhancement tests (stop-loss, take-profit, position sizing from item 22a)
     - **Success:** All features tested, 80%+ coverage, test results integrated into CI/CD.
-
-
-## PHASE 11.6 — ALTERNATIVE DATA SOURCES (from deep codebase analysis)
-
-[R11.6-1] News & Sentiment Pipeline
-    - [ ] Implement financial news ingestion (RSS feeds, NewsAPI, Alpha Vantage news)
-    - [ ] Add FinBERT-based sentiment scoring for financial text
-    - [ ] Build news impact decay model (sentiment fades over hours/days)
-    - [ ] Implement entity extraction (which assets mentioned in each article)
-    - [ ] Add headline vs full-article sentiment comparison
-    - **Success:** Real-time news sentiment features flowing into model.
-
-[R11.6-2] Social Media & Community Signals
-    - [ ] Integrate Reddit API (r/cryptocurrency, r/wallstreetbets mention frequency + sentiment)
-    - [ ] Add Twitter/X crypto influencer sentiment tracking
-    - [ ] Implement social volume anomaly detection (unusual mention spikes)
-    - [ ] Build community sentiment aggregator (weighted by user credibility score)
-    - [ ] Add Telegram/Discord signal channel monitoring
-    - **Success:** Social signals integrated, sentiment anomalies trigger alerts.
-
-[R11.6-3] On-Chain & DeFi Data
-    - [ ] Integrate exchange inflow/outflow data (detect whale movements)
-    - [ ] Add active address count features (network activity proxy)
-    - [ ] Implement whale wallet tracking (top-100 wallet balance changes)
-    - [ ] Add DeFi TVL and yield farming APY data
-    - [ ] Integrate DEX volume and liquidity pool depth data
-    - [ ] Add stablecoin flow data (USDT/USDC minting/burning as market signal)
-    - **Success:** On-chain data provides early warnings for major moves.
-
-[R11.6-4] Derivatives & Options Flow
-    - [ ] Add options max pain calculation (strike with most open interest)
-    - [ ] Implement put/call ratio tracking across exchanges
-    - [ ] Add implied volatility surface features
-    - [ ] Integrate liquidation data (cascade liquidation warnings)
-    - [ ] Add funding rate divergence across exchanges (arbitrage signal)
-    - **Success:** Derivatives positioning data improves directional accuracy.
-
-[R11.6-5] Macro & External Data
-    - [ ] Integrate economic calendar API (FOMC dates, CPI releases, NFP)
-    - [ ] Add Google Trends search volume correlation features
-    - [ ] Implement DXY (Dollar Index) and bond yield features as macro context
-    - [ ] Add VIX (fear index) and its crypto equivalent (DVOL) as features
-    - [ ] Build geopolitical risk scoring from news classification
-    - **Success:** Model has macro awareness, better at regime transitions.
-
----
 
 ---
 
@@ -730,33 +683,6 @@
     - [ ] Register WebSocket signal handler in FastAPI app startup event
     - [ ] Wire database initialization/migration check into app startup lifecycle
     - **Success:** Clean DI architecture, fully testable, no hidden global state.
-
-# --- PHASE 12 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R12-1] Next-Generation Model Architectures
-    - [ ] Implement Temporal Fusion Transformers (TFT) for multi-horizon forecasting with interpretability
-    - [ ] Add Mixture of Experts (MoE) — route different market conditions to specialized sub-models
-    - [ ] Build Graph Neural Networks for asset correlation and contagion modeling
-    - [ ] Implement Diffusion Models for synthetic market scenario generation
-    - [ ] Add Informer/Autoformer for long-sequence time series forecasting (O(n log n) attention)
-    - **Success:** State-of-the-art architectures available, measured uplift vs baseline.
-
-[R12-2] Uncertainty & Robustness
-    - [ ] Implement conformal prediction for calibrated prediction intervals
-    - [ ] Add Monte Carlo Dropout for Bayesian uncertainty estimation
-    - [ ] Build adversarial robustness testing (small input perturbations shouldn't flip predictions)
-    - [ ] Implement deep ensemble disagreement as confidence metric
-    - [ ] Add out-of-distribution detection (flag inputs unlike training data)
-    - **Success:** Model knows when it doesn't know, uncertainty quantified.
-
-[R12-3] Causal & Few-Shot Learning
-    - [ ] Implement causal inference for true signal vs noise separation (do-calculus)
-    - [ ] Add few-shot learning for rare market events (flash crashes, short squeezes)
-    - [ ] Build world model (learn internal market simulation for Monte Carlo planning)
-    - [ ] Implement multi-task learning (predict price, volume, volatility simultaneously)
-    - [ ] Add contrastive learning for market regime embeddings (learn regime similarity space)
-    - **Success:** Model generalizes to novel scenarios, understands causality.
-
 
 ---
 
@@ -966,39 +892,6 @@
     - [ ] Add password complexity requirements validation
     - **Success:** Auth system meets OWASP password storage guidelines.
 
-81e. Structured Logging & Observability [R]
-    - [ ] Replace all print() statements with structured JSON logging (structlog or python-json-logger)
-    - [ ] Add correlation ID middleware (generate unique ID per request, propagate through all logs)
-    - [ ] Implement log levels strategy (DEBUG for dev, INFO for prod, ERROR for alerts)
-    - [ ] Add request/response timing middleware with structured log output
-    - [ ] Configure log rotation and retention policies
-    - **Success:** All logs are structured JSON, searchable, correlated by request ID.
-
-81f. Architecture Documentation [R]
-    - [ ] Create Architecture Decision Records (ADRs) in docs/decisions/ for major design choices
-    - [ ] Add system architecture diagram (C4 model: context, container, component, code levels)
-    - [ ] Document data flow diagrams (ingestion -> features -> model -> prediction -> execution)
-    - [ ] Add API versioning headers (X-API-Version) and deprecation warning middleware
-    - [ ] Create runbook for common operations (deploy, rollback, retrain, troubleshoot)
-    - **Success:** Architecture self-documented, new devs onboard from docs alone.
-
-81g. Consistent Error Response Format [R]
-    - [ ] Define standard JSON error response schema: {type, message, detail, request_id, timestamp}
-    - [ ] Create custom exception handlers in FastAPI for all NeoBaseError subtypes
-    - [ ] Add error codes enum (NEO-001 through NEO-999) for programmatic error handling
-    - [ ] Implement error response tests ensuring all endpoints return consistent format
-    - [ ] Add error rate monitoring and alerting (Prometheus counter per error code)
-    - **Success:** All errors follow consistent schema, programmatically parseable.
-
-81h. Database Migrations & Schema Management [R]
-    - [ ] Set up Alembic for SQLAlchemy schema migrations
-    - [ ] Add migration CI gate (auto-generate migration diff, fail if schema drift detected)
-    - [ ] Create seed data scripts for development environment
-    - [ ] Implement schema versioning with backward compatibility checks
-    - [ ] Add database rollback procedure documentation
-    - **Success:** Schema changes tracked, reversible, CI-validated.
-
-
 ---
 
 ## PHASE 17 — MOBILE APPLICATION & EXTENDED UX
@@ -1012,25 +905,6 @@
     - [ ] Implement face/biometric authentication
     - [ ] Optimize for offline mode with local caching
     - **Success:** Mobile app live on App Store/Play Store, 95%+ feature parity with web.
-
-# --- PHASE 17 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R17-1] Progressive Web App (PWA) First
-    - [ ] Build PWA with offline support before native app (faster development, same codebase as web)
-    - [ ] Implement service worker for background sync and push notifications
-    - [ ] Add app install prompt (Add to Home Screen) for mobile browsers
-    - [ ] Build compact portfolio widget for mobile home screen
-    - [ ] Implement touch-optimized chart interactions (pinch-zoom, swipe between timeframes)
-    - **Success:** PWA available immediately, no app store approval needed.
-
-[R17-2] Real-Time Mobile Notifications
-    - [ ] Implement Firebase Cloud Messaging for cross-platform push notifications
-    - [ ] Add configurable alert triggers (price threshold, strategy signal, risk breach)
-    - [ ] Build notification priority system (critical: immediate, info: batched digest)
-    - [ ] Implement quiet hours and notification grouping
-    - [ ] Add one-tap actions from notifications (acknowledge alert, close position)
-    - **Success:** Users receive actionable alerts instantly, can respond from notification.
-
 
 ---
 
@@ -1163,35 +1037,6 @@
     - [ ] Add optional WebSocket support (polling fallback)
     - [ ] Create configuration profiles (dev, lite, production)
     - **Success:** System configurable for minimal, standard, and full deployments.
-
-# --- PHASE 19 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R19-1] GitOps & Deployment Automation
-    - [ ] Implement GitOps workflow with ArgoCD/Flux for declarative K8s deployments
-    - [ ] Add canary deployments with automatic rollback on error spike (Flagger/Argo Rollouts)
-    - [ ] Build feature flag system for gradual feature rollout (custom or Unleash)
-    - [ ] Implement blue-green deployment for zero-downtime updates
-    - [ ] Add deployment approval gates for production (require human sign-off)
-    - **Success:** Deployments are declarative, reversible, and risk-controlled.
-
-[R19-2] CI/CD Pipeline Hardening
-    - [ ] Fix GitHub Actions CI YAML (replace echo placeholders with real deploy commands)
-    - [ ] Add automated dependency updates (Dependabot/Renovate bot with auto-merge for patch versions)
-    - [ ] Implement CI caching for pip, pytest, docker layers (speed up builds 3-5x)
-    - [ ] Add security scanning in CI (Trivy for container images, safety for Python deps)
-    - [ ] Implement CI matrix testing (Python 3.10, 3.11, 3.12 + Linux, Windows)
-    - [ ] Add artifact signing and provenance tracking (SLSA Level 2)
-    - **Success:** CI/CD pipeline is fast, secure, and multi-platform.
-
-[R19-3] Infrastructure Monitoring
-    - [ ] Deploy Prometheus + Grafana stack for metrics collection and visualization
-    - [ ] Add cAdvisor and node_exporter for container/host metrics
-    - [ ] Implement distributed tracing with OpenTelemetry + Jaeger
-    - [ ] Add log aggregation with Loki or ELK stack
-    - [ ] Create alerting rules (PagerDuty/OpsGenie integration)
-    - [ ] Build infrastructure-as-code tests (Terraform plan validation in CI)
-    - **Success:** Full observability stack, proactive alerting, zero blind spots.
-
 
 ---
 
@@ -1385,25 +1230,6 @@
     - [ ] Implement reserved instance/commitment management
     - **Success:** Cloud costs reduced by 30-50%, budget compliance verified.
 
-# --- PHASE 21 RECOMMENDATIONS (from deep codebase analysis) ---
-
-[R21-1] Free-Tier & Cost-Efficient Training
-    - [ ] Implement Google Colab/Kaggle notebook integration for free GPU training
-    - [ ] Add AWS Spot / GCP Preemptible instance support for scheduled training jobs
-    - [ ] Build cost-aware early stopping (stop training if marginal improvement < cloud cost)
-    - [ ] Implement training checkpoint save/resume for preemptible instances
-    - [ ] Add multi-cloud model serving (serve from cheapest available region)
-    - **Success:** GPU training available at minimal cost, interruptible jobs supported.
-
-[R21-2] Model Registry & Deployment
-    - [ ] Set up MLflow Model Registry for version tracking and stage management
-    - [ ] Implement A/B testing framework for model deployment (traffic splitting)
-    - [ ] Add shadow deployment (run new model alongside old, compare predictions silently)
-    - [ ] Build automated model rollback on performance degradation (Sharpe drops >20%)
-    - [ ] Implement model serving latency SLA monitoring (alert if P95 > threshold)
-    - **Success:** Models versioned, A/B tested, auto-rolled-back on degradation.
-
-
 ---
 
 ## PHASE 22 — TESTING & VALIDATION FOR OPTIMIZATION PHASES
@@ -1501,48 +1327,4 @@
     - [ ] Add computation DAG to parallelize independent indicator calculations
     - [ ] Implement SIMD-friendly data layouts (struct-of-arrays vs array-of-structs)
     - **Success:** Feature computation 10x faster, backtesting 20x faster.
-
----
-
-## PHASE 24 — PRODUCTION READINESS CHECKLIST (from deep codebase analysis)
-
-> **Goal:** Ensure NEO is production-ready with all safety nets in place
-> before deploying with real capital. This phase serves as a gate before
-> any live trading.
-
-107. Pre-Production Safety Audit
-    - [ ] Verify all hardcoded default secrets are removed (no placeholder passwords in prod)
-    - [ ] Confirm model hash verification is enforced (no tampered models can load)
-    - [ ] Validate all API endpoints require authentication
-    - [ ] Run full security scan (bandit, safety, trivy) with zero critical findings
-    - [ ] Verify rate limiting is configured and tested under load
-    - [ ] Confirm all database connections use connection pooling
-    - [ ] Validate graceful shutdown handles in-flight requests
-    - **Success:** Security audit passes with zero critical findings.
-
-108. Operational Readiness
-    - [ ] Create incident response runbook (who to page, escalation path, rollback procedure)
-    - [ ] Set up on-call rotation and alerting channels
-    - [ ] Verify monitoring covers all critical paths (data ingestion, prediction, execution)
-    - [ ] Test disaster recovery procedure (restore from backup, verify data integrity)
-    - [ ] Document SLA targets (uptime, latency, data freshness)
-    - [ ] Run game day exercise (simulate production failure, verify team response)
-    - **Success:** Team can handle production incidents confidently.
-
-109. Capital Safety Mechanisms
-    - [ ] Implement hard kill switch (immediately halt all trading with single command)
-    - [ ] Add daily loss limit circuit breaker (stop trading if daily loss exceeds threshold)
-    - [ ] Implement position size caps (max % of portfolio per trade)
-    - [ ] Add out-of-hours trading prevention (configurable trading windows)
-    - [ ] Build paper trading validation period (30+ days profitable before real capital)
-    - [ ] Implement gradual capital deployment (start with 1% allocation, scale up based on performance)
-    - **Success:** Multiple safety layers prevent catastrophic losses.
-
-110. Compliance & Legal
-    - [ ] Review regulatory requirements for algorithmic trading in target jurisdictions
-    - [ ] Implement required audit trails and record retention
-    - [ ] Add terms of service and risk disclosure for any external users
-    - [ ] Verify data usage complies with exchange API terms of service
-    - [ ] Document algorithm behavior for regulatory inspection
-    - **Success:** Legal review complete, compliance documented.
 

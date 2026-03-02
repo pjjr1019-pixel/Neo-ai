@@ -1,5 +1,5 @@
 ﻿NEO Hybrid AI System - Progress Summary
-Last Updated: 2026-03-02 (Session 5)
+Last Updated: 2026-03-03 (Session 6)
 
 ========================================================================
 1. PROJECT OVERVIEW
@@ -18,18 +18,18 @@ Tech Stack:
   Crypto         - cryptography (AES-256-GCM), HMAC-SHA256
 
 Branch: appmod/java-upgrade-20260227212101
-Latest Commit: Session 5 (6b1ac46)
+Latest Commit: Session 6
 
 ========================================================================
-2. TEST SUITE STATUS (as of 2026-03-02, Session 5)
+2. TEST SUITE STATUS (as of 2026-03-03, Session 6)
 ========================================================================
-  pytest:   682 collected -> 682 passed, 5 skipped, 0 failed
+  pytest:   713 collected, all passing
   flake8:   0 errors (max-line-length=79)
   bandit:   0 medium/high severity issues
   black:    Compliant (--line-length 79)
-  mypy:     Compliant (0 errors in 127 source files)
+  mypy:     Compliant
   isort:    Compliant
-  Test files: 41 Python test modules + 6 Java JUnit test classes
+  Test files: 46 Python test modules + conftest.py + 6 Java JUnit classes
 
 ========================================================================
 3. PHASE COMPLETION STATUS
@@ -60,8 +60,8 @@ PHASE 3 - DATA & OBSERVABILITY ............................. COMPLETE
   [!] Observability: docs exist, Prometheus/Grafana not wired in code
 
 PHASE 4 - PYTHON AI ENGINE ................................. COMPLETE
-  [x] FastAPI service with endpoints: /, /predict, /learn, /metrics,
-      /compute-features, /explain, /health, /metrics/prometheus
+  [x] FastAPI service with 8 endpoints (/, /predict, /learn, /metrics,
+      /compute-features, /explain, /health, /metrics/prometheus)
   [x] JSON schemas (Pydantic v2 models)
   [x] Feature processing pipeline (normalize, windowing)
   [x] ML Model: RandomForest + GradientBoosting ensemble with
@@ -77,16 +77,16 @@ PHASE 4 - PYTHON AI ENGINE ................................. COMPLETE
 
 PHASE 5 - MODEL TRAINING & SELECTION ....................... COMPLETE
   [x] Backtesting simulator (walk-forward, transaction costs)
-  [x] Performance metrics: Sharpe ratio, max drawdown, win rate, fitness score
+  [x] Performance metrics: Sharpe ratio, max drawdown, win rate, fitness
   [x] Automatic model selection via evolution engine
   [x] Model persistence (pickle serialization)
   [x] Bayesian optimization replaced with Optuna TPE sampler
   [x] ONNX model export (skl2onnx with numpy .npz fallback)
-  [ ] Model saving to ONNX for Java inference - partial
+  [!] ONNX for Java inference - partial (export works, Java loading not wired)
 
 PHASE 5.5 - SYSTEM HARDENING ............................... COMPLETE
   [x] Full integration tests (Python + FastAPI + DB)
-  [x] Code review and refactoring done
+  [x] Code review and refactoring
   [x] Documentation updated (37 doc files in /docs)
   [x] Circuit breaker pattern for exchange API resilience
   [x] Token-bucket rate limiting middleware
@@ -100,8 +100,6 @@ PHASE 5.5 - SYSTEM HARDENING ............................... COMPLETE
   [x] Strategy configuration (YAML/JSON loader)
   [x] Performance timing decorators + registry
   [x] Trade journal (JSONL persistence)
-  [!] Backup procedures - manual
-  [!] Security audit - bandit passes, no pen testing done
 
 PHASE 6 - JAVA ORCHESTRATOR CORE ........................... PARTIAL
   [x] ApiClient.java - REST client for Python FastAPI
@@ -111,8 +109,8 @@ PHASE 6 - JAVA ORCHESTRATOR CORE ........................... PARTIAL
   [x] OrchestratorMain.java - entry point wiring all components
   [x] 6 JUnit test classes covering orchestrator components
   [!] Dashboard.java - placeholder (println only, no real UI)
-  [!] SecurityManager.java - placeholder (validateToken() always returns true)
-  [!] RedisCache.java - empty stubs
+  [!] SecurityManager.java - placeholder (validateToken() always true)
+  [!] RedisCache.java - empty stub
   [!] DataFeedClient.java - empty stub
 
 PHASE 7 - STRATEGY EVOLUTION & META-LEARNING ............... COMPLETE
@@ -128,21 +126,22 @@ PHASE 7 - STRATEGY EVOLUTION & META-LEARNING ............... COMPLETE
 PHASE 8 - DEPLOYMENT & SCALABILITY ......................... PARTIAL
   [x] Docker multi-stage build (runtime -> dev -> production)
   [x] docker-compose (neo-ai-service, postgres-db, redis-cache)
-  [x] Kubernetes manifests (namespace, configmap, secret, PVC, deployment, service)
+  [x] Kubernetes manifests (namespace, configmap, secret, PVC, deployment,
+      service, HPA, RBAC, PodDisruptionBudget)
   [x] GitHub Actions CI (lint + test matrix)
   [x] GitHub Actions CD (Docker build + push to GHCR)
   [!] CD deploy steps are placeholders (echo commands)
   [ ] Cloud deployment scripts - not implemented
-  [ ] Auto-scaling policies - not implemented
+  [ ] Auto-scaling policies - not implemented in code
 
 PHASE 9 - TESTING & VALIDATION ............................. MOSTLY COMPLETE
-  [x] 419 unit/integration tests across 38 test files
+  [x] 713 tests across 46 test files (all passing)
   [x] Compliance tests: flake8, black, mypy, bandit, isort, docstrings
   [x] Edge case tests, benchmark tests, CI pipeline compliance tests
-  [!] No stress/load tests implemented
+  [!] No stress/load tests
   [!] No chaos engineering tests
 
-PHASE 10 - CONTINUOUS LEARNING ............................. COMPLETE
+PHASE 10 - CONTINUOUS LEARNING ............................. MOSTLY COMPLETE
   [x] Resource monitoring (CPU/memory via psutil)
   [x] Configuration management (Pydantic settings, env vars)
   [x] Auth system: JWT tokens, API key management, RBAC
@@ -152,7 +151,8 @@ PHASE 10 - CONTINUOUS LEARNING ............................. COMPLETE
   [x] Graceful degradation with ordered fallbacks + TTL cache
   [x] I/O timeout wrappers (thread-based)
   [x] Auto-retrain scheduler (time-based + drift-triggered, background)
-  [!] Federated learning - not implemented
+  [ ] Federated learning - not implemented
+  [ ] Human-in-the-loop feedback - not implemented
 
 PHASE 11 - RESILIENCE & API SECURITY ....................... COMPLETE
   [x] HMAC request signing + verification (timestamp freshness)
@@ -182,142 +182,235 @@ PHASE 13 - PLATFORM & STREAMING ........................... COMPLETE
   [x] Statistical arbitrage / pairs trading (cointegration, z-score)
   [x] Stream ingestion (InMemoryStream, consumer groups, background)
 
-PHASE 14 - PERFORMANCE OPTIMIZATION ....................... COMPLETE
+PHASE 14 - PERFORMANCE & ALERTS ........................... COMPLETE
   [x] Vectorized indicators (SMA, EMA, RSI, MACD, Bollinger via numpy)
   [x] Circular buffer (pre-allocated numpy, O(1) append)
   [x] Alert notification system (Webhook, Slack, Telegram, Discord)
+  [x] B310 security fix in alert_notifier.py (URL validation, scheme checks)
+  [x] 24 regression tests for alert_notifier.py
 
 PHASE 15 - DATA MANAGEMENT ................................ PARTIAL
   [x] Data compression & archival (gzip, retention enforcement)
-  [ ] Real market data integration
-  [ ] Data pipeline orchestration
+  [x] Stream ingestion (Redis Streams-style, consumer groups)
+  [ ] Production Kafka/Redis Streams integration
+  [ ] Real market data pipeline
 
 PHASE 16 - COMPLIANCE & GOVERNANCE ........................ PARTIAL
   [x] Audit logger (SHA-256 hash chain, tamper detection, JSONL)
   [x] Risk governance (approval workflows, policy evaluation)
-  [ ] Regulatory reporting
-  [ ] Compliance dashboards
+  [x] datetime.utcnow() replaced with datetime.now(timezone.utc) globally
+  [x] Password hashing upgraded (sha256_crypt -> bcrypt)
+  [ ] MiFID II / Dodd-Frank compliance checks
+  [ ] Regulatory reporting & compliance dashboards
 
 ========================================================================
-4. IMPLEMENTED MODULES INVENTORY
+4. IMPLEMENTED MODULES INVENTORY (62 source modules + 13 subpackage modules)
 ========================================================================
 
-Python AI Source (python_ai/):
-  ml_model.py ............... 254 lines  Ensemble ML (RF+GB), train(X,y), predict
-  data_pipeline.py .......... 265 lines  Indicators + feature engineering
-  backtesting_engine.py ..... 249 lines  Walk-forward backtest simulator
-  evolution_engine.py ....... 495 lines  Strategy evolution + meta-learning
-  autonomous_trading_loop.py  355 lines  Autonomous trading (simulated)
-  orchestrator_integration.py 193 lines  Python-side orchestration layer
-  data_ingestion_api.py ..... 368 lines  Data validation + CSV storage
-  resource_monitor.py ....... 43 lines   CPU/memory logging
-  benchmark_predict.py ...... 44 lines   Async HTTP benchmark
-  fastapi_service.py ........ 306 lines  FastAPI endpoints (8 routes)
-  training_data_builder.py .. 180 lines  CCXT OHLCV -> feature matrix builder
-  exchange_feed.py .......... 271 lines  Live/sim exchange WebSocket feeds
-  historical_data_fetcher.py  150 lines  CCXT historical OHLCV fetcher
+Python AI Source (python_ai/) - 62 top-level modules:
 
-  -- Production Hardening (Session 3) --
-  circuit_breaker.py ........ 196 lines  Circuit breaker (CLOSED/OPEN/HALF_OPEN)
-  rate_limiter.py ........... 160 lines  Token-bucket rate limiting middleware
-  paper_trading.py .......... 302 lines  Simulated trading with slippage/fees
-  position_tracker.py ....... 301 lines  Position + PortfolioTracker
-  risk_management.py ........ 210 lines  Kelly Criterion, ATR stops, drawdown
-  drift_monitor.py .......... 224 lines  Model drift detection + auto-retrain
-  onnx_export.py ............ 136 lines  ONNX export with numpy fallback
-  incremental_indicators.py . 178 lines  Cache-backed incremental indicators
-  data_quality.py ........... 260 lines  OHLCV validation (NaN, gaps, anomalies)
-  signal_alerts.py .......... 214 lines  Alert system with pluggable handlers
-  strategy_config.py ........ 190 lines  YAML/JSON strategy configuration
-  perf_timing.py ............ 144 lines  @timed decorator + TimingRegistry
-  trade_journal.py .......... 264 lines  JSONL trade logging with persistence
+  -- Core Engine --
+  ml_model.py ............... Ensemble ML (RF+GB), train(X,y), predict
+  data_pipeline.py .......... Indicators + feature engineering
+  backtesting_engine.py ..... Walk-forward backtest simulator
+  evolution_engine.py ....... Strategy evolution + meta-learning
+  autonomous_trading_loop.py  Autonomous trading (simulated)
+  orchestrator_integration.py Python-side orchestration layer
+  fastapi_service.py ........ FastAPI endpoints (8 routes)
 
-  -- Session 4: Infrastructure, Analytics, Platform, Performance --
-  model_versioning.py ....... 180 lines  Hash-based model registry + rollback
-  retry.py .................. 157 lines  @retry decorator, exponential backoff
-  graceful_degradation.py ... 168 lines  Ordered fallback chains + TTL cache
-  timeout.py ................ 128 lines  Thread-based I/O timeout wrapper
-  var_risk.py ............... 225 lines  VaR: historical, parametric, MC, CVaR
-  correlation_matrix.py ..... 172 lines  Pearson, rolling, EWMA correlation
-  portfolio_rebalancer.py ... 205 lines  Threshold + calendar rebalancing
-  monte_carlo.py ............ 220 lines  MC simulator, confidence intervals
-  walk_forward.py ........... 195 lines  Walk-forward optimizer (anchored/rolling)
-  ws_signal_stream.py ....... 130 lines  Async WebSocket signal broadcasting
-  config_hot_reload.py ...... 155 lines  File-hash config hot reload
-  ab_testing.py ............. 195 lines  A/B testing with Welch's t-test
-  multi_exchange_aggregator.py 170 lines VWAP, best bid/ask aggregation
-  api_versioning.py ......... 135 lines  /vN API version prefix middleware
-  hmac_signing.py ........... 150 lines  HMAC signing + verification
-  vectorized_indicators.py .. 200 lines  Numpy-vectorized SMA/EMA/RSI/MACD/BB
-  circular_buffer.py ........ 173 lines  Pre-allocated numpy circular buffer
+  -- Data --
+  data_ingestion_api.py ..... Data validation + CSV storage
+  data_quality.py ........... OHLCV validation (NaN, gaps, anomalies)
+  data_archival.py .......... Gzip compression + retention enforcement
+  historical_data_fetcher.py  CCXT historical OHLCV fetcher
+  training_data_builder.py .. CCXT OHLCV -> feature matrix builder
+  stream_ingestion.py ....... Redis Streams-style event ingestion
 
-  -- Session 5: Security, ML, Platform, Compliance (Phases 10-16) --
-  request_encryption.py ..... 227 lines  AES-256-GCM encrypt/decrypt, middleware
-  ip_allowlist.py ........... 183 lines  CIDR-based IP allow-listing middleware
-  regime_detector.py ........ 255 lines  GMM regime detection, transition matrix
-  event_sourcing.py ......... 266 lines  Event store with file-backed persistence
-  cqrs.py ................... 307 lines  Command/Query buses with middleware
-  dead_letter_queue.py ...... 270 lines  DLQ with retry, purge, TTL, stats
-  bulkhead.py ............... 238 lines  Semaphore bulkhead with registry
-  anomaly_autoencoder.py .... 255 lines  PyTorch autoencoder anomaly detection
-  lstm_model.py ............. 280 lines  PyTorch LSTM predictor (sliding window)
-  transformer_model.py ...... 323 lines  PyTorch Transformer predictor
-  retrain_scheduler.py ...... 236 lines  Time-based + drift-triggered scheduler
-  rl_agent.py ............... 410 lines  DQN trading agent, experience replay
-  cross_exchange_validator.py 268 lines  Z-score outlier + staleness detection
-  stat_arb.py ............... 320 lines  Cointegration pairs trading signals
-  alert_notifier.py ......... 386 lines  Multi-channel alert dispatch system
-  data_archival.py .......... 308 lines  Gzip compression + retention enforcement
-  stream_ingestion.py ....... 332 lines  Redis Streams-style event ingestion
-  audit_logger.py ........... 321 lines  SHA-256 hash chain audit trail
-  risk_governance.py ........ 405 lines  Approval workflows + policy evaluation
+  -- AI / ML --
+  lstm_model.py ............. PyTorch LSTM predictor (sliding window)
+  transformer_model.py ...... PyTorch Transformer predictor
+  anomaly_autoencoder.py .... PyTorch autoencoder anomaly detection
+  rl_agent.py ............... DQN trading agent, experience replay
+  drift_monitor.py .......... Model drift detection + auto-retrain
+  onnx_export.py ............ ONNX export with numpy fallback
+  model_versioning.py ....... Hash-based model registry + rollback
+  retrain_scheduler.py ...... Time-based + drift-triggered scheduler
 
-  alembic/ .................. 4 files    DB migration framework + initial schema
+  -- Trading --
+  paper_trading.py .......... Simulated trading with slippage/fees
+  position_tracker.py ....... Position + PortfolioTracker
+  exchange_feed.py .......... Live/sim exchange WebSocket feeds
+  signal_alerts.py .......... Alert system with pluggable handlers
+  strategy_config.py ........ YAML/JSON strategy configuration
+  config_hot_reload.py ...... File-hash config hot reload
+  trade_journal.py .......... JSONL trade logging with persistence
+  ab_testing.py ............. A/B testing with Welch's t-test
+  walk_forward.py ........... Walk-forward optimizer (anchored/rolling)
 
-  auth/ (4 modules) ......... 855 lines  JWT, API keys, RBAC, dependencies
-  config/ (1 module) ........ 326 lines  Pydantic settings hierarchy
-  db/ (4 modules) ........... 1,179 lines ORM models, repositories, connections
-  logging/ (4 modules) ...... 751 lines  JSON/colored formatters, correlation IDs
+  -- Risk --
+  risk_management.py ........ Kelly Criterion, ATR stops, drawdown
+  risk_governance.py ........ Approval workflows + policy evaluation
+  var_risk.py ............... VaR: historical, parametric, MC, CVaR
+  monte_carlo.py ............ MC simulator, confidence intervals
+
+  -- Quant --
+  correlation_matrix.py ..... Pearson, rolling, EWMA correlation
+  regime_detector.py ........ GMM regime detection, transition matrix
+  stat_arb.py ............... Cointegration pairs trading signals
+
+  -- API --
+  api_versioning.py ......... /vN API version prefix middleware
+  ws_signal_stream.py ....... Async WebSocket signal broadcasting
+  benchmark_predict.py ...... Async HTTP benchmark
+
+  -- Security --
+  hmac_signing.py ........... HMAC signing + verification
+  request_encryption.py ..... AES-256-GCM encrypt/decrypt, middleware
+  ip_allowlist.py ........... CIDR-based IP allow-listing middleware
+  audit_logger.py ........... SHA-256 hash chain audit trail
+
+  -- Resilience --
+  circuit_breaker.py ........ Circuit breaker (CLOSED/OPEN/HALF_OPEN)
+  rate_limiter.py ........... Token-bucket rate limiting middleware
+  retry.py .................. @retry decorator, exponential backoff
+  graceful_degradation.py ... Ordered fallback chains + TTL cache
+  timeout.py ................ Thread-based I/O timeout wrapper
+  dead_letter_queue.py ...... DLQ with retry, purge, TTL, stats
+  bulkhead.py ............... Semaphore bulkhead with registry
+
+  -- Events --
+  event_sourcing.py ......... Event store with file-backed persistence
+  cqrs.py ................... Command/Query buses with middleware
+  alert_notifier.py ......... Multi-channel alert dispatch (4 channels)
+
+  -- Platform --
+  multi_exchange_aggregator.py VWAP, best bid/ask aggregation
+  cross_exchange_validator.py Z-score outlier + staleness detection
+  vectorized_indicators.py .. Numpy-vectorized SMA/EMA/RSI/MACD/BB
+  circular_buffer.py ........ Pre-allocated numpy circular buffer
+  incremental_indicators.py . Cache-backed incremental indicators
+  portfolio_rebalancer.py ... Threshold + calendar rebalancing
+
+  -- Infra --
+  resource_monitor.py ....... CPU/memory logging
+  perf_timing.py ............ @timed decorator + TimingRegistry
+  fun_compliance_config.py .. Fun compliance configuration
+  __init__.py ............... Package init
+
+  -- Subpackages --
+  auth/ (4 modules) ......... JWT, API keys, RBAC, dependencies
+  config/ (1 module) ........ Pydantic settings hierarchy
+  db/ (4 modules) ........... ORM models, repositories, connections
+  logging/ (4 modules) ...... JSON/colored formatters, correlation IDs
+  fastapi_service/ .......... FastAPI app factory
+
+  -- Alembic --
+  alembic/ .................. DB migration framework + initial schema
 
 Java Core (java_core/):
-  orchestrator/ ............. 10 files   ApiClient, RiskEngine, Loop, DB, pom.xml
-  data_ingestion/ ........... 1 file     RealTimeDataFetcher.java
+  orchestrator/ ............. 10 files (ApiClient, RiskEngine, Loop, DB, etc.)
+  data_ingestion/ ........... 1 file (RealTimeDataFetcher.java)
 
 Infrastructure:
   Dockerfile ................ Multi-stage (runtime/dev/production)
   docker-compose.yml ........ 3 services + networks + volumes
-  k8s-deployment.yaml ....... 273 lines (namespace, deploy, service, PVC)
-  .github/workflows/ ........ ci.yml (142 lines) + cd.yml (105 lines)
+  k8s-deployment.yaml ....... 273 lines (full K8s manifests)
+  .github/workflows/ ........ ci.yml + cd.yml
+  .pre-commit-config.yaml ... Pre-commit hooks configured
+  Makefile .................. Build automation targets
 
 Documentation:
-  docs/ ..................... 37 Markdown files covering Phases 0-5
+  docs/ ..................... 37 Markdown files (Phases 0-10)
   CODING_POLICY.md .......... Coding standards
-  CODING_POLICY_FULL.md ..... Extended policy
+  CODING_POLICY_FULL.md ..... Extended policy with examples
   README.md ................. Project overview
 
 ========================================================================
-5. KEY GAPS & KNOWN STUBS
+5. TEST INVENTORY (46 test files, 713 tests)
 ========================================================================
-  * ML model trains on synthetic random data (no real market data yet)
-  * Java Dashboard, SecurityManager, RedisCache, DataFeedClient - stubs
-  * CD pipeline deploy steps - echo placeholders
-  * Live exchange connectivity ready (ccxt) but untested on real accounts
-  * No stress/load/chaos tests
-  * Regulatory reporting / compliance dashboards - not implemented
-  * Federated learning - not implemented
+
+  tests/conftest.py ............... Shared fixtures
+  tests/test_alert_notifier.py .... 24 tests - B310 security regression
+  tests/test_api.py ............... API endpoint tests
+  tests/test_auth.py .............. JWT + API key + RBAC tests
+  tests/test_autonomous_trading_loop.py  Trading loop tests
+  tests/test_backtesting_engine.py  Backtest simulator tests
+  tests/test_bandit.py ............ Security scan compliance
+  tests/test_basic.py ............. Basic sanity tests
+  tests/test_benchmark_predict.py . Benchmark tests
+  tests/test_benchmark_predict_comprehensive.py  Extended benchmarks
+  tests/test_black.py ............. Black formatting compliance
+  tests/test_ci_env.py ............ CI environment validation
+  tests/test_ci_pipeline_compliance.py  Pipeline compliance suite
+  tests/test_config.py ............ Configuration tests
+  tests/test_coverage.py .......... Coverage checks
+  tests/test_coverage_threshold.py  Coverage threshold enforcement
+  tests/test_custom_policy.py ..... Custom policy tests
+  tests/test_data_ingestion_api.py  Data ingestion tests
+  tests/test_data_pipeline.py ..... Feature pipeline tests
+  tests/test_db.py ................ Database tests
+  tests/test_dependency_import.py . Import verification
+  tests/test_docstring_style.py ... Docstring compliance
+  tests/test_edge_cases_coverage.py Edge case tests
+  tests/test_environment_validation.py  Env validation
+  tests/test_evolution_engine.py .. Evolution engine tests
+  tests/test_evolution_engine_comprehensive.py  Extended evolution tests
+  tests/test_evolution_engine_minimal.py  Minimal evolution tests
+  tests/test_fastapi_service.py ... FastAPI endpoint tests
+  tests/test_fastapi_service_comprehensive.py  Extended API tests
+  tests/test_flake8.py ............ Flake8 compliance
+  tests/test_fun_compliance.py .... Fun compliance tests
+  tests/test_git_status.py ........ Git status checks
+  tests/test_integration.py ....... Integration tests
+  tests/test_integration_test_comprehensive.py  Extended integration
+  tests/test_isort.py ............. Import sorting compliance
+  tests/test_logging.py ........... Logging framework tests
+  tests/test_master.py ............ Master test suite
+  tests/test_ml_model.py .......... ML model tests
+  tests/test_mypy.py .............. Type checking compliance
+  tests/test_new_modules.py ....... New module smoke tests
+  tests/test_orchestrator_integration.py  Orchestrator tests
+  tests/test_production_hardening.py  Hardening suite
+  tests/test_resource_monitor_comprehensive.py  Resource monitor tests
+  tests/test_resource_monitor_minimal.py  Minimal resource tests
+  tests/test_session4_modules.py .. Session 4 module tests
+  tests/test_session5_modules.py .. Session 5 module tests
+  tests/test_utils.py ............. Utility function tests
 
 ========================================================================
-6. NEXT PRIORITIES
+6. KEY GAPS & KNOWN STUBS
 ========================================================================
-  1. Real exchange paper-trading dry run (ccxt sandbox mode)
-  2. Complete Java stubs (Dashboard, RedisCache, DataFeedClient)
-  3. Prometheus + Grafana dashboard wiring
-  4. Stress/load testing
-  5. Cloud deployment scripts (AWS/GCP/Azure)
-  6. Real market data pipeline (historical + live feeds)
-  7. Regulatory reporting & compliance dashboards
-  8. Model export for Java inference (ONNX production path)
-  9. Federated learning
-  10. Mobile notification integration (push notifications)
+  * ML model trains on synthetic random data (no real market data yet)
+  * Java stubs: Dashboard.java, SecurityManager.java, RedisCache.java,
+    DataFeedClient.java (placeholder implementations)
+  * CD pipeline deploy steps are echo placeholders
+  * Live exchange connectivity ready (ccxt) but untested on real accounts
+  * No stress/load/chaos tests
+  * MiFID II / Dodd-Frank compliance checks not implemented
+  * Regulatory reporting / compliance dashboards not built
+  * Federated learning not implemented
+  * No web frontend / dashboard UI
+  * No mobile application
+  * Cluster/distributed mode planned but not yet coded
+  * TradableStrategy (signal-generating class) planned but not coded
+  * AutoTrainer (autonomous strategy discovery) planned but not coded
+  * Hardcoded secret defaults still in config/settings.py
+  * pickle.load() in ml_model.py (potential RCE risk)
+  * FastAPI global state not using dependency injection
+  * Auth middleware not wired to production endpoints
+
+========================================================================
+7. NEXT PRIORITIES (see NEO_TODO_CLEAN.txt for full task list)
+========================================================================
+  1. Critical security fixes (hardcoded secrets, pickle RCE, auth wiring)
+  2. Backtester enhancements (stop-loss, take-profit, position sizing)
+  3. TradableStrategy implementation (signal-generating strategy class)
+  4. AutoTrainer (autonomous strategy training loop)
+  5. Java stub completion (Dashboard, RedisCache, DataFeedClient)
+  6. Real market data integration (exchange API connectors)
+  7. Prometheus + Grafana observability wiring
+  8. Stress/load/chaos testing
+  9. Web dashboard UI (React/Vue)
+  10. Distributed cluster mode
 
 Legend: [x] = Complete  [!] = Partial/Stub  [ ] = Not implemented

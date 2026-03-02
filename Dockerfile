@@ -25,7 +25,7 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["python", "-m", "pytest", "python_ai/", "-v"]
+CMD ["python", "-m", "pytest", "tests/", "-v"]
 
 # Stage 3: Production Image
 FROM python:3.12-slim
@@ -46,12 +46,11 @@ COPY pytest.ini .
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import sys; sys.exit(0)" || exit 1
+# Health check — hit the real FastAPI /health endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
-# Expose port for FastAPI (future deployment)
 EXPOSE 8000
 
-# Default command for production
-CMD ["python", "-c", "print('NEO Hybrid AI System Ready')"]
+# Run FastAPI via uvicorn in production
+CMD ["uvicorn", "python_ai.fastapi_service.fastapi_service:app", "--host", "0.0.0.0", "--port", "8000"]

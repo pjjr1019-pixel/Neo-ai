@@ -5,11 +5,14 @@ Provides streaming OHLCV data from market sources or simulations.
 Supports live trading data feeds and historical data replay.
 """
 
+import logging
 import time
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 class MarketDataFeed:
@@ -243,7 +246,7 @@ class AutonomousTradingLoop:
 
             return trade_record
         except Exception as e:
-            print(f"Trading cycle failed for {symbol}: {e}")
+            logger.error("Trading cycle failed for %s: %s", symbol, e)
             return None
 
     def run(self, duration_seconds: Optional[float] = None) -> None:
@@ -258,9 +261,10 @@ class AutonomousTradingLoop:
         self.is_running = True
         start_time = time.time()
 
-        print(
-            f"Starting autonomous trading loop for "
-            f"{self.symbols} ({duration_seconds or 'infinite'} sec)"
+        logger.info(
+            "Starting autonomous trading loop for %s (%s sec)",
+            self.symbols,
+            duration_seconds or "infinite",
         )
 
         try:
@@ -278,12 +282,12 @@ class AutonomousTradingLoop:
 
                 time.sleep(self.check_interval_sec)
         except KeyboardInterrupt:
-            print("Trading loop interrupted by user")
+            logger.info("Trading loop interrupted by user")
         finally:
             self.is_running = False
-            print(
-                f"Trading loop stopped. Executed {len(self.trades_executed)}"
-                f" trades"
+            logger.info(
+                "Trading loop stopped. Executed %d trades",
+                len(self.trades_executed),
             )
 
     def stop(self) -> None:

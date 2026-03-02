@@ -93,12 +93,26 @@ data/
 logs/
 *.log
 error_logs/
+Errorlog*.txt
+flake8_output.txt
+coverage_report.txt
+coverage_summary.txt
 
 # Temporary
 tmp/
 temp/
 *.tmp
 *.bak
+
+# Model artefacts (rebuilt at runtime)
+*.pkl
+*.pkl.sha256
+
+# NEO project files
+NEO*.txt
+ideas.txt
+Makefile
+.pre-commit-config.yaml
 
 # Docker
 docker-compose.override.yml
