@@ -7,7 +7,7 @@ API server) are defined here.  Trading-strategy-specific parameters
 """
 
 from functools import lru_cache
-from typing import List, Optional
+from typing import List
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -40,6 +40,10 @@ class DatabaseSettings(BaseSettings):
     name: str = Field(default="neo_ai", description="Database name")
     user: str = Field(default="neo", description="Database user")
     password: str = Field(default="", description="Database password")
+    pool_recycle: int = Field(
+        default=1800,
+        description="Seconds before recycling connections",
+    )
     pool_size: int = Field(default=5, description="Connection pool size")
     max_overflow: int = Field(default=10, description="Max overflow")
     pool_timeout: int = Field(default=30, description="Pool timeout")
@@ -64,6 +68,21 @@ class DatabaseSettings(BaseSettings):
             f"{self.driver}+asyncpg://{self.user}:{self.password}"
             f"@{self.host}:{self.port}/{self.name}"
         )
+
+    @property
+    def test_url(self) -> str:
+        """Get SQLite URL for testing."""
+        return "sqlite:///./test.db"
+
+    @property
+    def async_test_url(self) -> str:
+        """Get async SQLite URL for testing."""
+        return "sqlite+aiosqlite:///./test.db"
+
+    @property
+    def echo(self) -> bool:
+        """Alias for echo_sql (used by connection layer)."""
+        return self.echo_sql
 
 
 class AuthSettings(BaseSettings):
@@ -318,10 +337,6 @@ class Settings(BaseSettings):
     def is_testing(self) -> bool:
         """Check if running in testing mode."""
         return self.environment == "testing"
-
-
-# Cached settings instance
-_settings: Optional[Settings] = None
 
 
 @lru_cache

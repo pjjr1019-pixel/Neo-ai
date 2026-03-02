@@ -26,8 +26,8 @@ class TestDatabaseConfig:
         config = DatabaseConfig()
         assert config.host == "localhost"
         assert config.port == 5432
-        assert config.user == "neoai"
-        assert config.database == "neoai_db"
+        assert config.user == "neo"
+        assert config.database == "neo_ai"
         assert config.pool_size == 5
         assert config.max_overflow == 10
 
@@ -38,7 +38,7 @@ class TestDatabaseConfig:
         config = DatabaseConfig()
         url = config.sync_url
         assert url.startswith("postgresql://")
-        assert "neoai" in url
+        assert "neo" in url
         assert "5432" in url
 
     def test_config_async_url(self):
@@ -76,9 +76,11 @@ class TestDatabaseConfig:
 
     def test_config_from_environment(self):
         """Test configuration from environment variables."""
+        from python_ai.config.settings import get_settings
         from python_ai.db.config import DatabaseConfig, reset_config
 
         reset_config()
+        get_settings.cache_clear()
         with patch.dict(
             os.environ,
             {
@@ -91,6 +93,7 @@ class TestDatabaseConfig:
             assert config.host == "custom-host"
             assert config.port == 5433
             assert config.user == "custom-user"
+        get_settings.cache_clear()
 
 
 class TestDatabaseManager:

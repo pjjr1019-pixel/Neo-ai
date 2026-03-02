@@ -10,21 +10,35 @@ import asyncio
 import logging
 import platform
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
-from fastapi import Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, Response, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from python_ai.auth.dependencies import get_optional_user
+from python_ai.auth.dependencies import get_current_user
 from python_ai.auth.models import User
+from python_ai.config.settings import get_settings
 from python_ai.data_pipeline import DataPipeline, get_pipeline
 from python_ai.ml_model import MLModel, get_model
 from python_ai.rate_limiter import RateLimitMiddleware
+from python_ai.ws_signal_stream import websocket_signal_handler
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="NEO Hybrid AI", version="0.3.0")
+
+# ── CORS middleware ───────────────────────────────────────────
+_settings = get_settings()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_settings.api.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.add_middleware(
     RateLimitMiddleware,  # type: ignore[arg-type]
     requests_per_minute=120,
@@ -125,14 +139,16 @@ def health(
 def compute_features(
     payload: ComputeFeaturesInput,
     pipeline: DataPipeline = Depends(get_data_pipeline),
-    _user: Optional[User] = Depends(get_optional_user),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, float]:
     """Compute features from raw OHLCV price data.
+
+    Requires authentication (JWT or API key).
 
     Args:
         payload: ComputeFeaturesInput with symbol and OHLCV data.
         pipeline: Injected data pipeline.
-        _user: Optional authenticated user.
+        _user: Authenticated user.
 
     Returns:
         Dict with f0-f9 feature keys and normalized float values.
@@ -147,14 +163,16 @@ def compute_features(
 def predict(
     payload: PredictInput,
     model: MLModel = Depends(get_ml_model),
-    _user: Optional[User] = Depends(get_optional_user),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Predict endpoint for real model inference.
+
+    Requires authentication (JWT or API key).
 
     Args:
         payload: PredictInput with features dict.
         model: Injected ML model.
-        _user: Optional authenticated user.
+        _user: Authenticated user.
 
     Returns:
         Dict with prediction, confidence, and signal.
@@ -239,15 +257,16 @@ class LearnInput(BaseModel):
 @app.post("/learn")
 async def learn(
     payload: LearnInput,
-    _user: Optional[User] = Depends(get_optional_user),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Learn endpoint for incremental model training.
 
+    Requires authentication (JWT or API key).
     Uses an asyncio lock to prevent concurrent buffer mutations.
 
     Args:
         payload: LearnInput with features list and target float.
-        _user: Optional authenticated user.
+        _user: Authenticated user.
 
     Returns:
         Dict with buffered/retrained status.
@@ -262,13 +281,15 @@ async def learn(
 @app.get("/metrics")
 def metrics(
     model: MLModel = Depends(get_ml_model),
-    _user: Optional[User] = Depends(get_optional_user),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Return real request counts and model training metrics.
 
+    Requires authentication (JWT or API key).
+
     Args:
         model: Injected ML model.
-        _user: Optional authenticated user.
+        _user: Authenticated user.
 
     Returns:
         Dict with request counts, uptime, and model info.
@@ -287,11 +308,15 @@ def metrics(
 @app.get("/metrics/prometheus")
 def metrics_prometheus(
     model: MLModel = Depends(get_ml_model),
+    _user: User = Depends(get_current_user),
 ) -> Response:
     """Expose metrics in Prometheus text exposition format.
 
+    Requires authentication (JWT or API key).
+
     Args:
         model: Injected ML model.
+        _user: Authenticated user.
 
     Returns:
         Plain-text response with Prometheus-compatible metrics.
@@ -337,13 +362,15 @@ def metrics_prometheus(
 @app.get("/explain")
 def explain(
     model: MLModel = Depends(get_ml_model),
-    _user: Optional[User] = Depends(get_optional_user),
+    _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
     """Return real feature importance from model.
 
+    Requires authentication (JWT or API key).
+
     Args:
         model: Injected ML model.
-        _user: Optional authenticated user.
+        _user: Authenticated user.
 
     Returns:
         Dict with feature importance from RF and GB.
@@ -375,3 +402,17 @@ def explain(
         "explanation": "Feature importance from ensemble (RF + GB).",
         "model_type": "RandomForest + GradientBoosting Ensemble",
     }
+
+
+# ── WebSocket endpoint ────────────────────────────────────────
+
+
+@app.websocket("/ws/signals")
+async def ws_signals(websocket: WebSocket) -> None:
+    """Stream live trading signals over WebSocket.
+
+    Accepts the connection and delegates to the global
+    ``SignalBroadcaster`` for fan-out delivery.
+    """
+    await websocket.accept()
+    await websocket_signal_handler(websocket)

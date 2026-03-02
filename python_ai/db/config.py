@@ -1,97 +1,71 @@
 """
 Database configuration for NEO Hybrid AI.
 
-Handles environment-based configuration for database connections.
-Supports PostgreSQL with connection pooling settings.
+This module is a **compatibility shim** that delegates to the
+canonical ``python_ai.config.settings.DatabaseSettings``.
+
+All new code should import from ``python_ai.config.settings``
+directly instead of using this module.
 """
 
-import os
-from dataclasses import dataclass, field
-from typing import Optional
+from __future__ import annotations
+
+from python_ai.config.settings import get_settings
 
 
-@dataclass
 class DatabaseConfig:
-    """Configuration settings for database connection.
+    """Thin wrapper around ``DatabaseSettings``.
 
-    Attributes:
-        host: Database server hostname.
-        port: Database server port.
-        user: Database username.
-        password: Database password.
-        database: Database name.
-        pool_size: Connection pool size.
-        max_overflow: Maximum overflow connections beyond pool_size.
-        pool_timeout: Seconds to wait for a connection from pool.
-        pool_recycle: Seconds after which to recycle connections.
-        echo: Whether to log SQL statements.
+    Preserved for backward compatibility with existing callers.
+    All attributes are read from the central ``get_settings().database``
+    instance.
     """
 
-    host: str = field(
-        default_factory=lambda: os.getenv("DB_HOST", "localhost")
-    )
-    port: int = field(
-        default_factory=lambda: int(os.getenv("DB_PORT", "5432"))
-    )
-    user: str = field(default_factory=lambda: os.getenv("DB_USER", "neoai"))
-    password: str = field(
-        default_factory=lambda: os.getenv("DB_PASSWORD", "neoai123")
-    )
-    database: str = field(
-        default_factory=lambda: os.getenv("DB_NAME", "neoai_db")
-    )
-    pool_size: int = field(
-        default_factory=lambda: int(os.getenv("DB_POOL_SIZE", "5"))
-    )
-    max_overflow: int = field(
-        default_factory=lambda: int(os.getenv("DB_MAX_OVERFLOW", "10"))
-    )
-    pool_timeout: int = field(
-        default_factory=lambda: int(os.getenv("DB_POOL_TIMEOUT", "30"))
-    )
-    pool_recycle: int = field(
-        default_factory=lambda: int(os.getenv("DB_POOL_RECYCLE", "1800"))
-    )
-    echo: bool = field(
-        default_factory=lambda: os.getenv("DB_ECHO", "false").lower() == "true"
-    )
+    def __init__(self) -> None:
+        """Initialise from central settings."""
+        db = get_settings().database
+        self.host: str = db.host
+        self.port: int = db.port
+        self.user: str = db.user
+        self.password: str = db.password
+        self.database: str = db.name
+        self.pool_size: int = db.pool_size
+        self.max_overflow: int = db.max_overflow
+        self.pool_timeout: int = db.pool_timeout
+        self.pool_recycle: int = db.pool_recycle
+        self.echo: bool = db.echo_sql
 
     @property
     def sync_url(self) -> str:
-        """Generate synchronous PostgreSQL connection URL."""
-        return (
-            f"postgresql://{self.user}:{self.password}"
-            f"@{self.host}:{self.port}/{self.database}"
-        )
+        """Generate synchronous database connection URL."""
+        return get_settings().database.url
 
     @property
     def async_url(self) -> str:
-        """Generate async PostgreSQL connection URL for asyncpg."""
-        return (
-            f"postgresql+asyncpg://{self.user}:{self.password}"
-            f"@{self.host}:{self.port}/{self.database}"
-        )
+        """Generate async database connection URL."""
+        return get_settings().database.async_url
 
     @property
     def test_url(self) -> str:
         """Generate SQLite URL for testing."""
-        return "sqlite:///./test.db"
+        return get_settings().database.test_url
 
     @property
     def async_test_url(self) -> str:
         """Generate async SQLite URL for testing."""
-        return "sqlite+aiosqlite:///./test.db"
+        return get_settings().database.async_test_url
 
 
-# Global configuration instance
-_config: Optional[DatabaseConfig] = None
+# Singleton ────────────────────────────────────────────────────
+
+_config: DatabaseConfig | None = None
 
 
 def get_database_config() -> DatabaseConfig:
     """Get or create the global database configuration.
 
     Returns:
-        DatabaseConfig: The singleton configuration instance.
+        DatabaseConfig backed by central settings.
     """
     global _config
     if _config is None:

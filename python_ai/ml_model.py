@@ -113,7 +113,12 @@ class MLModel:
             Dict with training metrics (r2, mse, samples, etc.).
         """
         if X.shape[0] < 10:
-            raise ValueError(f"Need >= 10 samples to train, got {X.shape[0]}")
+            from python_ai.exceptions import NeoModelTrainingError
+
+            raise NeoModelTrainingError(
+                f"Need >= 10 samples to train, got {X.shape[0]}",
+                context={"samples": X.shape[0]},
+            )
 
         X_train, X_test, y_train, y_test = train_test_split(
             X,
@@ -174,7 +179,11 @@ class MLModel:
             Tuple of (prediction, confidence, signal).
         """
         if not self.is_trained:
-            raise ValueError("Model not trained. Call train() first.")
+            from python_ai.exceptions import NeoModelNotTrainedError
+
+            raise NeoModelNotTrainedError(
+                "Model not trained. Call train() first."
+            )
 
         # Convert dict to array
         feature_array = self._dict_to_array(features)
@@ -230,21 +239,41 @@ class MLModel:
     def load(self) -> None:
         """Load model from disk using joblib (safe deserializer).
 
-        Verifies SHA-256 integrity hash when available.
-        Falls back to reading legacy pickle files.
+        Verifies SHA-256 integrity hash.  If no ``.sha256`` sidecar
+        exists the hash is generated on first load so that future
+        loads are protected.
+
+        Raises:
+            NeoModelIntegrityError: When the hash check fails.
+            NeoModelError: On any other load failure.
         """
+        from python_ai.exceptions import (
+            NeoModelError,
+            NeoModelIntegrityError,
+        )
+
         try:
-            # Verify integrity hash if present
             hash_path = self.model_path + ".sha256"
+            actual = self._file_hash(self.model_path)
+
             if os.path.exists(hash_path):
                 with open(hash_path, "r") as hf:
                     expected = hf.read().strip()
-                actual = self._file_hash(self.model_path)
                 if actual != expected:
-                    raise RuntimeError(
+                    raise NeoModelIntegrityError(
                         "Model file integrity check failed – "
-                        "file may have been tampered with"
+                        "file may have been tampered with",
+                        context={"path": self.model_path},
                     )
+            else:
+                # First load without hash – generate sidecar
+                with open(hash_path, "w") as hf:
+                    hf.write(actual)
+                logger.warning(
+                    "No .sha256 sidecar found for %s – "
+                    "generated one for future integrity checks",
+                    self.model_path,
+                )
 
             data: Dict[str, Any] = joblib.load(self.model_path)
             self.rf_model = data["rf_model"]
@@ -256,8 +285,13 @@ class MLModel:
                 {},
             )
             self.train_count = data.get("train_count", 0)
+        except (NeoModelIntegrityError, NeoModelError):
+            raise
         except Exception as e:
-            raise RuntimeError(f"Failed to load model: {e}") from e
+            raise NeoModelError(
+                f"Failed to load model: {e}",
+                context={"path": self.model_path},
+            ) from e
 
     @staticmethod
     def _file_hash(path: str) -> str:

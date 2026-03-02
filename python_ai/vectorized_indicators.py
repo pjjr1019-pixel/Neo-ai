@@ -35,7 +35,7 @@ def sma(prices: List[float], window: int = 14) -> np.ndarray:
 
 
 def ema(prices: List[float], span: int = 14) -> np.ndarray:
-    """Exponential Moving Average (vectorized).
+    """Exponential Moving Average (vectorized via pandas EWM).
 
     Uses the standard ``alpha = 2 / (span + 1)`` decay.
 
@@ -46,60 +46,50 @@ def ema(prices: List[float], span: int = 14) -> np.ndarray:
     Returns:
         Array of EMA values.
     """
-    arr = np.array(prices, dtype=np.float64)
-    alpha = 2.0 / (span + 1)
-    out = np.empty_like(arr)
-    out[0] = arr[0]
-    for i in range(1, len(arr)):
-        out[i] = alpha * arr[i] + (1 - alpha) * out[i - 1]
-    return out
+    import pandas as pd
+
+    s = pd.Series(prices, dtype=np.float64)
+    result: np.ndarray = np.asarray(
+        s.ewm(span=span, adjust=False).mean(),
+    )
+    return result
 
 
 def rsi(prices: List[float], window: int = 14) -> np.ndarray:
-    """Relative Strength Index (vectorized).
+    """Relative Strength Index (vectorized via pandas EWM).
+
+    Uses Wilder's smoothing (``com = window - 1``) which matches
+    the industry-standard RSI used by TradingView / StockCharts.
 
     Args:
         prices: Price series.
         window: RSI lookback period.
 
     Returns:
-        Array of RSI values (0-100), ``NaN`` during
-        warm-up.
+        Array of RSI values (0-100), ``NaN`` during warm-up.
     """
-    arr = np.array(prices, dtype=np.float64)
-    if len(arr) < window + 1:
-        return np.full(len(arr), np.nan)
+    import pandas as pd
 
-    deltas = np.diff(arr)
-    gains = np.where(deltas > 0, deltas, 0.0)
-    losses = np.where(deltas < 0, -deltas, 0.0)
+    s = pd.Series(prices, dtype=np.float64)
+    if len(s) < window + 1:
+        return np.full(len(s), np.nan)
 
-    result = np.full(len(arr), np.nan)
+    delta = s.diff()
+    gains = delta.clip(lower=0.0)
+    losses = (-delta).clip(lower=0.0)
 
-    avg_gain = np.mean(gains[:window])
-    avg_loss = np.mean(losses[:window])
+    # Wilder's smoothing: com = window - 1  →  alpha = 1/window
+    avg_gain = gains.ewm(com=window - 1, min_periods=window).mean()
+    avg_loss = losses.ewm(com=window - 1, min_periods=window).mean()
 
-    for i in range(window, len(deltas)):
-        avg_gain = (avg_gain * (window - 1) + gains[i]) / window
-        avg_loss = (avg_loss * (window - 1) + losses[i]) / window
-        if avg_loss == 0:
-            result[i + 1] = 100.0
-        else:
-            rs = avg_gain / avg_loss
-            result[i + 1] = 100.0 - (100.0 / (1.0 + rs))
+    rs = avg_gain / avg_loss
+    result = 100.0 - (100.0 / (1.0 + rs))
 
-    # First valid RSI
-    if avg_loss == 0:
-        result[window] = 100.0
-    else:
-        first_gain = np.mean(gains[:window])
-        first_loss = np.mean(losses[:window])
-        if first_loss > 0:
-            result[window] = 100.0 - (100.0 / (1.0 + first_gain / first_loss))
-        else:
-            result[window] = 100.0
+    # Keep NaN during warm-up
+    result.iloc[:window] = np.nan
 
-    return result
+    out: np.ndarray = np.asarray(result)
+    return out
 
 
 def macd(
@@ -137,7 +127,7 @@ def bollinger_bands(
     window: int = 20,
     num_std: float = 2.0,
 ) -> Dict[str, np.ndarray]:
-    """Bollinger Bands (vectorized).
+    """Bollinger Bands (vectorized via pandas rolling).
 
     Args:
         prices: Price series.
@@ -148,19 +138,18 @@ def bollinger_bands(
         Dict with ``"upper"``, ``"middle"``,
         ``"lower"`` arrays.
     """
-    arr = np.array(prices, dtype=np.float64)
-    middle = sma(prices, window)
+    import pandas as pd
 
-    std_arr = np.full(len(arr), np.nan)
-    for i in range(window - 1, len(arr)):
-        std_arr[i] = float(np.std(arr[i - window + 1 : i + 1], ddof=1))
+    s = pd.Series(prices, dtype=np.float64)
+    middle = s.rolling(window=window, min_periods=window).mean()
+    std_arr = s.rolling(window=window, min_periods=window).std(ddof=1)
 
     upper = middle + num_std * std_arr
     lower = middle - num_std * std_arr
     return {
-        "upper": upper,
-        "middle": middle,
-        "lower": lower,
+        "upper": upper.to_numpy(),
+        "middle": middle.to_numpy(),
+        "lower": lower.to_numpy(),
     }
 
 

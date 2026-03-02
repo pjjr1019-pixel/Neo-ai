@@ -151,9 +151,11 @@ class TestMLModelTrain:
         assert m2.training_metrics["r2_ensemble"] is not None
 
     def test_train_too_few_samples(self, tmp_path: Any) -> None:
-        """Raise ValueError when < 10 samples."""
+        """Raise NeoModelTrainingError when < 10 samples."""
+        from python_ai.exceptions import NeoModelTrainingError
+
         model = MLModel(model_path=str(tmp_path / "model.pkl"))
-        with pytest.raises(ValueError, match="Need >= 10"):
+        with pytest.raises(NeoModelTrainingError, match="Need >= 10"):
             model.train(np.zeros((5, 10)), np.zeros(5))
 
 

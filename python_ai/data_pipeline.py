@@ -68,6 +68,9 @@ class TechnicalIndicators:
     ) -> Tuple[List[float], List[float]]:
         """Calculate MACD (Moving Average Convergence Divergence).
 
+        Uses vectorised pandas EWM for the fast / slow EMAs and the
+        9-period signal line, avoiding Python-level loops.
+
         Args:
             prices: List of closing prices.
             fast: Fast EMA period (default 12).
@@ -76,38 +79,25 @@ class TechnicalIndicators:
         Returns:
             Tuple of (MACD values, Signal line values).
         """
-        prices_array = np.array(prices, dtype=float)
+        import pandas as pd
 
-        # Simple EMA calculation
-        ema_fast = prices_array.copy()
-        ema_slow = prices_array.copy()
-
-        for i in range(1, len(prices_array)):
-            ema_fast[i] = (
-                2.0 / (fast + 1) * prices_array[i]
-                + (1 - 2.0 / (fast + 1)) * ema_fast[i - 1]
-            )
-            ema_slow[i] = (
-                2.0 / (slow + 1) * prices_array[i]
-                + (1 - 2.0 / (slow + 1)) * ema_slow[i - 1]
-            )
-
+        s = pd.Series(prices, dtype=float)
+        ema_fast = s.ewm(span=fast, adjust=False).mean()
+        ema_slow = s.ewm(span=slow, adjust=False).mean()
         macd = ema_fast - ema_slow
 
-        # Signal line: 9-period EMA of the MACD line
-        signal_period = 9
-        signal = macd.copy()
-        alpha_sig = 2.0 / (signal_period + 1)
-        for i in range(1, len(macd)):
-            signal[i] = alpha_sig * macd[i] + (1 - alpha_sig) * signal[i - 1]
+        signal = macd.ewm(span=9, adjust=False).mean()
 
-        return list(macd), list(signal)
+        return macd.tolist(), signal.tolist()
 
     @staticmethod
     def calculate_bollinger_bands(
         prices: List[float], period: int = 20, std_dev: float = 2.0
     ) -> Tuple[List[float], List[float], List[float]]:
         """Calculate Bollinger Bands.
+
+        Uses ``pandas.Series.rolling`` for fully vectorised
+        mean and standard-deviation computation.
 
         Args:
             prices: List of closing prices.
@@ -117,25 +107,16 @@ class TechnicalIndicators:
         Returns:
             Tuple of (Upper band, Middle band, Lower band).
         """
-        n = len(prices)
-        prices_array = np.array(prices, dtype=float)
+        import pandas as pd
 
-        middle = np.empty(n, dtype=float)
-        std_arr = np.empty(n, dtype=float)
-
-        for i in range(n):
-            if i < period - 1:
-                # Not enough data yet — use all available bars
-                window = prices_array[: i + 1]
-            else:
-                window = prices_array[i - period + 1 : i + 1]
-            middle[i] = float(np.mean(window))
-            std_arr[i] = float(np.std(window))
+        s = pd.Series(prices, dtype=float)
+        middle = s.rolling(window=period, min_periods=1).mean()
+        std_arr = s.rolling(window=period, min_periods=1).std(ddof=0)
 
         upper = middle + std_arr * std_dev
         lower = middle - std_arr * std_dev
 
-        return list(upper), list(middle), list(lower)
+        return upper.tolist(), middle.tolist(), lower.tolist()
 
     @staticmethod
     def calculate_atr(
@@ -175,6 +156,8 @@ class TechnicalIndicators:
     def calculate_sma(prices: List[float], period: int = 20) -> List[float]:
         """Calculate Simple Moving Average (SMA).
 
+        Uses ``pandas.Series.rolling`` for vectorised computation.
+
         Args:
             prices: List of closing prices.
             period: SMA period (default 20).
@@ -182,20 +165,11 @@ class TechnicalIndicators:
         Returns:
             List of SMA values.
         """
-        prices_array = np.array(prices, dtype=float)
-        sma_values = []
+        import pandas as pd
 
-        for i in range(len(prices_array)):
-            if i < period - 1:
-                # For initial values, use what we have
-                sma_values.append(np.mean(prices_array[: i + 1]))
-            else:
-                # Use full period
-                sma_values.append(
-                    np.mean(prices_array[i - period + 1 : i + 1])
-                )
-
-        return sma_values
+        s = pd.Series(prices, dtype=float)
+        sma = s.rolling(window=period, min_periods=1).mean()
+        return list(sma)
 
 
 class DataPipeline:

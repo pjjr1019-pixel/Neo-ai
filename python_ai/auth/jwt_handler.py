@@ -5,7 +5,6 @@ Provides JWT token creation, validation, and decoding
 using PyJWT with RS256 or HS256 algorithms.
 """
 
-import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
@@ -18,6 +17,10 @@ from python_ai.auth.models import TokenData
 class JWTConfig:
     """Configuration for JWT operations.
 
+    Reads the secret key from ``AuthSettings`` (via
+    ``get_settings()``) so there is a single source of truth
+    for ``AUTH_SECRET_KEY``.
+
     Attributes:
         secret_key: Secret key for HS256 signing.
         algorithm: JWT signing algorithm.
@@ -26,19 +29,14 @@ class JWTConfig:
     """
 
     def __init__(self) -> None:
-        """Initialize JWT configuration from environment."""
-        import secrets as _sec
+        """Initialize JWT configuration from central settings."""
+        from python_ai.config.settings import get_settings
 
-        _raw = os.getenv("JWT_SECRET_KEY", "")
-        # Fall back to runtime-generated key if not set
-        self.secret_key: str = _raw if _raw else _sec.token_urlsafe(32)
-        self.algorithm = os.getenv("JWT_ALGORITHM", "HS256")
-        self.access_token_expire_minutes = int(
-            os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60")
-        )
-        self.refresh_token_expire_days = int(
-            os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7")
-        )
+        _auth = get_settings().auth
+        self.secret_key: str = _auth.secret_key
+        self.algorithm = _auth.algorithm
+        self.access_token_expire_minutes = _auth.access_token_expire_minutes
+        self.refresh_token_expire_days = _auth.refresh_token_expire_days
 
 
 # Password hashing context - use bcrypt for secure password storage
