@@ -1,0 +1,37 @@
+<configuration>
+  <!-- Console appender with structured output -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- File appender for persistent logs -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/orchestrator.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/orchestrator.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Component-specific log levels -->
+  <logger name="orchestrator.AutonomousLoop" level="INFO" />
+  <logger name="orchestrator.RiskManagementEngine" level="INFO" />
+  <logger name="orchestrator.ApiClient" level="INFO" />
+  <logger name="orchestrator.DatabaseLogger" level="INFO" />
+  <logger name="orchestrator.RedisCache" level="WARN" />
+  <logger name="orchestrator.Dashboard" level="INFO" />
+
+  <!-- Suppress noisy third-party loggers -->
+  <logger name="com.zaxxer.hikari" level="WARN" />
+  <logger name="redis.clients" level="WARN" />
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>
