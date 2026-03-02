@@ -140,8 +140,6 @@ class AuthManagerTest {
             // Since signing adds a timestamp, direct verification is tricky
             // But we can verify that matching timestamp+payload works
 
-            AuthManager verifier = new AuthManager("token", "my-secret");
-
             // Verification with no HMAC secret always returns true
             AuthManager noHmac = new AuthManager("token", "");
             assertTrue(noHmac.verifySignature("payload", "any-sig", 1234));

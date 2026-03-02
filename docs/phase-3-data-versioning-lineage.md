@@ -1,3 +1,10 @@
+## Data Lineage and Validation Policies
+
+- Data validation is performed using the validate_data function in data/validation.py (placeholder for Great Expectations).
+- Lineage tracking is automated using the track_lineage function in data/lineage_tracker.py (placeholder for OpenLineage).
+- All validation and lineage logic is tested in tests/test_validation_lineage.py.
+
+*Add diagrams and further details as implementation progresses.*
 # NEO Hybrid AI — Data Versioning & Lineage
 
 ## Overview

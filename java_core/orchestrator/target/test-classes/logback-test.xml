@@ -1,0 +1,14 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <!-- Suppress verbose logging during tests -->
+  <logger name="orchestrator" level="WARN" />
+  <logger name="com.zaxxer.hikari" level="ERROR" />
+  <logger name="redis.clients" level="ERROR" />
+  <root level="WARN">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

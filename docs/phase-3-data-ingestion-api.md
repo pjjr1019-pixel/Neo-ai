@@ -1,3 +1,18 @@
+## Data Pipeline Operational Modes
+
+The data pipeline supports two modes:
+- **Batch**: Processes data in discrete chunks.
+- **Stream**: Processes data as it arrives in real time.
+
+Switching logic is handled by the `DataPipeline` class in data/pipeline.py. The mode is set at initialization and determines which ingestion method is used.
+
+Example:
+```python
+pipeline = DataPipeline(mode="batch")
+pipeline.ingest([...])
+pipeline = DataPipeline(mode="stream")
+pipeline.ingest([...])
+```
 # NEO Hybrid AI — Data Ingestion Service API
 
 ## Service: RealTimeDataFetcher (Java)

@@ -1,0 +1,685 @@
+# MASTER TODO LIST (NEO Hybrid AI Trading System)
+
+## Recommended Workflow: PROJECT-WIDE BEST PRACTICES & COMPLIANCE
+1. **Unresolved Decisions & Open Questions**
+	- Maintain a running list of all open technology, compliance, and architecture decisions at the top of this file. Update as resolved.
+2. **Cross-Phase Integration**
+	- After each major phase, verify integration with previous phases (e.g., data flows, API contracts, compliance handoffs).
+3. **Version Control & Change Log**
+	- Update CHANGELOG.md for all major changes. Ensure traceability for compliance.
+4. **Automated Linting & Formatting**
+	- Run and enforce linting/formatting (flake8, black, isort) in every phase.
+5. **Security Threat Modeling**
+	- For security/compliance, perform threat modeling and document findings/mitigations.
+6. **User Feedback Loops**
+	- In GUI/UX, gather user feedback and iterate on design.
+7. **Performance Benchmarks**
+	- For optimization, require before/after benchmarks to quantify improvements.
+8. **Dependency Graph**
+	- Maintain a simple dependency graph (docs/ or diagram) to track inter-phase dependencies.
+9. **Test Data Management**
+	- Manage synthetic/real test data in compliance with privacy/retention policies.
+10. **Continuous Compliance Monitoring**
+	 - Schedule periodic reviews (e.g., quarterly) for ongoing compliance.
+11. **Disaster Recovery & Rollback**
+	 - For deployment, add explicit steps for disaster recovery and rollback testing.
+12. **Onboarding & Knowledge Transfer**
+	 - Document onboarding and knowledge transfer for new contributors.
+13. **Accessibility & Internationalization**
+	 - In GUI/UX, include accessibility (a11y) and internationalization (i18n) checks.
+14. **Metrics & Observability**
+	 - Ensure all critical components emit actionable metrics/logs for ops and compliance.
+15. **Regular Review of Workflows**
+	 - Periodically review/update workflows to reflect lessons learned and best practices.
+
+### Unresolved Decisions & Open Questions (Update as needed)
+- [ ] List all open technology, compliance, and architecture decisions here for stakeholder review.
+
+
+## Recommended Workflow: PHASE 0 — FOUNDATION, SECURITY, CI/CD, COST
+1. **Preparation**
+	- Review all compliance requirements (GDPR, CCPA, internal policies)
+	- Clarify cloud provider, cost tracking, and compliance scope
+	- Identify dependencies for architecture, CI/CD, and security
+2. **Implementation**
+	- Design modular architecture with clear separation of concerns
+	- Implement resource tracking, cost-aware scheduling, and compliance checks in dedicated modules
+	- Use secure coding practices for all new code
+3. **Testing**
+	- Write unit/integration tests for all modules (coverage >90%)
+	- Add automated compliance checks to CI/CD
+	- Test cost reporting, scaling, and compliance workflows
+4. **Documentation**
+	- Document architecture, cost strategies, and compliance automation in docs/phase-0-*.md
+	- Maintain up-to-date compliance documentation
+5. **Review & Audit**
+	- Conduct code review with focus on security and compliance
+	- Schedule and log compliance audits
+6. **Deployment/Integration**
+	- Integrate with CI/CD pipeline, ensure rollback/canary strategies are in place
+	- Confirm all acceptance criteria are met before moving to next phase
+
+## PHASE 0 — FOUNDATION, SECURITY, CI/CD, COST
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm architecture, CI/CD, and security modules integrate with each other
+- [ ] Update CHANGELOG.md and docs/phase-0-foundation-architecture.md
+- [ ] Run linting/formatting and security review
+
+# General Guidelines for Implementation
+# - Each task lists explicit file/module paths where possible
+# - Technology choices are clarified or flagged for decision
+# - Large tasks are broken into atomic, testable subtasks
+# - Input/output formats and interfaces are specified for endpoints
+# - Dependencies are listed for each task
+# - Acceptance criteria are included for each item
+# - Open questions are flagged inline for user review
+# - Consistent terminology and structure are used throughout
+
+### 0.1 Project Foundation & Architecture
+### 0.1 Project Foundation & Architecture
+- [ ] Define system architecture and core modules (docs/phase-0-foundation-architecture.md, src/architecture.py)
+	- [ ] Draft initial architecture diagram
+	- [ ] List all core modules and their responsibilities
+	- [ ] Review with stakeholders and revise
+	- [ ] Finalize and document in docs/phase-0-foundation-architecture.md
+- [ ] Implement resource usage tracking (monitoring/resource_tracker.py)
+	- [ ] Research and select cloud provider (TODO: AWS, GCP, Azure?)
+	- [ ] Implement resource usage tracking logic
+	- [ ] Implement resource usage reporting endpoint
+	- [ ] Write unit tests for tracking and reporting
+	- [ ] Document usage tracking in docs/phase-0-foundation-architecture.md
+- [ ] Add cost-aware job scheduling and auto-scaling (scheduler/cost_scheduler.py)
+	- [ ] Design scheduling logic
+	- [ ] Implement cost-aware job scheduling
+	- [ ] Implement auto-scaling logic
+	- [ ] Write unit tests for scheduling and scaling
+	- [ ] Document scheduling/auto-scaling in docs/phase-0-foundation-architecture.md
+- [ ] Test cost reporting and scaling logic (tests/test_cost_scheduler.py)
+	- [ ] Write integration tests for cost reporting
+	- [ ] Write integration tests for scaling logic
+	- [ ] Achieve >90% test coverage
+- [ ] Document cost optimization strategies (docs/phase-0-foundation-architecture.md)
+	- [ ] Draft cost optimization section
+	- [ ] Review and update after implementation
+
+### 0.2 Security & Compliance
+### 0.2 Security & Compliance
+- [ ] Integrate automated PII detection and redaction (security/pii_redactor.py)
+	- Technology: Specify tool/library (TODO: Presidio, custom?)
+	- Acceptance: PII detected/redacted in security/pii_redactor.py
+- [ ] Add compliance checks (GDPR, CCPA) to CI/CD (ci/compliance_checks.py)
+	- Open question: Confirm compliance scope (TODO: GDPR, CCPA, others?)
+	- Acceptance: Compliance checks run in CI/CD pipeline
+- [ ] Test compliance workflows and reporting (tests/test_compliance_checks.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Document compliance automation coverage (docs/phase-0-security-compliance.md)
+	- Acceptance: Section in docs/phase-0-security-compliance.md
+
+#### Recommended Steps to Maintain Compliance
+- [ ] Schedule regular compliance audits (security/compliance_audit.py)
+    - Acceptance: Audit logs and reports generated quarterly
+- [ ] Maintain up-to-date compliance documentation (docs/compliance_report.txt)
+    - Acceptance: Documentation reviewed and updated after each release
+- [ ] Implement automated compliance checks in CI/CD (ci/compliance_checks.py)
+    - Acceptance: Checks run on every commit and pull request
+- [ ] Ensure user data handling follows best practices (security/data_handling_policy.md)
+    - Acceptance: Policy documented and enforced in code reviews
+- [ ] Monitor for changes in relevant regulations (security/regulation_monitor.py)
+    - Acceptance: Alerts for new/updated regulations
+- [ ] Provide user consent and data access controls (security/user_consent.py)
+    - Acceptance: Consent and access controls implemented and tested
+
+### 0.3 CI/CD Pipeline & MLOps
+### 0.3 CI/CD Pipeline & MLOps
+- [ ] Integrate model versioning (mlops/model_versioning.py)
+	- Technology: Choose MLflow or DVC (TODO: default MLflow)
+	- Acceptance: Model versioning implemented in mlops/model_versioning.py
+- [ ] Automate model validation and promotion in CI/CD (ci/model_validation.py)
+	- Dependency: Model versioning complete
+	- Acceptance: Model validation and promotion automated in CI/CD
+- [ ] Add rollback/canary deployment strategies (ci/deployment_strategies.py)
+	- Acceptance: Rollback/canary logic in ci/deployment_strategies.py
+- [ ] Test pipeline reproducibility and rollback (tests/test_deployment_strategies.py)
+	- Acceptance: All tests pass, coverage >90%
+
+## PHASE 2 — LOGGING & MONITORING
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm logging/monitoring integrates with foundation and CI/CD
+- [ ] Update CHANGELOG.md and docs/phase-2-logging-monitoring.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 2 — LOGGING & MONITORING
+1. **Preparation**
+	- Review logging and monitoring requirements (compliance, auditability)
+	- Clarify metrics to be tracked and alerting needs
+2. **Implementation**
+	- Implement structured logging in all services (Python, Java)
+	- Integrate Prometheus for metrics and Grafana for dashboards
+	- Add model/data drift detection with alerting
+3. **Testing**
+	- Write tests for logging, metrics, and alert triggers
+	- Simulate drift and alert scenarios
+4. **Documentation**
+	- Document logging/monitoring setup, dashboards, and alert policies
+5. **Review & Audit**
+	- Review logs for sensitive data (PII redaction)
+	- Audit alerting and monitoring for compliance
+6. **Deployment/Integration**
+	- Deploy monitoring stack, validate dashboards and alerts in production-like environment
+
+### 2.1 Basic Logging
+### 2.1 Basic Logging
+- [ ] Implement structured logging (neo_logging/structured_logger.py for Python, java_core/StructuredLogger.java for Java)
+	- Acceptance: Logs are structured and validated in both languages
+- [ ] Integrate Prometheus metrics (monitoring/prometheus_metrics.py)
+	- Acceptance: Prometheus metrics exposed in monitoring/prometheus_metrics.py
+- [ ] Create Grafana dashboard config (docs/phase-2-logging-monitoring.md)
+	- Acceptance: Grafana dashboard config documented
+- [ ] Document logging/monitoring setup (docs/phase-2-logging-monitoring.md)
+	- Acceptance: Setup steps and diagrams included
+
+### 2.2 Advanced Monitoring & Alerting
+### 2.2 Advanced Monitoring & Alerting
+- [ ] Add model/data drift detection with alerting (monitoring/drift_detector.py)
+	- Technology: Specify drift detection method (TODO: KS test, ADWIN, etc.)
+	- Acceptance: Drift detection and alerting implemented
+- [ ] Test alert triggers and notification channels (tests/test_drift_detector.py)
+	- Acceptance: All alert triggers and notifications tested
+- [ ] Document dashboards and alert policies (docs/phase-2-logging-monitoring.md)
+	- Acceptance: Alert policies and dashboard screenshots included
+
+## PHASE 3 — DATA INGESTION, VERSIONING, OBSERVABILITY
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm data ingestion/validation/lineage integrates with logging and foundation
+- [ ] Update CHANGELOG.md and docs/phase-3-data-ingestion-api.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 3 — DATA INGESTION, VERSIONING, OBSERVABILITY
+1. **Preparation**
+	- Clarify data sources, ingestion modes (stream/batch), and compliance needs
+	- Review data validation and lineage requirements
+2. **Implementation**
+	- Refactor pipeline for modular, testable streaming and batch ingestion
+	- Integrate Great Expectations for validation and OpenLineage for lineage
+	- Ensure all data handling follows compliance and privacy best practices
+3. **Testing**
+	- Write tests for latency, throughput, data quality, and lineage completeness
+	- Simulate data quality failures and lineage gaps
+4. **Documentation**
+	- Document operational modes, switching logic, validation, and lineage policies
+5. **Review & Audit**
+	- Review data flows for compliance (PII, retention, access controls)
+	- Audit validation and lineage tracking
+6. **Deployment/Integration**
+	- Deploy ingestion pipeline, validate in production-like environment
+
+### 3.1 Data Ingestion & Pipeline
+### 3.1 Data Ingestion & Pipeline
+- [ ] Refactor pipeline for both streaming and batch ingestion (data/pipeline.py)
+	- Acceptance: Pipeline supports both modes, switching logic documented
+- [ ] Tests for latency, throughput, and correctness in both modes (tests/test_pipeline.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Document operational modes and switching logic (docs/phase-3-data-ingestion-api.md)
+	- Acceptance: Modes and switching logic explained
+
+### 3.2 Data Versioning & Lineage
+### 3.2 Data Versioning & Lineage
+- [ ] Integrate data validation (Great Expectations) (data/validation.py)
+	- Acceptance: Data validation implemented and tested
+- [ ] Automate lineage tracking (OpenLineage) (data/lineage_tracker.py)
+	- Acceptance: Lineage tracking automated
+- [ ] Test for data quality failures and lineage completeness (tests/test_validation_lineage.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Document lineage and validation policies (docs/phase-3-data-versioning-lineage.md)
+	- Acceptance: Policies and diagrams included
+
+## PHASE 4 — PYTHON AI ENGINE
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm AI engine integrates with data pipeline and logging
+- [ ] Update CHANGELOG.md and docs/phase-4-python-ai-engine.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 4 — PYTHON AI ENGINE
+1. **Preparation**
+	- Review requirements for endpoints, feature engineering, model training, and compliance
+	- Clarify input/output schemas and explainability needs
+2. **Implementation**
+	- Implement FastAPI endpoints with async I/O and schema validation
+	- Build modular feature processing and model training/inference code
+	- Apply performance optimizations (vectorization, caching, async, orjson)
+	- Integrate explainability tools (SHAP, LIME) and ensure endpoints are secure
+3. **Testing**
+	- Write unit/integration tests for endpoints, features, models, and optimizations
+	- Test for ONNX/RandomForest parity, cache correctness, and async behavior
+4. **Documentation**
+	- Document API usage, schemas, feature engineering, model architecture, and optimizations
+5. **Review & Audit**
+	- Conduct code review for security, performance, and compliance
+	- Audit endpoints for PII exposure and schema adherence
+6. **Deployment/Integration**
+	- Deploy endpoints, validate with integration tests and monitoring
+
+### 4.1 FastAPI Endpoints & Schemas
+### 4.1 FastAPI Endpoints & Schemas
+- [ ] Implement `/predict` endpoint (python_ai/fastapi_service.py)
+	- Input: JSON schema defined in python_ai/schemas.py
+	- Output: JSON schema defined in python_ai/schemas.py
+	- Acceptance: Endpoint live, passes all tests, documented in docs/API_USAGE.md
+- [ ] Implement `/learn` endpoint (python_ai/fastapi_service.py)
+	- Input/Output: JSON schema defined in python_ai/schemas.py
+	- Acceptance: Endpoint live, passes all tests, documented in docs/API_USAGE.md
+- [ ] Define and validate input/output JSON schemas (python_ai/schemas.py)
+	- Acceptance: Schemas validated, used in endpoints
+- [ ] Add `/explain` endpoint for model explainability (python_ai/fastapi_service.py)
+	- Technology: Specify explainability tool (TODO: SHAP, LIME?)
+	- Acceptance: Endpoint live, passes all tests, documented
+- [ ] Unit/integration tests for endpoints and schema validation (tests/test_fastapi_service.py)
+	- Acceptance: All endpoint tests pass, coverage >90%
+- [ ] API usage and schema documentation (docs/API_USAGE.md)
+	- Acceptance: API usage and schemas documented
+- [ ] Linting, code review
+- [ ] Acceptance: Endpoints live, pass all tests, docs up-to-date
+
+### 4.2 Feature Processing Pipeline
+### 4.2 Feature Processing Pipeline
+- [ ] List all required rolling window features (SMA, EMA, RSI, etc.) (python_ai/feature_factory.py)
+	- [ ] List SMA
+	- [ ] List EMA
+	- [ ] List RSI
+	- [ ] List additional required features
+	- [ ] Document feature list in python_ai/feature_factory.py
+- [ ] Implement rolling window feature functions (python_ai/feature_factory.py)
+	- [ ] Implement SMA
+	- [ ] Implement EMA
+	- [ ] Implement RSI
+	- [ ] Implement additional features
+	- [ ] Write unit tests for each feature
+- [ ] Move all indicator logic to vectorized_indicators.py (optimization)
+	- [ ] Refactor SMA logic
+	- [ ] Refactor EMA logic
+	- [ ] Refactor RSI logic
+	- [ ] Refactor additional indicators
+	- [ ] Benchmark before/after refactor
+- [ ] Add numba JIT to hot indicator functions (optimization)
+	- [ ] Profile for bottlenecks
+	- [ ] Apply numba JIT to SMA
+	- [ ] Apply numba JIT to EMA
+	- [ ] Apply numba JIT to RSI
+	- [ ] Benchmark before/after JIT
+- [ ] Memoize repeated indicator calls (optimization)
+	- [ ] Add memoization to SMA
+	- [ ] Add memoization to EMA
+	- [ ] Add memoization to RSI
+	- [ ] Test memoization effectiveness
+- [ ] Unit tests for each feature function and optimization (tests/test_feature_factory.py)
+	- [ ] Write unit tests for SMA
+	- [ ] Write unit tests for EMA
+	- [ ] Write unit tests for RSI
+	- [ ] Write unit tests for additional features
+	- [ ] Achieve >90% test coverage
+- [ ] Pipeline and optimization documentation (docs/phase-3-feature-engineering.md)
+	- [ ] Document each feature and optimization
+	- [ ] Update documentation after implementation
+- [ ] Linting, code review
+- [ ] Acceptance: Pipeline processes/logs data, 2-5x speedup on indicators
+
+### 4.3 ML Model Inference & Training
+### 4.3 ML Model Inference & Training
+- [ ] Implement model architecture (Transformers, LSTM/GRU, etc.) (python_ai/ml_model.py)
+	- Technology: Specify architecture (TODO: Transformers for NLP, LSTM/GRU for time series)
+	- Acceptance: Model implemented, documented
+- [ ] Parallelize RandomForest training (optimization)
+	- Acceptance: Training parallelized, benchmarks documented
+- [ ] Use ONNX runtime for inference (optimization)
+	- Acceptance: ONNX inference implemented, tested
+- [ ] Add prediction result caching (optimization)
+	- Acceptance: Caching implemented, tested
+- [ ] Async model save/load (optimization)
+	- Acceptance: Async logic implemented, tested
+- [ ] Model unit/integration tests, ONNX/RandomForest parity, cache correctness (tests/test_ml_model.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Model architecture, ONNX usage, caching documentation (docs/phase-4-python-ai-engine.md)
+	- Acceptance: Documentation updated
+- [ ] Linting, code review
+- [ ] Acceptance: Model code, diagrams, docs complete; 2-10x faster inference
+
+### 4.4 Data Pipeline & Ingestion
+### 4.4 Data Pipeline & Ingestion
+- [ ] Bound price history memory with CircularBuffer (data/circular_buffer.py)
+	- Acceptance: Memory bounded, tested
+- [ ] Per-symbol per-timestamp feature caching (data/feature_cache.py)
+	- Acceptance: Caching implemented, tested
+- [ ] Switch storage from CSV to Parquet (data/storage.py)
+	- Open question: Confirm Parquet as preferred backend (TODO: Parquet, DB?)
+	- Acceptance: Storage switched, parity tested
+- [ ] Batch candle writes, async file I/O (data/io.py)
+	- Acceptance: Batch writes and async I/O implemented, tested
+- [ ] Memory usage, cache hit/miss, Parquet/CSV parity, batch/async correctness tests (tests/test_data_pipeline.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Data pipeline, caching, storage format documentation (docs/phase-3-data-ingestion-api.md)
+	- Acceptance: Documentation updated
+- [ ] Linting, code review
+- [ ] Acceptance: Fixed memory, 3-10x faster I/O, no data loss
+
+### 4.5 General Python AI Optimizations
+### 4.5 General Python AI Optimizations
+- [ ] Ensure all FastAPI endpoint I/O is async (python_ai/fastapi_service.py)
+	- Acceptance: All endpoints async, tested
+- [ ] Use orjson for faster JSON serialization (python_ai/fastapi_service.py)
+	- Acceptance: orjson used, response parity tested
+- [ ] Async audit, orjson response parity tests (tests/test_fastapi_service.py)
+	- Acceptance: All tests pass, coverage >90%
+- [ ] Async/serialization best practices documentation (docs/phase-4-python-ai-engine.md)
+	- Acceptance: Documentation updated
+- [ ] Linting, code review
+- [ ] Acceptance: Full event loop utilization, 2-5x faster JSON encoding
+
+## PHASE 5 — MODEL TRAINING, SELECTION, ROBUSTNESS
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm model training/selection integrates with AI engine and data pipeline
+- [ ] Update CHANGELOG.md and docs/phase-5-model-training-selection.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 5 — MODEL TRAINING, SELECTION, ROBUSTNESS
+1. **Preparation**
+	- Review model training, selection, and robustness requirements
+	- Clarify distributed training, explainability, and adversarial robustness needs
+2. **Implementation**
+	- Implement backtesting, model scoring/selection, and export logic
+	- Integrate distributed training (Ray/Horovod) and explainability (SHAP/LIME)
+	- Add adversarial robustness checks (FGSM, PGD)
+3. **Testing**
+	- Write tests for backtesting, model selection, export, distributed orchestration, and robustness
+	- Simulate adversarial scenarios and explainability outputs
+4. **Documentation**
+	- Document backtesting, metrics, model saving, and robustness strategies
+5. **Review & Audit**
+	- Review model code for compliance, fairness, and security
+	- Audit explainability and robustness implementations
+6. **Deployment/Integration**
+	- Integrate with CI/CD, validate model promotion and rollback
+
+### 5.1 Backtesting Simulator
+- [ ] Implement backtesting engine (simulate past X years) (python_ai/backtest.py)
+- [ ] Vectorize main backtest loop with numpy (optimization)
+- [ ] Add parallel backtest support (optimization)
+- [ ] Model transaction costs, multi-timeframe evaluation (optimization)
+- [ ] Backtest correctness, vectorized/parallel parity, cost modeling tests (tests/test_backtest.py)
+- [ ] Backtesting logic, optimization notes documentation (docs/phase-5-backtesting-simulator.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Simulator runs, 10-100x faster, realistic cost modeling
+
+### 5.2 Model Performance & Selection
+- [ ] Score model performance (Sharpe, drawdown, win rate) (python_ai/model_selection.py)
+- [ ] Implement purged walk-forward cross-validation (optimization)
+- [ ] Add regime-aware backtesting, statistical significance testing (optimization)
+- [ ] Cross-validation, regime detection, p-value correctness tests (tests/test_model_selection.py)
+- [ ] Performance metrics, validation methodology documentation (docs/phase-5-model-performance-metrics.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Metrics computed, backtests statistically rigorous
+
+### 5.3 Model Saving & Export
+- [ ] Save models (PyTorch/ONNX for Java inference) (python_ai/model_export.py)
+- [ ] Use pruning/distillation for efficiency (optimization)
+- [ ] Export/import parity, pruning/distillation correctness tests (tests/test_model_export.py)
+- [ ] Model export, efficiency techniques documentation (docs/phase-5-model-saving.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Models saved, efficient, compatible with Java
+
+### 5.4 Automated Test Scripts & Synthetic Data
+- [ ] Write unit tests for backtesting, metrics, model selection (tests/)
+- [ ] Add pytest-xdist for parallel test execution (optimization)
+- [ ] Integrate synthetic data generators (SDV, Faker)
+- [ ] Add tests using synthetic data for edge cases
+- [ ] Test coverage, parallel execution correctness (tests/)
+- [ ] Test strategy, parallelization notes documentation (docs/phase-5-automated-test-scripts.md)
+- [ ] Linting, code review
+- [ ] Acceptance: 90%+ coverage, 2-8x faster test suite
+
+### 5.5 Distributed Training, HPO, Explainability, Robustness
+- [ ] Integrate Ray/Horovod for distributed model training
+- [ ] Add distributed hyperparameter search (Optuna/Ray Tune)
+- [ ] Integrate SHAP/LIME for feature importance and local explanations
+- [ ] Implement adversarial attack simulations (FGSM, PGD)
+- [ ] Add adversarial training pipeline
+- [ ] Unit/integration tests for distributed orchestration, explainability, and robustness
+- [ ] Document scaling, explainability, and security best practices
+
+## PHASE 7 — STRATEGY EVOLUTION & META-LEARNING
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm strategy evolution integrates with model/strategy code
+- [ ] Update CHANGELOG.md and docs/phase-7-strategy-evolution.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 7 — STRATEGY EVOLUTION & META-LEARNING
+1. **Preparation**
+	- Review requirements for evolution engine, strategy evaluation, and lifecycle management
+	- Clarify diversity/novelty metrics and lineage tracking
+2. **Implementation**
+	- Implement evolution logic, mutation, and selection in modular code
+	- Integrate diversity/novelty metrics and lineage tracking
+3. **Testing**
+	- Write tests for mutation logic, diversity/novelty, and lineage
+	- Simulate strategy evolution scenarios
+4. **Documentation**
+	- Document evolution logic, evaluation, and lifecycle management
+5. **Review & Audit**
+	- Review code for compliance, reproducibility, and auditability
+	- Audit lineage and evolution tracking
+6. **Deployment/Integration**
+	- Integrate with model/strategy code, validate in production-like environment
+
+### 7.1 Evolution Engine
+- [ ] Implement evolution engine (mutate strategies, meta-learning) (python_ai/evolution_engine.py)
+- [ ] Parallelize strategy evaluation (optimization)
+- [ ] Use generators for large populations (optimization)
+- [ ] Parallel/generator correctness, mutation logic tests (tests/test_evolution_engine.py)
+- [ ] Evolution logic, parallelization documentation (docs/phase-7-evolution-engine.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Engine mutates/logs strategies, linear speedup
+
+### 7.2 Strategy Evaluation & Replacement
+- [ ] Evaluate mutated strategies (backtesting, ensemble methods) (python_ai/strategy_evaluation.py)
+- [ ] Add novelty search, speciation, Pareto optimization (optimization)
+- [ ] Diversity/novelty metrics, Pareto front correctness tests (tests/test_strategy_evaluation.py)
+- [ ] Evaluation/selection logic documentation (docs/phase-7-strategy-evaluation.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Backtests run, diverse/novel strategies discovered
+
+### 7.3 Strategy Lifecycle Management
+- [ ] Track strategy lineage, aging, museum/archive (python_ai/strategy_lifecycle.py)
+- [ ] Implement strategy complexity penalty, warm-start, family tree (optimization)
+- [ ] Lineage tracking, complexity scoring tests (tests/test_strategy_lifecycle.py)
+- [ ] Lifecycle management documentation (docs/phase-7-strategy-lifecycle.md)
+- [ ] Linting, code review
+- [ ] Acceptance: Institutional memory, bias toward simplicity
+
+---
+
+## PHASE 8 — LOCAL INTERACTIVE GUI
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm GUI integrates with backend APIs and models
+- [ ] Update CHANGELOG.md and docs/phase-8-gui.md
+- [ ] Run linting/formatting, accessibility, and security review
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm installer and packaging integrate with GUI and backend
+- [ ] Update CHANGELOG.md and docs/phase-9-deployment-guide.md
+- [ ] Run linting/formatting and security review
+## Recommended Workflow: PHASE 8 — LOCAL INTERACTIVE GUI
+1. **Preparation**
+	- Review GUI requirements, user roles, and compliance (accessibility, privacy)
+	- Clarify framework choice and integration points
+2. **Implementation**
+	- Build modular GUI components for visualization, controls, management, and trading
+	- Integrate with backend APIs and models
+	- Implement notifications, settings, and help dialogs
+3. **Testing**
+	- Write tests for widgets, data feeds, controls, file operations, and accessibility
+	- Simulate trading and notification scenarios
+4. **Documentation**
+	- Document GUI framework, architecture, controls, and user guidance
+5. **Review & Audit**
+	- Review GUI for accessibility, security, and compliance
+	- Audit user data handling and notification logic
+6. **Deployment/Integration**
+	- Package GUI for target OSes, validate integration with backend
+## Recommended Workflow: PHASE 9 — INSTALLATION, PACKAGING, DEPLOYMENT
+1. **Preparation**
+	- Review packaging, installer, and deployment requirements for all target OSes
+	- Clarify update system and compliance needs
+2. **Implementation**
+	- Build installer and update system using chosen tools (PyInstaller, cx_Freeze, Electron)
+	- Ensure all dependencies and compliance docs are included
+3. **Testing**
+	- Write tests for installer, update logic, and cross-platform compatibility
+	- Simulate install/update scenarios on all target OSes
+4. **Documentation**
+	- Document installation, update process, and troubleshooting
+5. **Review & Audit**
+	- Review installer for security, compliance, and completeness
+	- Audit packaging for license and documentation inclusion
+6. **Deployment/Integration**
+	- Release installer, validate update system in production-like environment
+
+### 8.1 GUI Framework Selection & Setup
+- [ ] Research and select GUI framework (PyQt, Tkinter, Electron+Py, or DearPyGui)
+- [ ] Set up project structure for GUI (e.g., python_ai/gui/)
+- [ ] Write initial “Hello World” window and test launch script
+- [ ] Document framework choice and setup
+
+### 8.2 Core GUI Architecture
+- [ ] Design main window layout (dashboard, navigation, status bar)
+- [ ] Implement modular widget/component system
+- [ ] Add unit tests for widget/component instantiation
+- [ ] Document architecture and extensibility
+
+### 8.3 Data Visualization
+- [ ] Integrate real-time price charting (candlesticks, indicators)
+- [ ] Add portfolio and P&L visualization
+- [ ] Implement feature/indicator visualizations (rolling windows, feature importances)
+- [ ] Unit/integration tests for data feeds and chart updates
+- [ ] Document visualization features
+
+### 8.4 Interactive Controls
+- [ ] Add controls for model selection, backtest configuration, and live trading toggles
+- [ ] Implement parameter sliders, dropdowns, and input validation
+- [ ] Add tests for control logic and input validation
+- [ ] Document all user controls
+
+### 8.5 Model & Strategy Management
+- [ ] GUI for loading/saving models and strategies
+- [ ] Display model performance metrics and logs
+- [ ] Add tests for model/strategy file operations
+- [ ] Document management workflows
+
+### 8.6 Live Trading & Simulation Interface
+- [ ] Implement start/stop controls for live/simulated trading
+- [ ] Show real-time trade logs and error messages
+- [ ] Add tests for trading state transitions and error handling
+- [ ] Document trading interface
+
+### 8.7 Notifications & Alerts
+- [ ] Integrate pop-up or in-app notifications for errors, alerts, and model drift
+- [ ] Add tests for notification triggers and display
+- [ ] Document alerting system
+
+### 8.8 Settings & Preferences
+- [ ] GUI for user settings (API keys, risk limits, theme, etc.)
+- [ ] Persist settings to local config file
+- [ ] Add tests for settings load/save
+- [ ] Document settings options
+
+### 8.9 Help, Docs, and About
+- [ ] Add in-app help, tooltips, and documentation links
+- [ ] Implement “About” dialog with version info
+- [ ] Add tests for help/about dialogs
+- [ ] Document help system
+
+---
+
+## PHASE 9 — INSTALLATION, PACKAGING, & DEPLOYMENT
+
+### 9.1 Local Installer & Packaging
+- [ ] Create cross-platform installer (PyInstaller, cx_Freeze, or Electron builder)
+- [ ] Bundle all dependencies (Python, GUI, models, etc.)
+- [ ] Add tests for installer on Windows, Mac, Linux
+- [ ] Document installation process
+
+### 9.2 Update & Upgrade System
+- [ ] Implement auto-update or update notification system
+- [ ] Add tests for update logic and rollback
+- [ ] Document update process
+
+## PHASE 10 — USER EXPERIENCE & POLISH
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm UX improvements integrate with GUI and backend
+- [ ] Update CHANGELOG.md and docs/phase-10-user-experience.md
+- [ ] Run linting/formatting, accessibility, and security review
+### Cross-Phase Integration Checklist (after this phase)
+- [ ] Confirm all features, docs, and compliance requirements are integrated
+- [ ] Update CHANGELOG.md and docs/phase-11-release-notes.md
+- [ ] Run linting/formatting and final compliance review
+## Recommended Workflow: PHASE 10 — USER EXPERIENCE & POLISH
+1. **Preparation**
+	- Review UX, theming, accessibility, and error handling requirements
+	- Clarify performance optimization goals
+2. **Implementation**
+	- Implement theming, accessibility, error handling, and performance optimizations
+	- Ensure all user-facing features follow best practices
+3. **Testing**
+	- Write tests for themes, accessibility, error scenarios, and performance regression
+	- Simulate user interactions and error conditions
+4. **Documentation**
+	- Document accessibility, error handling, and performance best practices
+5. **Review & Audit**
+	- Review UX for accessibility, usability, and compliance
+	- Audit error handling and performance improvements
+6. **Deployment/Integration**
+	- Validate UX in production-like environment, gather user feedback
+## Recommended Workflow: PHASE 11 — FINAL QA, COMPLIANCE, RELEASE
+1. **Preparation**
+	- Review all features, documentation, and compliance requirements
+	- Clarify UAT and release criteria
+2. **Implementation**
+	- Conduct end-to-end and regression testing
+	- Finalize documentation and release notes
+3. **Testing**
+	- Perform E2E, regression, and UAT
+	- Validate compliance and test coverage
+4. **Documentation**
+	- Update test coverage, UAT feedback, and release notes
+5. **Review & Audit**
+	- Conduct final code and compliance review
+	- Audit release artifacts for completeness and compliance
+6. **Deployment/Integration**
+	- Release to production, monitor for post-release issues
+
+### 10.1 Accessibility & Theming
+- [ ] Add dark/light mode and colorblind-friendly themes
+- [ ] Ensure keyboard navigation and screen reader support
+- [ ] Add tests for theme switching and accessibility
+- [ ] Document accessibility features
+
+### 10.2 Error Handling & Logging
+- [ ] Centralize error handling and user-friendly error dialogs
+- [ ] Add persistent error logs with export option
+- [ ] Add tests for error scenarios and log export
+- [ ] Document error handling
+
+### 10.3 Performance Optimization
+- [ ] Profile GUI and backend for bottlenecks
+- [ ] Optimize rendering and data refresh rates
+- [ ] Add performance regression tests
+- [ ] Document performance improvements
+
+## PHASE 11 — FINAL QA, COMPLIANCE, & RELEASE
+
+### 11.1 End-to-End Testing
+- [ ] Write end-to-end tests for all major workflows (GUI, trading, model management)
+- [ ] Add automated test suite for regression and compliance
+- [ ] Document test coverage and results
+
+### 11.2 User Acceptance Testing (UAT)
+- [ ] Prepare UAT checklist and feedback form
+- [ ] Conduct UAT with sample users
+- [ ] Document feedback and required changes
+
+### 11.3 Final Documentation & Release
+- [ ] Finalize all user and developer documentation
+- [ ] Prepare release notes and changelog
+- [ ] Tag and publish release

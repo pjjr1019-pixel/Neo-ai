@@ -130,7 +130,8 @@ public class ApiClient {
         String responseBody = postWithRetry("/predict", payload);
         JsonNode responseNode = mapper.readTree(responseBody);
 
-        String action = responseNode.path("signal").asText("HOLD");
+        JsonNode signalNode = responseNode.path("signal");
+        String action = (signalNode.isMissingNode() || signalNode.isNull()) ? "HOLD" : signalNode.asText();
         double confidence = responseNode.path("confidence").asDouble(0.0);
         double prediction = responseNode.path("prediction").asDouble(0.0);
 

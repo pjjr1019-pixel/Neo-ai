@@ -146,8 +146,8 @@ public class RiskManagementEngine {
         try {
             JsonNode node = mapper.readTree(predictionJson);
             double confidence = node.path("confidence").asDouble(0.0);
-            String action = node.path("signal").asText(
-                    node.path("action").asText("HOLD"));
+            String actionNode = node.path("action").isMissingNode() ? "HOLD" : node.path("action").asText();
+            String action = node.path("signal").isMissingNode() ? actionNode : node.path("signal").asText();
 
             ApiClient.PredictionResult result = new ApiClient.PredictionResult(
                     action, confidence, 0.0);

@@ -51,7 +51,6 @@ public class AutonomousLoop {
     private String lastAction = "HOLD";
     private double lastPrediction = 0.0;
     private double lastConfidence = 0.0;
-    private Map<String, Double> lastFeatures = new HashMap<>();
     private final List<TradeRecord> tradeHistory = new ArrayList<>();
 
     /**
@@ -184,7 +183,7 @@ public class AutonomousLoop {
                 logStep(cycleNum, "SKIP", "Empty features");
                 return;
             }
-            lastFeatures = features;
+            // lastFeatures = features; // Removed unused field assignment
 
             // Cache features in Redis
             cache.setJson("features:" + symbol, features.toString());
