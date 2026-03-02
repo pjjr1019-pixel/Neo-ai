@@ -1,0 +1,72 @@
+# Changelog
+
+All notable changes to the NEO Hybrid AI project.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
+
+### Added
+- `.env.example` template for environment configuration
+- `Makefile` with common development commands
+- `CHANGELOG.md` (this file)
+- Pre-commit hooks: added isort, mypy alongside existing black/flake8/bandit
+- `_torch_optim_available()` guard for CI environments with broken triton
+- `tests/conftest.py` with shared project-root path setup
+
+### Changed
+- Replaced `datetime.utcnow()` with `datetime.now(timezone.utc)` across
+  all modules (deprecated since Python 3.12)
+- Upgraded password hashing from `sha256_crypt` to `bcrypt`
+- Moved all 46 test files from `python_ai/` to `tests/` directory
+- Renamed `integration_test.py` → `test_integration.py`
+- Updated `pyproject.toml`, `pytest.ini`, and CI workflow for
+  new `tests/` layout
+- Pinned `bcrypt<5` for passlib 1.7.4 compatibility
+- RSI calculation now uses Wilder's exponential smoothing
+- Bollinger Bands use per-bar rolling standard deviation
+- MACD signal line uses 9-period EMA (was uniform average)
+- Replaced `pickle` with `joblib` + SHA-256 integrity in `ml_model.py`
+- FastAPI endpoints use `Depends()` DI for model/pipeline injection
+- Learn endpoint uses `asyncio.Lock` for buffer safety
+- Secret key validator auto-generates runtime key in dev/test,
+  rejects insecure values in production
+
+### Security
+- Removed hardcoded default secrets from `config/settings.py` and
+  `auth/jwt_handler.py`
+- Wired `get_optional_user` auth dependency to all data endpoints
+- Fixed `alert_notifier.py` mypy `resp.status` operator type errors
+
+## [0.3.0] - 2026-03-01
+
+### Added
+- Phase 11.05 critical code audit fixes (56a–56f)
+- Auth dependency injection on FastAPI endpoints
+- SHA-256 model file integrity verification
+
+## [0.2.0] - 2026-02-28
+
+### Added
+- 19 modules across Phases 10–16 (Session 5)
+- Request encryption, IP allowlist, regime detector
+- Event sourcing, CQRS, dead letter queue, bulkhead
+- Anomaly autoencoder, LSTM model, transformer model
+- Retrain scheduler, RL agent, cross-exchange validator
+- Statistical arbitrage, alert notifier, data archival
+- Stream ingestion, audit logger, risk governance
+- 682 tests passing, 5 skipped, full compliance
+
+## [0.1.0] - 2026-02-27
+
+### Added
+- Initial project setup (Phases 0–9)
+- FastAPI service with predict/learn/metrics/explain endpoints
+- ML ensemble model (RandomForest + GradientBoosting)
+- Data pipeline with technical indicators
+- Auth system (JWT, API keys, RBAC)
+- CI/CD pipeline (GitHub Actions)
+- Docker support
+- PostgreSQL/SQLite database layer
+- Backtesting engine, evolution engine
+- Strategy configuration loader

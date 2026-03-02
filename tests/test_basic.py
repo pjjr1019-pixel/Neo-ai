@@ -4,8 +4,7 @@ import subprocess
 import traceback
 
 import pytest
-
-from python_ai.test_fun_compliance import (
+from test_fun_compliance import (
     test_all_functions_have_docstrings,
     test_flake8_compliance,
     test_line_length,

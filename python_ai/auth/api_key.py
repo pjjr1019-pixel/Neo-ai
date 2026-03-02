@@ -8,7 +8,7 @@ for service-to-service authentication.
 import hashlib
 import os
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from python_ai.auth.models import APIKey, UserRole
@@ -122,7 +122,10 @@ class APIKeyManager:
             return None
 
         # Check expiration
-        if api_key.expires_at and datetime.utcnow() > api_key.expires_at:
+        if (
+            api_key.expires_at
+            and datetime.now(timezone.utc) > api_key.expires_at
+        ):
             return None
 
         # Verify hash
@@ -130,7 +133,7 @@ class APIKeyManager:
             return None
 
         # Update last used timestamp
-        api_key.last_used = datetime.utcnow()
+        api_key.last_used = datetime.now(timezone.utc)
 
         return api_key
 

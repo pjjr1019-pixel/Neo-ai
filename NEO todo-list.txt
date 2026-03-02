@@ -490,7 +490,7 @@
     - [ ] Implement visual regression tests for UI components
     - [ ] Setup continuous testing in CI/CD with automated reporting
     - [ ] Create pre-production load testing environment
-    - [ ] Separate test files from source code (move tests/ out of python_ai/ or use src layout)
+    - [x] Separate test files from source code (move tests/ out of python_ai/ or use src layout) ✅ Done (46 files → tests/)
     - [ ] Fix rate limiter state leak between test runs (add proper teardown/reset)
     - [ ] Enforce minimum coverage threshold (>=80%) in CI pipeline with --cov-fail-under
     - [ ] Add full pipeline integration test (ingest -> features -> predict -> learn -> metrics)
@@ -729,7 +729,7 @@
 
 81a. Code Quality Cleanup
     - [ ] Replace all print() statements with structured logger calls (logging module)
-    - [ ] Replace all datetime.utcnow() with datetime.now(timezone.utc) (deprecated since Python 3.12)
+    - [x] Replace all datetime.utcnow() with datetime.now(timezone.utc) (deprecated since Python 3.12) ✅ Done
     - [ ] Add __all__ exports to all public modules for explicit API surface
     - [ ] Add missing return type annotations across all functions
     - [ ] Ensure consistent exception messages with context (file, line, operation)
@@ -751,7 +751,7 @@
     - **Success:** Self-documenting API, real-time business metrics visible.
 
 81d. Password & Auth Hardening
-    - [ ] Use bcrypt or argon2 for password hashing (replace any weaker alternatives)
+    - [x] Use bcrypt or argon2 for password hashing (replace any weaker alternatives) ✅ Done (sha256_crypt → bcrypt)
     - [ ] Implement account lockout after N failed login attempts
     - [ ] Add password complexity requirements validation
     - **Success:** Auth system meets OWASP password storage guidelines.
@@ -904,7 +904,124 @@
 
 ---
 
+## PHASE 19.5 — DISTRIBUTED CLUSTER MODE (Multi-Node Neo)
+
+> **Goal:** Allow 2+ Neo instances on separate machines to share
+> resources (CPU, GPU, models) and operate as a single unified system.
+> Builds on containerization (Phase 19) and enables edge (Phase 20)
+> and cloud/hybrid (Phase 21) deployments.
+
+92a. Node Identity & Cluster Configuration
+    - [ ] Define cluster config schema (YAML) — node_id, role, secret, peers, strategy
+    - [ ] Implement ClusterNode dataclass with host/port/role/status/resources
+    - [ ] Add ResourceSnapshot (CPU, GPU, memory, active tasks, availability score)
+    - [ ] Support auto-generated and manual node IDs
+    - [ ] Implement HMAC auth tokens for inter-node identity verification
+    - [ ] Create cluster_config.yaml with sane defaults and env-var overrides
+    - **Success:** Each node has unique identity, config validates on startup.
+
+92b. Peer Discovery
+    - [ ] Implement static peer discovery (list peer addresses in config)
+    - [ ] Add multicast/mDNS auto-discovery for LAN deployments
+    - [ ] Add Redis-based discovery for cloud deployments (shared registry)
+    - [ ] Implement peer registration, deregistration, and timeout eviction
+    - **Success:** Nodes find each other automatically, dead nodes removed within 15s.
+
+92c. Transport Layer (Secure Inter-Node Communication)
+    - [ ] Build Transport ABC with start/stop/send interface
+    - [ ] Implement length-prefixed JSON-over-TCP transport (lightweight default)
+    - [ ] Add gRPC transport option for production (protobuf schemas)
+    - [ ] Add TLS support (cert/key config per node)
+    - [ ] Implement heartbeat protocol (5s interval, 15s timeout)
+    - [ ] Add message authentication (HMAC-SHA256 on every message)
+    - **Success:** Nodes exchange messages securely, bad actors rejected.
+
+92d. Leader Election
+    - [ ] Implement Bully algorithm (highest node_id wins)
+    - [ ] Support manual leader assignment via config (role: leader)
+    - [ ] Auto-trigger re-election when leader goes offline
+    - [ ] Track election terms to prevent split-brain
+    - [ ] Implement leader announcement broadcast
+    - [ ] Add graceful leadership transfer on planned shutdown
+    - **Success:** Leader elected in <5s, re-election on failure in <20s.
+
+92e. Resource Sharing & Monitoring
+    - [ ] Collect local CPU/memory usage via psutil on each heartbeat
+    - [ ] Collect GPU usage via pynvml (if available)
+    - [ ] Broadcast resource snapshots to all peers every heartbeat
+    - [ ] Track which models are loaded on each node
+    - [ ] Implement configurable share limits (max_cpu_share_pct, max_gpu_share_pct)
+    - [ ] Build aggregate cluster resource view (total CPU, total GPU, total memory)
+    - **Success:** Every node knows every other node's available resources in real-time.
+
+92f. Task Distribution & Scheduling
+    - [ ] Define RemoteTask dataclass (type, payload, priority, timeout, GPU requirement)
+    - [ ] Define TaskResult dataclass (success, data, error, elapsed time)
+    - [ ] Implement task submission (workers forward to leader, leader schedules)
+    - [ ] Implement "least_loaded" scheduling (assign to highest-score node)
+    - [ ] Implement "round_robin" scheduling for even distribution
+    - [ ] Implement "capability" scheduling (GPU tasks to GPU nodes, model affinity)
+    - [ ] Add task timeout detection and automatic retry (configurable max_retries)
+    - [ ] Handle task reassignment when assigned node dies
+    - [ ] Support task types: predict, train, alert, healthcheck, model_sync, custom
+    - [ ] Implement priority queue (priority 1 = highest, 10 = lowest)
+    - **Success:** Tasks route to optimal node, retried on failure, GPU-aware.
+
+92g. Model Synchronization Across Nodes
+    - [ ] Implement model_sync task type to push model files to peers
+    - [ ] Add model version tracking per node
+    - [ ] Implement lazy model pull (node downloads model on first prediction request)
+    - [ ] Add model hash verification after transfer
+    - [ ] Support incremental model updates (diff-based sync)
+    - **Success:** All nodes can serve predictions with same model version.
+
+92h. Cluster REST API & CLI
+    - [ ] Create /cluster/status endpoint (leader, nodes, alive_count, running_tasks)
+    - [ ] Create /cluster/nodes endpoint (list all nodes with resource details)
+    - [ ] Create /cluster/tasks POST endpoint (submit distributed task)
+    - [ ] Create /cluster/tasks/{id}/result endpoint (poll for result)
+    - [ ] Build CLI entry-point: python -m python_ai.cluster.cli --host --port --peers --secret
+    - [ ] Add --strategy flag (least_loaded | round_robin | capability)
+    - [ ] Add --api-port flag to run REST API alongside cluster
+    - **Success:** Cluster manageable via API and CLI, easy to start on any machine.
+
+92i. Fault Tolerance & Graceful Degradation
+    - [ ] Implement node draining (finish tasks, stop accepting new ones)
+    - [ ] Handle network partitions (nodes continue locally, rejoin when possible)
+    - [ ] Add dead node detection and automatic task reassignment
+    - [ ] Implement circuit breaker for unreachable peers
+    - [ ] Support single-node fallback (cluster of 1 works identically to standalone)
+    - [ ] Log all cluster events (join, leave, election, task assignment, failure)
+    - **Success:** System survives node failures, no data loss, auto-recovers.
+
+92j. Cluster Testing & Validation
+    - [ ] Create FakeTransport for in-memory unit testing (no network required)
+    - [ ] Write unit tests for ClusterNode serialization and auth tokens
+    - [ ] Write unit tests for ResourceSnapshot scoring
+    - [ ] Write unit tests for RemoteTask timeout and retry logic
+    - [ ] Write async tests for ClusterManager start/stop lifecycle
+    - [ ] Write async tests for local task execution and result retrieval
+    - [ ] Write async tests for leader election (single node, multi-node)
+    - [ ] Write async tests for heartbeat and peer discovery
+    - [ ] Write integration test: 2 nodes on localhost with different ports
+    - [ ] Run stress test: 100+ concurrent tasks across 2+ nodes
+    - [ ] Test failover: kill leader, verify re-election and task continuity
+    - **Success:** 90%+ coverage on cluster module, integration test passes.
+
+92k. Cluster Documentation
+    - [ ] Document cluster architecture diagram (leader/worker topology)
+    - [ ] Write quickstart guide: 2-machine cluster setup in 5 minutes
+    - [ ] Document all cluster_config.yaml options with examples
+    - [ ] Document security setup (TLS certs, shared secret rotation)
+    - [ ] Add troubleshooting guide (common issues: firewall, NAT, port conflicts)
+    - [ ] Document performance tuning (heartbeat interval, task timeout, strategy choice)
+    - **Success:** New user can set up a multi-node cluster from docs alone.
+
+---
+
 ## PHASE 20 — EDGE COMPUTING & MINIMAL HARDWARE SUPPORT
+
+> **Depends on:** Phase 19.5 (Cluster Mode) for edge-to-cloud sync.
 
 92. Edge/Embedded System Support
     - [ ] Create Raspberry Pi-compatible distribution (Python 3.9+)
@@ -944,6 +1061,8 @@
 ---
 
 ## PHASE 21 — CLOUD & HYBRID DEPLOYMENT
+
+> **Depends on:** Phase 19.5 (Cluster Mode) for multi-node coordination.
 
 95. Multi-Cloud Support (AWS, Azure, GCP)
     - [ ] Create Infrastructure-as-Code (Terraform) for all major clouds

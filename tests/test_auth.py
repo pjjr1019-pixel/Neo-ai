@@ -4,7 +4,7 @@ Tests for authentication module.
 Covers JWT handling, API key management, and authentication dependencies.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -314,7 +314,7 @@ class TestAPIKeyManager:
         from python_ai.auth.api_key import get_api_key_manager
 
         manager = get_api_key_manager()
-        past = datetime.utcnow() - timedelta(days=1)
+        past = datetime.now(timezone.utc) - timedelta(days=1)
         full_key, _ = manager.create_key("Expired Key", expires_at=past)
 
         validated = manager.validate_key(full_key)

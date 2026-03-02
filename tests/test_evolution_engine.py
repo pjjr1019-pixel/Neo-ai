@@ -1,4 +1,4 @@
-from .evolution_engine import EvolutionEngine, Strategy
+from python_ai.evolution_engine import EvolutionEngine, Strategy
 
 
 def test_strategy_mutation_changes_params() -> None:

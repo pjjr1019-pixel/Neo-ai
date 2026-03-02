@@ -24,7 +24,7 @@ disallow_untyped_defs = false
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-testpaths = ["python_ai"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -38,7 +38,7 @@ asyncio_mode = "strict"
 [tool.coverage.run]
 source = ["python_ai"]
 omit = [
-    "*/tests/*",
+    "tests/*",
     "*/test_*.py",
     "*/__main__.py",
 ]

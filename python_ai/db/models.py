@@ -5,7 +5,7 @@ Defines database tables for predictions, training sessions,
 model metrics, and feature importance tracking.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 from sqlalchemy import (
@@ -48,7 +48,11 @@ class Prediction(Base):
     output_data = Column(JSON, nullable=False)
     model_version = Column(String(50), nullable=False, default="v1.0.0")
     confidence = Column(Float, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
     latency_ms = Column(Float, nullable=True)
 
     __table_args__ = (
@@ -93,7 +97,11 @@ class TrainingSession(Base):
     model_version = Column(String(50), nullable=False)
     hyperparameters = Column(JSON, nullable=True)
     training_data_hash = Column(String(64), nullable=True)
-    started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    started_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
     completed_at = Column(DateTime, nullable=True)
     status = Column(String(20), default="running", nullable=False)
     error_message = Column(Text, nullable=True)
@@ -151,7 +159,11 @@ class ModelMetrics(Base):
     metric_name = Column(String(50), nullable=False)
     metric_value = Column(Float, nullable=False)
     epoch = Column(Integer, nullable=True)
-    recorded_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    recorded_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
 
     # Relationship back to training session
     training_session = relationship(
@@ -237,7 +249,11 @@ class EvolutionHistory(Base):
     performance_score = Column(Float, nullable=False)
     # SQLite compat: use int
     is_elite = Column(Integer, default=0, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
 
     __table_args__ = (
         Index("ix_evolution_history_generation", "generation"),

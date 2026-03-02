@@ -39,7 +39,7 @@ jobs:
         run: mypy python_ai --ignore-missing-imports
 
       - name: Security scan with Bandit
-        run: bandit -r python_ai/ --exclude '*/test_*.py,*/integration_test.py,*/benchmark_predict.py' -ll
+        run: bandit -r python_ai/ --exclude '*/benchmark_predict.py' -ll
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
@@ -65,8 +65,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest python_ai/ \
-            --ignore=python_ai/fastapi_service \
+          pytest tests/ \
             --cov=python_ai \
             --cov-report=xml \
             --cov-report=term-missing \

@@ -5,7 +5,7 @@ Provides CRUD operations and query methods for all models.
 Follows repository pattern for clean separation of concerns.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, cast
 
 from sqlalchemy import desc, func, select
@@ -195,7 +195,7 @@ class TrainingSessionRepository:
         Returns:
             TrainingSession: Updated training session.
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         training_session.completed_at = now  # type: ignore
         training_session.status = status  # type: ignore
         training_session.error_message = error_message  # type: ignore

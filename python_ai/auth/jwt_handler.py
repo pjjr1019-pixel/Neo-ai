@@ -6,7 +6,7 @@ using PyJWT with RS256 or HS256 algorithms.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from jose import JWTError, jwt
@@ -41,9 +41,8 @@ class JWTConfig:
         )
 
 
-# Password hashing context - use sha256_crypt for compatibility
-# In production, consider using argon2 or bcrypt with compatible versions
-pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
+# Password hashing context - use bcrypt for secure password storage
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Global config instance
 _jwt_config: Optional[JWTConfig] = None
@@ -99,16 +98,16 @@ def create_access_token(
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = datetime.now(timezone.utc) + timedelta(
             minutes=config.access_token_expire_minutes
         )
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
             "type": "access",
         }
     )
@@ -136,16 +135,16 @@ def create_refresh_token(
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = datetime.now(timezone.utc) + timedelta(
             days=config.refresh_token_expire_days
         )
 
     to_encode.update(
         {
             "exp": expire,
-            "iat": datetime.utcnow(),
+            "iat": datetime.now(timezone.utc),
             "type": "refresh",
         }
     )

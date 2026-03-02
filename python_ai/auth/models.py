@@ -4,7 +4,7 @@ Authentication data models for NEO Hybrid AI.
 Defines Pydantic models for users, tokens, and API keys.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional
 
@@ -96,7 +96,9 @@ class APIKey(BaseModel):
     key_hash: str
     name: str
     roles: List[UserRole] = Field(default_factory=lambda: [UserRole.SERVICE])
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     expires_at: Optional[datetime] = None
     last_used: Optional[datetime] = None
     enabled: bool = True
