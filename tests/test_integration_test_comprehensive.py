@@ -59,7 +59,10 @@ def test_explain_endpoint():
     resp = client.get("/explain")
     assert resp.status_code == 200
     data = resp.json()
-    assert "feature_importance" in data
-    assert "explanation" in data
-    assert isinstance(data["feature_importance"], dict)
-    assert isinstance(data["explanation"], str)
+    assert "features" in data or "feature_importance" in data
+    assert "method" in data or "explanation" in data
+    assert isinstance(
+        data.get("features", data.get("feature_importance")),
+        (list, dict),
+    )
+    assert isinstance(data.get("method", data.get("explanation")), str)

@@ -530,7 +530,7 @@ class TestProtectedEndpoints:
         resp = client.get("/explain")
         assert resp.status_code == 200
         data = resp.json()
-        assert "feature_importance" in data
+        assert "features" in data or "feature_importance" in data
         assert "model_type" in data
 
     def test_prometheus_metrics(self) -> None:

@@ -68,5 +68,5 @@ def test_explain_endpoint():
     resp = client.get("/explain")
     assert resp.status_code == 200
     data = resp.json()
-    assert "feature_importance" in data
-    assert "explanation" in data
+    assert "features" in data or "feature_importance" in data
+    assert "method" in data or "explanation" in data

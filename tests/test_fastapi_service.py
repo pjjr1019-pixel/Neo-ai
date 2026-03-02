@@ -57,9 +57,9 @@ def test_explain_endpoint():
     response = client.get("/explain")
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert "feature_importance" in data
-    assert "explanation" in data
-    assert isinstance(data["feature_importance"], dict)
+    assert "features" in data or "feature_importance" in data
+    assert "method" in data or "explanation" in data
+    assert "model_type" in data
 
 
 def test_learn_invalid_missing_features():

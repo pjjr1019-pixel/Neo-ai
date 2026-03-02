@@ -84,9 +84,28 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
 
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: neo-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=neo_grafana
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - neo-network
+    depends_on:
+      - prometheus
+
 volumes:
   postgres_data:
   prometheus_data:
+  grafana_data:
 
 networks:
   neo-network:

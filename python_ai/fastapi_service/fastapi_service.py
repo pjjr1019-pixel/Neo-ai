@@ -22,7 +22,9 @@ from python_ai.auth.dependencies import get_current_user
 from python_ai.auth.jwt_handler import decode_token
 from python_ai.auth.models import User
 from python_ai.config.settings import get_settings
+from python_ai.data_lineage import get_lineage_store
 from python_ai.data_pipeline import DataPipeline, get_pipeline
+from python_ai.explainability import get_global_importance
 from python_ai.logging import LogConfig, LogFormat, LogLevel, setup_logging
 from python_ai.middleware import (
     CorrelationIDMiddleware,
@@ -490,7 +492,10 @@ def explain(
     model: MLModel = Depends(get_ml_model),
     _user: User = Depends(get_current_user),
 ) -> Dict[str, Any]:
-    """Return real feature importance from model.
+    """Return feature importance from model.
+
+    Uses SHAP TreeExplainer when the ``shap`` library is
+    installed, otherwise falls back to sklearn gini importances.
 
     Requires authentication (JWT or API key).
 
@@ -499,35 +504,30 @@ def explain(
         _user: Authenticated user.
 
     Returns:
-        Dict with feature importance from RF and GB.
+        Dict with feature importance and explanation method.
     """
     _request_counts["explain"] += 1
+    result = get_global_importance(model)
+    result["model_type"] = "RandomForest + GradientBoosting Ensemble"
+    return result
 
-    rf_importance: np.ndarray = (
-        model.rf_model.feature_importances_
-        if model.rf_model is not None
-        else np.array([])
-    )
-    gb_importance: np.ndarray = (
-        model.gb_model.feature_importances_
-        if model.gb_model is not None
-        else np.array([])
-    )
 
-    # Average importance across models
-    avg_importance: np.ndarray = (
-        (rf_importance + gb_importance) / 2.0
-        if len(rf_importance) > 0
-        else np.array([])
-    )
+@app.get("/lineage")
+def lineage_summary(
+    _user: User = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """Return a summary of the data/model lineage store.
 
-    return {
-        "feature_importance": {
-            f"feature_{i}": float(imp) for i, imp in enumerate(avg_importance)
-        },
-        "explanation": "Feature importance from ensemble (RF + GB).",
-        "model_type": "RandomForest + GradientBoosting Ensemble",
-    }
+    Requires authentication (JWT or API key).
+
+    Args:
+        _user: Authenticated user.
+
+    Returns:
+        Dict with lineage record counts by type.
+    """
+    store = get_lineage_store()
+    return store.summary()
 
 
 # ── WebSocket endpoint ────────────────────────────────────────
