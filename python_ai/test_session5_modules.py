@@ -503,6 +503,31 @@ class TestBulkhead:
 # ── 8. Anomaly Autoencoder ─────────────────────────────────────
 
 
+def _torch_optim_available() -> bool:
+    """Return True if ``torch.optim.Adam`` can be instantiated.
+
+    On some CI runners (Python 3.12 + older triton/setuptools),
+    importing the dynamo sub-module raises ``AttributeError:
+    module 'pkgutil' has no attribute 'ImpImporter'``.
+    """
+    try:
+        import torch
+        import torch.nn as nn
+
+        m = nn.Linear(2, 2)
+        torch.optim.Adam(m.parameters(), lr=1e-3)
+        return True
+    except (AttributeError, ImportError):
+        return False
+
+
+_skip_torch = pytest.mark.skipif(
+    not _torch_optim_available(),
+    reason="torch.optim unavailable (triton/pkgutil compat)",
+)
+
+
+@_skip_torch
 class TestAnomalyAutoencoder:
     """Tests for autoencoder anomaly detection."""
 
@@ -558,6 +583,7 @@ class TestAnomalyAutoencoder:
 # ── 9. LSTM Model ──────────────────────────────────────────────
 
 
+@_skip_torch
 class TestLSTMModel:
     """Tests for LSTM time-series predictor."""
 
@@ -613,6 +639,7 @@ class TestLSTMModel:
 # ── 10. Transformer Model ─────────────────────────────────────
 
 
+@_skip_torch
 class TestTransformerModel:
     """Tests for Transformer time-series predictor."""
 
@@ -753,6 +780,7 @@ class TestRetrainScheduler:
 # ── 12. RL Agent ───────────────────────────────────────────────
 
 
+@_skip_torch
 class TestRLAgent:
     """Tests for DQN reinforcement learning agent."""
 
