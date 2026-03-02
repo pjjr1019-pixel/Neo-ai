@@ -39,7 +39,9 @@ def _safe_urlopen(
             f"URL scheme {parsed.scheme!r} is not allowed; "
             f"only {sorted(_ALLOWED_SCHEMES)} are permitted"
         )
-    return urllib.request.urlopen(req, timeout=timeout)  # nosec B310
+    return urllib.request.urlopen(  # type: ignore[no-any-return]
+        req, timeout=timeout
+    )  # nosec B310
 
 
 logger = logging.getLogger(__name__)
@@ -128,7 +130,8 @@ class WebhookChannel(NotificationChannel):
         req = urllib.request.Request(self._url, data=data, headers=headers)
         try:
             with _safe_urlopen(req, timeout=self._timeout) as resp:
-                return 200 <= resp.status < 300  # type: ignore[no-any-return]
+                status: int = resp.status or 0
+                return 200 <= status < 300
         except Exception:
             logger.exception("Webhook send failed: %s", self._url)
             return False
@@ -176,7 +179,8 @@ class SlackChannel(NotificationChannel):
         )
         try:
             with _safe_urlopen(req, timeout=self._timeout) as resp:
-                return 200 <= resp.status < 300  # type: ignore[no-any-return]
+                status: int = resp.status or 0
+                return 200 <= status < 300
         except Exception:
             logger.exception("Slack send failed")
             return False
@@ -230,7 +234,8 @@ class TelegramChannel(NotificationChannel):
         )
         try:
             with _safe_urlopen(req, timeout=self._timeout) as resp:
-                return 200 <= resp.status < 300  # type: ignore[no-any-return]
+                status: int = resp.status or 0
+                return 200 <= status < 300
         except Exception:
             logger.exception("Telegram send failed")
             return False
@@ -278,7 +283,8 @@ class DiscordChannel(NotificationChannel):
         )
         try:
             with _safe_urlopen(req, timeout=self._timeout) as resp:
-                return 200 <= resp.status < 300  # type: ignore[no-any-return]
+                status: int = resp.status or 0
+                return 200 <= status < 300
         except Exception:
             logger.exception("Discord send failed")
             return False

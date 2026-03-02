@@ -3,24 +3,28 @@ FastAPI app for NEO Hybrid AI service.
 
 Exposes root, predict, learn, metrics, health, and explain endpoints.
 Uses real ML model for predictions with confidence calibration.
+Auth-protected routes use JWT / API-key dependency injection.
 """
 
+import asyncio
 import logging
 import platform
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
-from fastapi import FastAPI, Response
-from pydantic import BaseModel
+from fastapi import Depends, FastAPI, Response
+from pydantic import BaseModel, Field
 
-from python_ai.data_pipeline import get_pipeline
-from python_ai.ml_model import get_model
+from python_ai.auth.dependencies import get_optional_user
+from python_ai.auth.models import User
+from python_ai.data_pipeline import DataPipeline, get_pipeline
+from python_ai.ml_model import MLModel, get_model
 from python_ai.rate_limiter import RateLimitMiddleware
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="NEO Hybrid AI", version="0.2.0")
+app = FastAPI(title="NEO Hybrid AI", version="0.3.0")
 app.add_middleware(
     RateLimitMiddleware,  # type: ignore[arg-type]
     requests_per_minute=120,
@@ -37,7 +41,21 @@ _start_time = time.time()
 
 # ── Sample buffer for incremental learning ────────────────────
 _learn_buffer: List[Dict[str, Any]] = []
+_learn_lock = asyncio.Lock()
 _RETRAIN_THRESHOLD = 50  # retrain after this many samples
+
+
+# ── Dependency-injection helpers ──────────────────────────────
+
+
+def get_ml_model() -> MLModel:
+    """Dependency: return the ML model singleton."""
+    return get_model()
+
+
+def get_data_pipeline() -> DataPipeline:
+    """Dependency: return the DataPipeline singleton."""
+    return get_pipeline()
 
 
 class ComputeFeaturesInput(BaseModel):
@@ -48,25 +66,34 @@ class ComputeFeaturesInput(BaseModel):
 
 
 class PredictInput(BaseModel):
-    """Input schema for /predict endpoint."""
+    """Input schema for /predict endpoint.
 
-    features: Dict[str, float]
+    Attributes:
+        features: Dict mapping feature names to float values.
+    """
+
+    features: Dict[str, float] = Field(
+        ...,
+        min_length=1,
+        description="Feature dict with at least one entry",
+    )
 
 
 @app.get("/")
-def root():
+def root() -> Dict[str, str]:
     """Root endpoint returns service status message."""
     return {"message": "NEO Hybrid AI Service is running."}
 
 
 @app.get("/health")
-def health() -> Dict[str, Any]:
+def health(
+    model: MLModel = Depends(get_ml_model),
+) -> Dict[str, Any]:
     """Health check with model, DB, and system status.
 
     Returns:
         Dict with status, model info, uptime, and system details.
     """
-    model = get_model()
     uptime = time.time() - _start_time
     status = "healthy"
     checks: Dict[str, Any] = {}
@@ -89,7 +116,7 @@ def health() -> Dict[str, Any]:
     return {
         "status": status,
         "uptime_seconds": round(uptime, 1),
-        "version": "0.2.0",
+        "version": "0.3.0",
         "checks": checks,
     }
 
@@ -97,34 +124,42 @@ def health() -> Dict[str, Any]:
 @app.post("/compute-features")
 def compute_features(
     payload: ComputeFeaturesInput,
+    pipeline: DataPipeline = Depends(get_data_pipeline),
+    _user: Optional[User] = Depends(get_optional_user),
 ) -> Dict[str, float]:
     """Compute features from raw OHLCV price data.
 
     Args:
         payload: ComputeFeaturesInput with symbol and OHLCV data.
+        pipeline: Injected data pipeline.
+        _user: Optional authenticated user.
 
     Returns:
         Dict with f0-f9 feature keys and normalized float values.
     """
     _request_counts["compute_features"] += 1
-    pipeline = get_pipeline()
     pipeline.update_price_data(payload.symbol, payload.ohlcv_data)
     features = pipeline.compute_features(payload.symbol)
     return features
 
 
 @app.post("/predict")
-def predict(payload: PredictInput) -> Dict[str, Any]:
+def predict(
+    payload: PredictInput,
+    model: MLModel = Depends(get_ml_model),
+    _user: Optional[User] = Depends(get_optional_user),
+) -> Dict[str, Any]:
     """Predict endpoint for real model inference.
 
     Args:
         payload: PredictInput with features dict.
+        model: Injected ML model.
+        _user: Optional authenticated user.
 
     Returns:
         Dict with prediction, confidence, and signal.
     """
     _request_counts["predict"] += 1
-    model = get_model()
     pred, confidence, signal = model.predict(payload.features)
     return {
         "prediction": float(pred),
@@ -202,18 +237,42 @@ class LearnInput(BaseModel):
 
 
 @app.post("/learn")
-def learn(payload: LearnInput) -> Dict[str, Any]:
-    """Learn endpoint for incremental model training."""
+async def learn(
+    payload: LearnInput,
+    _user: Optional[User] = Depends(get_optional_user),
+) -> Dict[str, Any]:
+    """Learn endpoint for incremental model training.
+
+    Uses an asyncio lock to prevent concurrent buffer mutations.
+
+    Args:
+        payload: LearnInput with features list and target float.
+        _user: Optional authenticated user.
+
+    Returns:
+        Dict with buffered/retrained status.
+    """
     _request_counts["learn"] += 1
-    logic = get_learning_logic()
-    result: Dict[str, Any] = logic(payload.model_dump())
+    async with _learn_lock:
+        logic = get_learning_logic()
+        result: Dict[str, Any] = logic(payload.model_dump())
     return result
 
 
 @app.get("/metrics")
-def metrics() -> Dict[str, Any]:
-    """Return real request counts and model training metrics."""
-    model = get_model()
+def metrics(
+    model: MLModel = Depends(get_ml_model),
+    _user: Optional[User] = Depends(get_optional_user),
+) -> Dict[str, Any]:
+    """Return real request counts and model training metrics.
+
+    Args:
+        model: Injected ML model.
+        _user: Optional authenticated user.
+
+    Returns:
+        Dict with request counts, uptime, and model info.
+    """
     uptime = time.time() - _start_time
     return {
         "request_counts": dict(_request_counts),
@@ -226,13 +285,17 @@ def metrics() -> Dict[str, Any]:
 
 
 @app.get("/metrics/prometheus")
-def metrics_prometheus() -> Response:
+def metrics_prometheus(
+    model: MLModel = Depends(get_ml_model),
+) -> Response:
     """Expose metrics in Prometheus text exposition format.
+
+    Args:
+        model: Injected ML model.
 
     Returns:
         Plain-text response with Prometheus-compatible metrics.
     """
-    model = get_model()
     uptime = time.time() - _start_time
     lines: List[str] = [
         "# HELP neo_requests_total Total requests by endpoint.",
@@ -272,15 +335,21 @@ def metrics_prometheus() -> Response:
 
 
 @app.get("/explain")
-def explain() -> Dict[str, Any]:
+def explain(
+    model: MLModel = Depends(get_ml_model),
+    _user: Optional[User] = Depends(get_optional_user),
+) -> Dict[str, Any]:
     """Return real feature importance from model.
 
+    Args:
+        model: Injected ML model.
+        _user: Optional authenticated user.
+
     Returns:
-        Dict with feature importance from Random Forest and Gradient  Boosting.
+        Dict with feature importance from RF and GB.
     """
     _request_counts["explain"] += 1
 
-    model = get_model()
     rf_importance: np.ndarray = (
         model.rf_model.feature_importances_
         if model.rf_model is not None

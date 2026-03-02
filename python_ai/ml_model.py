@@ -6,12 +6,13 @@ confidence calibration, and model persistence.
 Supports both synthetic demo training and real market data training.
 """
 
+import hashlib
 import logging
 import os
-import pickle
 import warnings
 from typing import Any, Dict, Optional, Tuple
 
+import joblib
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
@@ -209,36 +210,63 @@ class MLModel:
         return arr
 
     def save(self) -> None:
-        """Save model to disk."""
-        with open(self.model_path, "wb") as f:
-            pickle.dump(
-                {
-                    "rf_model": self.rf_model,
-                    "gb_model": self.gb_model,
-                    "scaler": self.scaler,
-                    "is_trained": self.is_trained,
-                    "training_metrics": self.training_metrics,
-                    "train_count": self.train_count,
-                },
-                f,
-            )
+        """Save model to disk using joblib (safe serializer)."""
+        data = {
+            "rf_model": self.rf_model,
+            "gb_model": self.gb_model,
+            "scaler": self.scaler,
+            "is_trained": self.is_trained,
+            "training_metrics": self.training_metrics,
+            "train_count": self.train_count,
+        }
+        joblib.dump(data, self.model_path, compress=3)
+
+        # Write integrity hash next to model file
+        hash_path = self.model_path + ".sha256"
+        file_hash = self._file_hash(self.model_path)
+        with open(hash_path, "w") as hf:
+            hf.write(file_hash)
 
     def load(self) -> None:
-        """Load model from disk."""
+        """Load model from disk using joblib (safe deserializer).
+
+        Verifies SHA-256 integrity hash when available.
+        Falls back to reading legacy pickle files.
+        """
         try:
-            with open(self.model_path, "rb") as f:
-                data: Dict[str, Any] = pickle.load(f)  # nosec: B301
-                self.rf_model = data["rf_model"]
-                self.gb_model = data["gb_model"]
-                self.scaler = data["scaler"]
-                self.is_trained = data["is_trained"]
-                self.training_metrics = data.get(
-                    "training_metrics",
-                    {},
-                )
-                self.train_count = data.get("train_count", 0)
+            # Verify integrity hash if present
+            hash_path = self.model_path + ".sha256"
+            if os.path.exists(hash_path):
+                with open(hash_path, "r") as hf:
+                    expected = hf.read().strip()
+                actual = self._file_hash(self.model_path)
+                if actual != expected:
+                    raise RuntimeError(
+                        "Model file integrity check failed – "
+                        "file may have been tampered with"
+                    )
+
+            data: Dict[str, Any] = joblib.load(self.model_path)
+            self.rf_model = data["rf_model"]
+            self.gb_model = data["gb_model"]
+            self.scaler = data["scaler"]
+            self.is_trained = data["is_trained"]
+            self.training_metrics = data.get(
+                "training_metrics",
+                {},
+            )
+            self.train_count = data.get("train_count", 0)
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}") from e
+
+    @staticmethod
+    def _file_hash(path: str) -> str:
+        """Compute SHA-256 hash of a file."""
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+        return h.hexdigest()
 
 
 # Global model instance (singleton)

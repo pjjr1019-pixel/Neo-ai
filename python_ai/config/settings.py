@@ -1,4 +1,10 @@
-"""Application settings using Pydantic Settings."""
+"""Application settings using Pydantic Settings.
+
+Infrastructure settings (database, auth, logging, model storage,
+API server) are defined here.  Trading-strategy-specific parameters
+(risk, indicator periods, execution fees) live in
+:mod:`python_ai.strategy_config` and can be loaded from YAML/JSON.
+"""
 
 from functools import lru_cache
 from typing import List, Optional
@@ -78,8 +84,8 @@ class AuthSettings(BaseSettings):
     )
 
     secret_key: str = Field(
-        default="change-me-in-production",
-        description="JWT secret key",
+        default="",
+        description="JWT secret key (required via AUTH_SECRET_KEY env var)",
     )
     algorithm: str = Field(default="HS256", description="JWT algorithm")
     access_token_expire_minutes: int = Field(
@@ -99,16 +105,31 @@ class AuthSettings(BaseSettings):
     @field_validator("secret_key")
     @classmethod
     def validate_secret_key(cls, v: str) -> str:
-        """Warn if using default secret key."""
-        if v == "change-me-in-production":
-            import warnings
+        """Validate secret key is set.
 
-            warnings.warn(
-                "Using default AUTH_SECRET_KEY. "
-                "Set a secure key in production!",
-                UserWarning,
-                stacklevel=2,
-            )
+        In production the AUTH_SECRET_KEY env var MUST be a
+        non-trivial value.  In dev/test a fallback is generated
+        so the app still boots.
+        """
+        import os
+
+        _INSECURE = {
+            "",
+            "change-me-in-production",
+            "your-secret-key-change-in-production",
+        }
+        env = os.getenv("NEO_ENVIRONMENT", "development").lower()
+        if v in _INSECURE:
+            if env == "production":
+                raise ValueError(
+                    "AUTH_SECRET_KEY must be set to a secure "
+                    "value in production. Do not use defaults."
+                )
+            # Dev/test: auto-generate a runtime key so unit
+            # tests and local runs work without .env
+            import secrets as _sec
+
+            v = _sec.token_urlsafe(32)
         return v
 
 

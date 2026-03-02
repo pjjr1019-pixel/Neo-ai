@@ -1,8 +1,15 @@
 """
 Strategy Configuration loader for NEO Hybrid AI.
 
-Loads trading strategy parameters from YAML or JSON files so
+Loads **trading-strategy** parameters from YAML or JSON files so
 strategies can be iterated without code changes.
+
+.. note::
+
+   This module manages *strategy-specific* knobs (risk, indicator
+   periods, execution fees, symbol lists).  Infrastructure settings
+   (database, auth, logging, API host/port, model directory) live
+   in :mod:`python_ai.config.settings`.
 """
 
 import json

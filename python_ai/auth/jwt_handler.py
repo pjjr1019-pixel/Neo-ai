@@ -27,9 +27,11 @@ class JWTConfig:
 
     def __init__(self) -> None:
         """Initialize JWT configuration from environment."""
-        self.secret_key = os.getenv(
-            "JWT_SECRET_KEY", "your-secret-key-change-in-production"
-        )
+        import secrets as _sec
+
+        _raw = os.getenv("JWT_SECRET_KEY", "")
+        # Fall back to runtime-generated key if not set
+        self.secret_key: str = _raw if _raw else _sec.token_urlsafe(32)
         self.algorithm = os.getenv("JWT_ALGORITHM", "HS256")
         self.access_token_expire_minutes = int(
             os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "60")

@@ -18,13 +18,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from python_ai.alert_notifier import (
+    _ALLOWED_SCHEMES,
     Alert,
     AlertDispatcher,
     DiscordChannel,
     SlackChannel,
     TelegramChannel,
     WebhookChannel,
-    _ALLOWED_SCHEMES,
     _safe_urlopen,
 )
 

@@ -15,37 +15,50 @@ class TechnicalIndicators:
 
     @staticmethod
     def calculate_rsi(prices: List[float], period: int = 14) -> List[float]:
-        """Calculate Relative Strength Index (RSI).
+        """Calculate Relative Strength Index using Wilder's smoothing.
+
+        Uses the exponential moving average method (Wilder's
+        smoothing factor ``1/period``) which is the industry-standard
+        RSI calculation used by TradingView, StockCharts, etc.
 
         Args:
             prices: List of closing prices.
             period: RSI period (default 14).
 
         Returns:
-            List of RSI values.
+            List of RSI values (0-100).
         """
         if len(prices) < period + 1:
             return [50.0] * len(prices)
 
         prices_array = np.array(prices, dtype=float)
         deltas = np.diff(prices_array)
-        gains = np.where(deltas > 0, deltas, 0)
-        losses = np.where(deltas < 0, -deltas, 0)
+        gains = np.where(deltas > 0, deltas, 0.0)
+        losses = np.where(deltas < 0, -deltas, 0.0)
 
-        avg_gain = np.mean(gains[-period:])
-        avg_loss = np.mean(losses[-period:])
+        # Seed with simple average for first ``period`` bars
+        avg_gain = float(np.mean(gains[:period]))
+        avg_loss = float(np.mean(losses[:period]))
 
-        rsi_values = []
-        for i in range(len(prices)):
-            if i < period:
-                rsi_values.append(50.0)
+        rsi_values: List[float] = [50.0] * period
+
+        # First real RSI value
+        if avg_loss == 0:
+            rsi_values.append(100.0 if avg_gain > 0 else 50.0)
+        else:
+            rs = avg_gain / avg_loss
+            rsi_values.append(100.0 - (100.0 / (1.0 + rs)))
+
+        # Wilder's exponential smoothing for remaining bars
+        alpha = 1.0 / period
+        for i in range(period, len(deltas)):
+            avg_gain = avg_gain * (1 - alpha) + gains[i] * alpha
+            avg_loss = avg_loss * (1 - alpha) + losses[i] * alpha
+            if avg_loss == 0:
+                rsi_values.append(100.0 if avg_gain > 0 else 50.0)
             else:
-                if avg_loss == 0:
-                    rsi = 100.0 if avg_gain > 0 else 50.0
-                else:
-                    rs = avg_gain / avg_loss
-                    rsi = 100.0 - (100.0 / (1.0 + rs))
-                rsi_values.append(rsi)
+                rs = avg_gain / avg_loss
+                rsi_values.append(100.0 - (100.0 / (1.0 + rs)))
 
         return rsi_values
 
@@ -80,7 +93,13 @@ class TechnicalIndicators:
             )
 
         macd = ema_fast - ema_slow
-        signal = np.convolve(macd, [1 / 9] * 9, mode="same")
+
+        # Signal line: 9-period EMA of the MACD line
+        signal_period = 9
+        signal = macd.copy()
+        alpha_sig = 2.0 / (signal_period + 1)
+        for i in range(1, len(macd)):
+            signal[i] = alpha_sig * macd[i] + (1 - alpha_sig) * signal[i - 1]
 
         return list(macd), list(signal)
 
@@ -98,15 +117,23 @@ class TechnicalIndicators:
         Returns:
             Tuple of (Upper band, Middle band, Lower band).
         """
+        n = len(prices)
         prices_array = np.array(prices, dtype=float)
-        middle = np.convolve(prices_array, [1 / period] * period, mode="same")
-        std = (
-            np.std(prices_array[-period:])
-            if len(prices_array) >= period
-            else 0
-        )
-        upper = middle + std * std_dev
-        lower = middle - std * std_dev
+
+        middle = np.empty(n, dtype=float)
+        std_arr = np.empty(n, dtype=float)
+
+        for i in range(n):
+            if i < period - 1:
+                # Not enough data yet — use all available bars
+                window = prices_array[: i + 1]
+            else:
+                window = prices_array[i - period + 1 : i + 1]
+            middle[i] = float(np.mean(window))
+            std_arr[i] = float(np.std(window))
+
+        upper = middle + std_arr * std_dev
+        lower = middle - std_arr * std_dev
 
         return list(upper), list(middle), list(lower)
 
