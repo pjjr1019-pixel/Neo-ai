@@ -7,8 +7,8 @@ class TestDataValidation(unittest.TestCase):
     def test_empty_data(self):
         self.assertTrue(validate_data([]))
     def test_invalid_data(self):
-        # Placeholder: always returns True, but should be False for invalid in future
-        self.assertTrue(validate_data(None))
+        # Should return False for invalid (None) input
+        self.assertFalse(validate_data(None))
 
 if __name__ == "__main__":
     unittest.main()
