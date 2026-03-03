@@ -24,7 +24,9 @@ def test_worker_status(monkeypatch, status_code, should_raise):
     """Test worker status response and error handling."""
 
     class MockResponse:
-        """Mock HTTP response with configurable status code."""
+        """Mock HTTP response with configurable status code.
+        Used to simulate HTTP responses in worker status tests.
+        """
 
         def __init__(self, code):
             """Initialize MockResponse with status code."""
@@ -34,7 +36,9 @@ def test_worker_status(monkeypatch, status_code, should_raise):
         return MockResponse(status_code)
 
     class MockClient:
-        """Mock HTTP client for simulating async post requests."""
+        """Mock HTTP client for simulating async post requests.
+        Used to simulate an async client in worker status tests.
+        """
 
         async def post(self, *args, **kwargs):
             """Send a mock POST request."""
@@ -68,7 +72,9 @@ def test_worker_no_post_method(monkeypatch):
     """Test worker when client lacks post method."""
 
     class MockClient:
-        """Mock client for simulating async post requests."""
+        """Mock client for simulating async post requests.
+        Used to test missing post method edge case.
+        """
 
         pass
 
@@ -177,7 +183,9 @@ def test_worker_status_invalid(monkeypatch):
     """Test worker with invalid status code (not 200 or 500)."""
 
     class MockResponse:
-        """Mock response object for simulating HTTP responses."""
+        """Mock response object for simulating HTTP responses.
+        Used to simulate HTTP responses with invalid status codes.
+        """
 
         def __init__(self, code):
             """Initialize MockResponse with status code."""
@@ -187,7 +195,9 @@ def test_worker_status_invalid(monkeypatch):
         return MockResponse(404)
 
     class MockClient:
-        """Mock client for simulating async post requests."""
+        """Mock client for simulating async post requests.
+        Used to simulate an async client in invalid status tests.
+        """
 
         async def post(self, *args, **kwargs):
             return await mock_post()
@@ -252,7 +262,9 @@ def test_worker_unexpected_exception(monkeypatch):
         raise RuntimeError("unexpected error")
 
     class MockClient:
-        """Mock HTTP client that raises on post."""
+        """Mock HTTP client that raises on post.
+        Used to simulate exceptions in async post requests.
+        """
 
         async def post(self, *args, **kwargs):
             """Send a mock POST request that raises."""

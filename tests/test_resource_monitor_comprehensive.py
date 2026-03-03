@@ -33,7 +33,9 @@ class DummyProcess:
             raise RuntimeError("fail mem")
 
         class Mem:
-            """Holds memory usage rss value."""
+            """Holds memory usage rss value.
+            Used to simulate memory info for resource monitor tests.
+            """
 
             rss = self._rss
 
