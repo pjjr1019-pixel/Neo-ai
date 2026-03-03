@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional
 
-
 import numpy as np
 
 _faker: Optional["Faker"] = None

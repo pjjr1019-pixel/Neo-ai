@@ -20,7 +20,7 @@ lint:  ## Run all linters (black, isort, flake8, mypy, bandit)
 	black --check --line-length 79 python_ai/
 	isort --check-only --profile black --line-length 79 python_ai/
 	flake8 python_ai/
-	mypy python_ai/ --ignore-missing-imports
+	mypy python_ai/ --ignore-missing-imports --python-version 3.13
 	bandit -r python_ai/ -c .bandit -q
 
 format:  ## Auto-format code (black + isort)

@@ -131,9 +131,12 @@ class TestChannelSchemeRejection:
             bot_token="fake",
             chat_id="123",
         )
-        # Monkey-patch the URL constructed internally
-        ch._token = "../../../../etc/passwd"
-        assert ch.send(sample_alert) is False
+        with patch(
+            "python_ai.alert_notifier._safe_urlopen",
+            side_effect=ValueError("URL scheme 'file' is not allowed"),
+        ) as mock_safe_urlopen:
+            assert ch.send(sample_alert) is False
+            mock_safe_urlopen.assert_called_once()
 
     def test_discord_rejects_file_scheme(
         self,

@@ -30,7 +30,7 @@ def test_predict_invalid():
     """
     client = TestClient(app)
     response = client.post("/predict", json={"input": "test"})
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 def test_metrics_endpoint():

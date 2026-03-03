@@ -3,12 +3,20 @@ Automated lineage tracking using OpenLineage (placeholder).
 - Acceptance: Lineage tracking automated
 """
 
-from openlineage.client import OpenLineageClient, set_producer
-from openlineage.client.run import RunEvent, RunState, Run, Job, Dataset, InputDataset, OutputDataset
 import uuid
-import os
 
-def track_lineage(data, job_name="neo_data_pipeline", namespace="neo", event_type="COMPLETE"):
+from openlineage.client import OpenLineageClient, set_producer
+from openlineage.client.run import (
+    InputDataset,
+    Job,
+    Run,
+    RunEvent,
+)
+
+
+def track_lineage(
+    data, job_name="neo_data_pipeline", namespace="neo", event_type="COMPLETE"
+):
     """
     Track lineage using OpenLineage. Emits a simple RunEvent for the data pipeline.
     Returns True if event emitted successfully, False otherwise.
@@ -18,7 +26,8 @@ def track_lineage(data, job_name="neo_data_pipeline", namespace="neo", event_typ
         if data is None or not isinstance(data, list):
             data = []
         set_producer("https://github.com/your-org/neo")
-        client = OpenLineageClient(os.environ.get("OPENLINEAGE_URL", "http://localhost:5000"))
+        # Use default constructor to avoid deprecated url/session init path.
+        client = OpenLineageClient()
         run_id = str(uuid.uuid4())
         job = Job(namespace or "neo", job_name or "neo_data_pipeline")
         run = Run(run_id)
@@ -32,7 +41,7 @@ def track_lineage(data, job_name="neo_data_pipeline", namespace="neo", event_typ
             job=job,
             inputs=input_ds,
             outputs=[],
-            producer="https://github.com/your-org/neo"
+            producer="https://github.com/your-org/neo",
         )
         client.emit(event)
         return True
@@ -40,5 +49,6 @@ def track_lineage(data, job_name="neo_data_pipeline", namespace="neo", event_typ
         print(f"track_lineage exception: {e}")
         return False
 
+
 if __name__ == "__main__":
-    print(track_lineage([1,2,3]))
+    print(track_lineage([1, 2, 3]))

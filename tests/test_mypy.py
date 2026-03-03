@@ -24,6 +24,8 @@ def test_mypy_type_checking():
             "mypy",
             "python_ai",
             "--ignore-missing-imports",
+            "--python-version",
+            "3.13",
         ],
         capture_output=True,
         text=True,
