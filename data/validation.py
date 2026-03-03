@@ -21,14 +21,16 @@ def validate_data(data):
             return False
     else:
         df = data
-    # Create a simple expectation suite: at least 1 row, no nulls
-    ge_df = ge.from_pandas(df)
-    results = ge_df.expect_table_row_count_to_be_greater_than(0)
+    # Use Great Expectations Validator API (v0.15+)
+    from great_expectations.validator.validator import Validator
+    validator = Validator(execution_engine=None, batches=None, data=df)
+    # At least 1 row
+    results = validator.expect_table_row_count_to_be_greater_than(0)
     if not results.success:
         return False
-    # Example: check no nulls in any column
+    # Check no nulls in any column
     for col in df.columns:
-        res = ge_df.expect_column_values_to_not_be_null(col)
+        res = validator.expect_column_values_to_not_be_null(col)
         if not res.success:
             return False
     return True
