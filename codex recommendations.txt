@@ -1,0 +1,334 @@
+NEO Detailed Implementation Todo List
+Derived from codex recommendations
+Generated On: 2026-03-03 (America/New_York)
+
+How to use this list
+- Mark tasks as [x] only when acceptance criteria pass.
+- Execute phases in order unless explicitly blocked.
+- Keep all command runs pinned to one interpreter.
+
+Phase 0 - Baseline and Tracking
+
+[ ] T00.1 Create an implementation branch.
+Owner: Engineering
+Files: git branch only
+Commands:
+- git checkout -b chore/codex-recommendations-implementation
+Done when:
+- Branch exists and is active.
+
+[ ] T00.2 Capture current baseline outputs for comparison.
+Owner: Engineering
+Files: docs or local notes
+Commands:
+- python -m pytest --collect-only -q
+- python -m pytest -q
+- python -m flake8 python_ai
+- python -m mypy python_ai --ignore-missing-imports
+- python -m bandit -r python_ai -q
+Done when:
+- You have baseline pass/fail output for all 5 checks.
+
+Phase 1 - P0 Deterministic Environment and CI/Local Alignment
+
+[ ] T01.1 Standardize the Python interpreter used everywhere.
+Owner: Engineering
+Files:
+- Makefile
+- .github/workflows/ci.yml
+- README.md
+Implementation:
+- Choose a single version (recommended: 3.11 or 3.12 for broad package compatibility).
+- Ensure all local and CI commands use `python -m ...` with that interpreter.
+Done when:
+- `where python` and `where pytest` both resolve to intended environment.
+- CI matrix and local docs reflect chosen version.
+
+[ ] T01.2 Install all runtime and dev dependencies in the same environment.
+Owner: Engineering
+Files:
+- requirements.txt
+- requirements-dev.txt
+Commands:
+- python -m pip install --upgrade pip
+- python -m pip install -r requirements.txt
+- python -m pip install -r requirements-dev.txt
+- python -m pip show great_expectations
+- python -m pip show optuna
+Done when:
+- `great_expectations` and `optuna` are available from the active interpreter.
+
+[ ] T01.3 Add a local preflight check command.
+Owner: Engineering
+Files:
+- Makefile
+Implementation:
+- Add target `env-check` that prints:
+  - interpreter path
+  - Python version
+  - availability of critical modules (fastapi, optuna, great_expectations, torch, sqlalchemy)
+Done when:
+- `make env-check` outputs consistent interpreter and module presence.
+
+[ ] T01.4 Align test command targets across local tooling and CI.
+Owner: Engineering
+Files:
+- Makefile
+- pytest.ini
+- pyproject.toml
+- .github/workflows/ci.yml
+Implementation:
+- Make Makefile run tests from `tests/` to match `pytest.ini`.
+- Remove duplicate/conflicting pytest options between `pytest.ini` and `pyproject.toml`.
+Done when:
+- `make test` and CI execute the same logical test scope.
+
+[ ] T01.5 Decide and enforce `--maxfail` policy.
+Owner: Engineering
+Files:
+- pytest.ini
+- README.md
+Implementation:
+- Keep `--maxfail=1` only for fast local smoke, or remove for full failure surfacing.
+- Document policy clearly.
+Done when:
+- Team can intentionally run either fast-fail or full-failure mode without ambiguity.
+
+[ ] T01.6 Normalize Windows Hidden attributes on tracked source files.
+Owner: Engineering
+Files:
+- repo tracked files under `python_ai`, `tests`, and config files
+Commands (PowerShell):
+- Get-ChildItem -Force -Recurse -File python_ai,tests | ForEach-Object { $_.Attributes = ($_.Attributes -band (-bnot [IO.FileAttributes]::Hidden)) }
+Done when:
+- Hidden attribute count for Python source files is zero (or explicitly documented exceptions).
+
+Phase 2 - P1 Architecture Cleanup
+
+[ ] T02.1 Remove import path mutation in drift detector.
+Owner: Engineering
+Files:
+- monitoring/drift_detector.py
+Implementation:
+- Remove `sys.path.append("..")`.
+- Replace with package-safe import strategy.
+- Ensure module still works under tests.
+Done when:
+- No runtime path mutation remains.
+- Drift detector tests pass.
+
+[ ] T02.2 Separate prototype/stub modules from production modules.
+Owner: Engineering
+Files:
+- monitoring/observability.py
+- ci/compliance_checks.py
+- any prototype modules identified during review
+Implementation:
+- Either promote with full implementation or move/label as `experimental`.
+- Add module-level status markers.
+Done when:
+- Each module is clearly `production` or `experimental`, not ambiguous.
+
+[ ] T02.3 Define and document subsystem boundaries.
+Owner: Engineering
+Files:
+- docs/architecture.md (or equivalent)
+- package `__init__` exports where needed
+Implementation:
+- Document boundaries:
+  - API/service layer
+  - domain/trading core
+  - infra adapters (db/exchange/alerts/metrics)
+- Enforce via import conventions.
+Done when:
+- New architecture doc exists and imports follow declared boundaries.
+
+[ ] T02.4 Reduce import-time side effects and heavy eager imports.
+Owner: Engineering
+Files:
+- python_ai/evolution_engine.py
+- data validation modules using great_expectations
+- any heavy import modules discovered in scan
+Implementation:
+- Move optional/heavy imports into guarded lazy-load functions.
+- Return explicit, actionable errors when optional dependency is missing.
+Done when:
+- Module import no longer fails hard unless feature is invoked.
+
+Phase 3 - P2 Hardening and Reliability
+
+[ ] T03.1 Replace runtime `assert` in production code paths.
+Owner: Engineering
+Files:
+- python_ai/ml_model.py
+- python_ai/stat_arb.py
+- any additional flagged files
+Implementation:
+- Replace `assert` with explicit guards and domain exceptions.
+Done when:
+- Bandit assert warnings in production paths are removed or justified.
+
+[ ] T03.2 Narrow broad exception handlers.
+Owner: Engineering
+Files:
+- python_ai/explainability.py
+- python_ai/evolution_engine.py
+Implementation:
+- Replace generic `except Exception` with targeted exceptions.
+- Log context-rich error messages.
+Done when:
+- Silent failure paths are eliminated.
+
+[ ] T03.3 Add optional dependency guard utility.
+Owner: Engineering
+Files:
+- new utility, e.g. `python_ai/dependency_guard.py`
+- callers in evolution/data validation/explainability modules
+Implementation:
+- Central API to check/import optional deps.
+- Standardized error message format for missing extras.
+Done when:
+- All optional deps use one guard pattern.
+
+[ ] T03.4 Add CI collection-health stage.
+Owner: Engineering
+Files:
+- .github/workflows/ci.yml
+Implementation:
+- Add step/job: `python -m pytest --collect-only -q`.
+- Run before expensive test jobs.
+Done when:
+- CI fails early on import/dependency breakage.
+
+Phase 4 - Feature Delivery (Quick Wins)
+
+[ ] T04.1 Implement `neo doctor` environment preflight.
+Owner: Engineering
+Files:
+- new CLI module, e.g. `python_ai/tools/doctor.py`
+- Makefile target and README usage docs
+Implementation:
+- Report:
+  - interpreter path/version
+  - package availability
+  - key env vars presence
+  - DB connectivity check (non-destructive)
+  - model artifact availability
+Done when:
+- Single command gives actionable readiness summary.
+
+[ ] T04.2 Implement structured diagnostics/readiness endpoint expansion.
+Owner: Engineering
+Files:
+- python_ai/fastapi_service/fastapi_service.py
+- relevant auth/dependency modules
+Implementation:
+- Expand `/health/details` to include dependency and storage readiness checks.
+- Keep sensitive values redacted.
+Done when:
+- Endpoint returns consistent, documented readiness schema.
+
+[ ] T04.3 Implement dependency guard integration feature-complete.
+Owner: Engineering
+Files:
+- modules that currently fail on import when optional deps are absent
+Implementation:
+- Wire all optional modules to guard layer.
+- Add clear fallback behavior.
+Done when:
+- Missing optional package does not crash unrelated functionality.
+
+[ ] T04.4 Add recommendation artifact exporter.
+Owner: Engineering
+Files:
+- new module, e.g. `ci/recommendation_exporter.py`
+- optional CI integration
+Implementation:
+- Generate TXT/JSON output from lint/test/security summaries.
+Done when:
+- One command produces reproducible recommendation artifacts.
+
+Phase 5 - Strategic Features
+
+[ ] T05.1 Build unified observability package.
+Owner: Engineering
+Files:
+- monitoring/*
+- neo_logging/*
+- python_ai/middleware.py
+Implementation:
+- Standardize log format, metrics, and trace correlation IDs.
+- Replace placeholder observability code.
+Done when:
+- Logs, metrics, and traces follow one schema and one setup entrypoint.
+
+[ ] T05.2 Implement feature flag framework.
+Owner: Engineering
+Files:
+- new feature flag module/config
+- guarded entry points in experimental modules
+Implementation:
+- Add runtime flags for experimental engines/features.
+- Provide defaults per environment.
+Done when:
+- Experimental features can be enabled/disabled without code edits.
+
+[ ] T05.3 Implement drift policy engine.
+Owner: Engineering
+Files:
+- monitoring/drift_detector.py
+- config files for threshold profiles
+Implementation:
+- Move hardcoded thresholds to policy profiles by model/symbol/regime.
+- Add policy-based alert routing.
+Done when:
+- Drift behavior is configuration-driven and test-covered.
+
+Phase 6 - Validation and Closeout
+
+[ ] T06.1 Run full quality gate suite after changes.
+Owner: Engineering
+Commands:
+- python -m pytest --collect-only -q
+- python -m pytest -q
+- python -m flake8 python_ai
+- python -m mypy python_ai --ignore-missing-imports
+- python -m bandit -r python_ai -q
+Done when:
+- Collection succeeds.
+- Test suite passes or failures are triaged and ticketed.
+- No untriaged quality/security regressions remain.
+
+[ ] T06.2 Update documentation and developer onboarding.
+Owner: Engineering
+Files:
+- README.md
+- docs/architecture.md
+- docs/runbook.md (if present)
+Implementation:
+- Document:
+  - interpreter strategy
+  - env-check/doctor usage
+  - feature flag usage
+  - CI stages and failure triage flow
+Done when:
+- New contributor can bootstrap and run checks with no ambiguity.
+
+[ ] T06.3 Open follow-up issues for deferred items.
+Owner: Engineering
+Files:
+- issue tracker entries
+Implementation:
+- For any task not completed in this cycle, create issue with:
+  - problem statement
+  - acceptance criteria
+  - owner
+  - target milestone
+Done when:
+- No recommendation is lost; all are either done or tracked.
+
+Completion Criteria for this todo list
+- P0 tasks complete and CI/local determinism achieved.
+- P1 and P2 tasks either complete or tracked with committed milestones.
+- Quick-win features shipped with docs and tests.
+- Strategic features have implementation plan, owners, and milestones.

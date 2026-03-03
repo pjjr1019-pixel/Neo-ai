@@ -62,6 +62,59 @@ class TestBacktestMetrics:
 class TestBacktestingEngine:
     """Test BacktestingEngine simulation logic."""
 
+    def test_backtest_stop_loss(self) -> None:
+        """Test stop-loss triggers and limits loss."""
+        engine = BacktestingEngine(initial_capital=1000.0)
+        ohlcv = {
+            "open": [100.0, 95.0, 90.0, 85.0, 80.0],
+            "high": [101.0, 96.0, 91.0, 86.0, 81.0],
+            "low": [99.0, 94.0, 89.0, 84.0, 79.0],
+            "close": [100.0, 95.0, 90.0, 85.0, 80.0],
+            "volume": [1000.0] * 5,
+        }
+        signals = ["BUY", "HOLD", "HOLD", "HOLD", "HOLD"]
+        # Set stop-loss at -5%
+        metrics = engine.run_backtest(ohlcv, signals, stop_loss_pct=-0.05)
+        # Should trigger stop-loss after price drops 5%
+        assert metrics.num_trades == 2  # Buy + stop-loss sell
+        assert metrics.total_return < 0.0
+
+    def test_backtest_take_profit(self) -> None:
+        """Test take-profit triggers and locks in profit."""
+        engine = BacktestingEngine(initial_capital=1000.0)
+        ohlcv = {
+            "open": [100.0, 105.0, 110.0, 115.0, 120.0],
+            "high": [101.0, 106.0, 111.0, 116.0, 121.0],
+            "low": [99.0, 104.0, 109.0, 114.0, 119.0],
+            "close": [100.0, 105.0, 110.0, 115.0, 120.0],
+            "volume": [1000.0] * 5,
+        }
+        signals = ["BUY", "HOLD", "HOLD", "HOLD", "HOLD"]
+        # Set take-profit at +10%
+        metrics = engine.run_backtest(ohlcv, signals, take_profit_pct=0.10)
+        # Should trigger take-profit after price rises 10%
+        assert metrics.num_trades == 2  # Buy + take-profit sell
+        assert metrics.total_return > 9.0
+
+    def test_backtest_position_sizing(self) -> None:
+        """Test position sizing allocates only a fraction of capital."""
+        engine = BacktestingEngine(initial_capital=1000.0)
+        ohlcv = {
+            "open": [100.0, 105.0, 110.0, 115.0, 120.0],
+            "high": [101.0, 106.0, 111.0, 116.0, 121.0],
+            "low": [99.0, 104.0, 109.0, 114.0, 119.0],
+            "close": [100.0, 105.0, 110.0, 115.0, 120.0],
+            "volume": [1000.0] * 5,
+        }
+        signals = ["BUY", "HOLD", "HOLD", "HOLD", "SELL"]
+        # Only 50% of capital should be used
+        metrics = engine.run_backtest(ohlcv, signals, position_size_pct=0.5)
+        # Final portfolio value should be less than full allocation
+        assert (
+            metrics.total_return < 20.0
+        )  # ~20% if fully allocated
+        assert metrics.num_trades == 2
+
     def test_engine_initialization(self) -> None:
         """Test backtesting engine initializes with defaults."""
         engine = BacktestingEngine()

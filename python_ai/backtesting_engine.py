@@ -108,13 +108,21 @@ class BacktestingEngine:
         self,
         ohlcv_data: Dict[str, List[float]],
         signals: List[str],
+        stop_loss_pct: Optional[float] = None,
+        take_profit_pct: Optional[float] = None,
+        position_size_pct: float = 1.0,
     ) -> BacktestMetrics:
-        """Run backtest simulation with given signals.
+        """Run backtest simulation with given signals and risk controls.
 
         Args:
             ohlcv_data: Dictionary with keys 'open', 'high', 'low',
                        'close', 'volume'. Each value is list of prices/volumes.
             signals: List of trading signals ('BUY', 'SELL', 'HOLD').
+            stop_loss_pct: Stop-loss as a negative decimal
+                (e.g., -0.05 for -5%).
+            take_profit_pct: Take-profit as a positive decimal
+                (e.g., 0.10 for +10%).
+            position_size_pct: Fraction of capital to allocate per trade (0-1).
 
         Returns:
             BacktestMetrics with performance statistics.
@@ -130,7 +138,7 @@ class BacktestingEngine:
 
         portfolio_values = np.empty(num_bars + 1, dtype=float)
         portfolio_values[0] = self.initial_capital
-        pv_idx = 0  # tracks current write index
+        pv_idx = 0
         position = 0  # 0 = no position, 1 = long
         entry_price = 0.0
         shares = 0.0
@@ -146,11 +154,44 @@ class BacktestingEngine:
 
             current_price = close_prices[i]
 
+            # Check for stop-loss/take-profit triggers if in position
+            if position == 1:
+                pnl_pct = (current_price - entry_price) / entry_price
+                if stop_loss_pct is not None and pnl_pct <= stop_loss_pct:
+                    # Trigger stop-loss
+                    proceeds = shares * current_price
+                    cost = proceeds * self.transaction_cost_pct
+                    net_proceeds = proceeds - cost
+                    gain = net_proceeds - (shares * entry_price)
+                    trades.append(gain)
+                    cash = net_proceeds
+                    position = 0
+                    shares = 0.0
+                    num_trades += 1
+                    pv_idx += 1
+                    portfolio_values[pv_idx] = cash
+                    continue
+                if take_profit_pct is not None and pnl_pct >= take_profit_pct:
+                    # Trigger take-profit
+                    proceeds = shares * current_price
+                    cost = proceeds * self.transaction_cost_pct
+                    net_proceeds = proceeds - cost
+                    gain = net_proceeds - (shares * entry_price)
+                    trades.append(gain)
+                    cash = net_proceeds
+                    position = 0
+                    shares = 0.0
+                    num_trades += 1
+                    pv_idx += 1
+                    portfolio_values[pv_idx] = cash
+                    continue
+
             if signal == "BUY" and position == 0:
-                cost = cash * self.transaction_cost_pct
-                net_value = cash - cost
+                alloc_cash = cash * position_size_pct
+                cost = alloc_cash * self.transaction_cost_pct
+                net_value = alloc_cash - cost
                 shares = net_value / current_price
-                cash = 0.0
+                cash -= alloc_cash
                 position = 1
                 entry_price = current_price
                 num_trades += 1
@@ -162,7 +203,7 @@ class BacktestingEngine:
                 net_proceeds = proceeds - cost
                 gain = net_proceeds - (shares * entry_price)
                 trades.append(gain)
-                cash = net_proceeds
+                cash += net_proceeds
                 position = 0
                 shares = 0.0
                 num_trades += 1

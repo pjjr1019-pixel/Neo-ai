@@ -1,3 +1,5 @@
+import os
+os.environ["AUTH_SECRET_KEY"] = os.environ.get("AUTH_SECRET_KEY", "test-secret-key")
 import pytest
 from fastapi.testclient import TestClient
 

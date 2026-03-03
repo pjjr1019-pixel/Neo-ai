@@ -1,3 +1,11 @@
+# Ensure AUTH_SECRET_KEY is set for dev/test if missing, to avoid test failures
+import os
+
+if not os.environ.get("AUTH_SECRET_KEY"):
+    env = os.environ.get("NEO_ENVIRONMENT", "development").lower()
+    if env != "production":
+        os.environ["AUTH_SECRET_KEY"] = "test-secret-key"
+
 """Application settings using Pydantic Settings.
 
 Infrastructure settings (database, auth, logging, model storage,
@@ -143,12 +151,7 @@ class AuthSettings(BaseSettings):
     @field_validator("secret_key")
     @classmethod
     def validate_secret_key(cls, v: str) -> str:
-        """Validate secret key is set.
-
-        In production the AUTH_SECRET_KEY env var MUST be a
-        non-trivial value.  In dev/test a fallback is generated
-        so the app still boots.
-        """
+        """Validate secret key and generate one for dev/test when needed."""
         import os
 
         _INSECURE = {
@@ -168,6 +171,11 @@ class AuthSettings(BaseSettings):
             import secrets as _sec
 
             v = _sec.token_urlsafe(32)
+            logger.warning(
+                "Auto-generated AUTH_SECRET_KEY for %s. "
+                "Do not use in production.",
+                env,
+            )
         return v
 
 

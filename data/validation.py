@@ -1,12 +1,27 @@
-"""
-Data validation using Great Expectations (placeholder).
-- Acceptance: Data validation implemented and tested
-"""
+"""Data validation helpers with optional Great Expectations support."""
+
+from __future__ import annotations
+
+from typing import Any
 
 import pandas as pd
-import great_expectations as ge
 
-def validate_data(data):
+
+def _load_ge() -> Any | None:
+    """Best-effort loader for Great Expectations.
+
+    Returns ``None`` when GE is unavailable or incompatible with
+    the current runtime so callers can fall back to pandas checks.
+    """
+    try:
+        import great_expectations as ge  # type: ignore
+
+        return ge
+    except Exception:
+        return None
+
+
+def validate_data(data: Any) -> bool:
     """
     Validate data using Great Expectations. Accepts a pandas DataFrame or list of dicts.
     Returns True if validation passes, False otherwise.
@@ -21,10 +36,14 @@ def validate_data(data):
             return False
     else:
         df = data
-    # Use Great Expectations Validator API (v0.15+)
-    # Try Great Expectations PandasDataset if available
+    ge = _load_ge()
+    # Use GE only when available and compatible.
     try:
-        if hasattr(ge, "dataset") and hasattr(ge.dataset, "PandasDataset"):
+        if (
+            ge is not None
+            and hasattr(ge, "dataset")
+            and hasattr(ge.dataset, "PandasDataset")
+        ):
             ge_df = ge.dataset.PandasDataset(df)
             # At least 1 row
             results = ge_df.expect_table_row_count_to_be_greater_than(0)
@@ -37,6 +56,7 @@ def validate_data(data):
                     return False
             return True
     except Exception:
+        # Any GE runtime issue falls back to pandas-only validation.
         pass
     # Fallback: basic DataFrame validation
     if df.shape[0] == 0:
@@ -46,4 +66,4 @@ def validate_data(data):
     return True
 
 if __name__ == "__main__":
-    print(validate_data([1,2,3]))
+    print(validate_data([1, 2, 3]))
