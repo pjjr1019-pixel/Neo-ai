@@ -14,9 +14,10 @@ def test_flake8_compliance():
     Run flake8 compliance check on the Neo project.
     Asserts that all files are flake8 compliant.
     """
+    import sys
     result = subprocess.run(
         [
-            "python",
+            sys.executable,
             "-m",
             "flake8",
             "python_ai/",
