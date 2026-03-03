@@ -14,17 +14,19 @@ def track_lineage(data, job_name="neo_data_pipeline", namespace="neo", event_typ
     Returns True if event emitted successfully, False otherwise.
     """
     try:
-        if not data:
+        # Defensive: always use valid, non-None values for OpenLineage objects
+        if data is None or not isinstance(data, list):
             data = []
         set_producer("https://github.com/your-org/neo")
         client = OpenLineageClient(os.environ.get("OPENLINEAGE_URL", "http://localhost:5000"))
         run_id = str(uuid.uuid4())
-        job = Job(namespace, job_name)
+        job = Job(namespace or "neo", job_name or "neo_data_pipeline")
         run = Run(run_id)
         # Always provide a valid InputDataset, even for empty data
-        input_ds = [InputDataset(namespace, "neo_input", facets={})]
+        # Optionally, use a default name and facets
+        input_ds = [InputDataset(namespace or "neo", "neo_input", facets={})]
         event = RunEvent(
-            eventType=event_type,
+            eventType=event_type or "COMPLETE",
             eventTime=None,
             run=run,
             job=job,
