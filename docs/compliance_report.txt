@@ -1,0 +1,19 @@
+NEO Compliance Report
+Generated: 2026-03-03
+
+Scope:
+- GDPR baseline controls
+- CCPA baseline controls
+- Internal data handling policy controls
+
+Implemented Controls:
+- Compliance checks in CI (`ci/compliance_checks.py`)
+- Quarterly audit utilities (`security/compliance_audit.py`)
+- Regulation change monitor (`security/regulation_monitor.py`)
+- User consent controls (`security/user_consent.py`)
+- Data handling policy document (`security/data_handling_policy.md`)
+
+Status:
+- Baseline technical controls implemented.
+- Automated test coverage added for compliance checks and deployment strategies.
+- Remaining legal review actions are tracked in release governance docs.

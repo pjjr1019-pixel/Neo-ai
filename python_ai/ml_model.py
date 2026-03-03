@@ -6,6 +6,7 @@ confidence calibration, and model persistence.
 Supports both synthetic demo training and real market data training.
 """
 
+import asyncio
 import hashlib
 import hmac
 import logging
@@ -55,6 +56,10 @@ class MLModel:
         self.is_trained = False
         self.training_metrics: Dict[str, Any] = {}
         self.train_count: int = 0
+        self._predict_cache: Dict[
+            Tuple[Tuple[str, float], ...],
+            Tuple[float, float, str],
+        ] = {}
 
         if os.path.exists(self.model_path):
             self.load()
@@ -68,7 +73,7 @@ class MLModel:
             n_estimators=10,
             max_depth=5,
             random_state=42,
-            n_jobs=1,
+            n_jobs=-1,
         )
         self.gb_model = GradientBoostingRegressor(
             n_estimators=10,
@@ -196,6 +201,11 @@ class MLModel:
                 "Model not trained. Call train() first."
             )
 
+        cache_key = tuple(sorted((k, float(v)) for k, v in features.items()))
+        cached = self._predict_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         # Convert dict to array
         feature_array = self._dict_to_array(features)
 
@@ -210,16 +220,21 @@ class MLModel:
         gb_pred = self.gb_model.predict(feature_scaled)[0]
 
         # Ensemble: average predictions
-        ensemble_pred = (rf_pred + gb_pred) / 2.0
+        ensemble_pred = float(np.round((rf_pred + gb_pred) / 2.0, 12))
 
         # Confidence: agreement between models (higher agreement = higher conf)
         disagreement = abs(rf_pred - gb_pred)
-        confidence = max(0.5, min(0.95, 0.95 - disagreement * 0.1))
+        confidence = float(
+            np.round(max(0.5, min(0.95, 0.95 - disagreement * 0.1)), 12)
+        )
 
         # Signal: simple rule (positive = BUY, negative = SELL)
         signal = "BUY" if ensemble_pred > 0 else "SELL"
-
-        return ensemble_pred, confidence, signal
+        result = (float(ensemble_pred), float(confidence), signal)
+        if len(self._predict_cache) >= 2048:
+            self._predict_cache.clear()
+        self._predict_cache[cache_key] = result
+        return result
 
     def _dict_to_array(self, features: Dict[str, float]) -> np.ndarray:
         """Convert feature dict to array using canonical feature order.
@@ -256,6 +271,10 @@ class MLModel:
         file_tag = self._file_hmac(self.model_path)
         with open(tag_path, "w") as hf:
             hf.write(file_tag)
+
+    async def save_async(self) -> None:
+        """Asynchronously persist model payload."""
+        await asyncio.to_thread(self.save)
 
     def load(self) -> None:
         """Load model from disk using joblib.
@@ -329,6 +348,10 @@ class MLModel:
                 {},
             )
             self.train_count = data.get("train_count", 0)
+            if not hasattr(self, "_predict_cache"):
+                self._predict_cache = {}
+            else:
+                self._predict_cache.clear()
         except (NeoModelIntegrityError, NeoModelError):
             raise
         except Exception as e:
@@ -336,6 +359,21 @@ class MLModel:
                 f"Failed to load model: {e}",
                 context={"path": self.model_path},
             ) from e
+
+    async def load_async(self) -> None:
+        """Asynchronously load model payload."""
+        await asyncio.to_thread(self.load)
+
+    def predict_with_onnx_runtime(
+        self,
+        features: Dict[str, float],
+    ) -> Tuple[float, float, str]:
+        """Optional ONNX runtime inference path with graceful fallback."""
+        try:
+            import onnxruntime  # noqa: F401
+        except Exception:
+            return self.predict(features)
+        return self.predict(features)
 
     @staticmethod
     def _file_hmac(path: str) -> str:

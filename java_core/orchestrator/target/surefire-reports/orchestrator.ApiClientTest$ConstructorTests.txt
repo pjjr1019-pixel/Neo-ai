@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: orchestrator.ApiClientTest$ConstructorTests
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.743 s -- in orchestrator.ApiClientTest$ConstructorTests
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.593 s -- in orchestrator.ApiClientTest$ConstructorTests

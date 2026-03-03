@@ -11,11 +11,12 @@ import logging
 import platform
 import time
 from contextlib import asynccontextmanager
-from typing import Any, AsyncIterator, Callable, Dict, List
+from typing import Any, AsyncIterator, Callable, Dict, List, Type
 
 import numpy as np
 from fastapi import Depends, FastAPI, Response, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
 from python_ai.auth.dependencies import get_current_user
@@ -39,6 +40,15 @@ logger = logging.getLogger(__name__)
 
 _settings = get_settings()
 _VERSION = "0.6.0"
+_default_response_class: Type[Response]
+
+try:  # pragma: no cover - optional dependency path
+    import orjson  # noqa: F401
+    from fastapi.responses import ORJSONResponse
+
+    _default_response_class = ORJSONResponse
+except Exception:  # pragma: no cover - optional dependency path
+    _default_response_class = JSONResponse
 
 
 # ── Lifespan (startup / shutdown) ─────────────────────────────
@@ -87,6 +97,7 @@ app = FastAPI(
     title="NEO Hybrid AI",
     version=_VERSION,
     lifespan=lifespan,
+    default_response_class=_default_response_class,
 )
 
 # ── Exception handlers (must be registered before middleware) ──

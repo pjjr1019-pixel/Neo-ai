@@ -1,29 +1,14 @@
-# NEO Hybrid AI — Phase 5: Model Training & Selection
+# Phase 5: Model Training and Selection
 
-## Step 22: Implement Backtesting Simulator
-- Simulate past X years of trading/data
-- Log results and performance metrics
+## Implemented
+- Purged walk-forward CV utilities in `python_ai/model_selection.py`.
+- Regime-aware scoring and significance testing utilities.
+- Distributed-style hyperparameter search with Optuna parallel workers.
 
-## Step 23: Score Model Performance
-- Compute Sharpe ratio, max drawdown, win rate
-- Document metrics and results
+## Robustness
+- Adversarial simulation helpers (FGSM/PGD) in `python_ai/robustness.py`.
+- Adversarial training batch augmentation helper.
 
-## Step 24: Automatic Model Selection
-- Select top-N models based on performance
-- Integrate hyperparameter optimization (Optuna, Ray Tune, Hyperopt)
-- Document selection logic and results
-
-## Step 25: Save Models for Java Inference
-- Save models in PyTorch/ONNX format
-- Use pruning/distillation for efficiency
-- Document model saving and loading
-
----
-## Rules of Engagement
-- Modular, explainable, and automated
-- Document all code, metrics, and logic in /docs
-- Log all actions, errors, and test results
-- Verify each step with sample data and tests
-
----
-Update this file as Phase 5 progresses. Each step should be documented, tested, and logged.
+## Validation
+- `tests/test_model_selection.py`
+- `tests/test_distributed_robustness.py`

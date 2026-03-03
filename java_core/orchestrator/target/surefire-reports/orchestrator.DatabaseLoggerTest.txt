@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: orchestrator.DatabaseLoggerTest
 -------------------------------------------------------------------------------
-Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.906 s -- in orchestrator.DatabaseLoggerTest
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.860 s -- in orchestrator.DatabaseLoggerTest

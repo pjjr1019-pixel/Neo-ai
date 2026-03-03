@@ -1,28 +1,12 @@
-# NEO Hybrid AI — Backtesting Simulator Example
+# Phase 5 Backtesting Simulator
 
-## Example (Python)
-import pandas as pd
+## Implemented
+- Standard backtest mode in `python_ai/backtesting_engine.py`.
+- Vectorized-parity API: `run_backtest_vectorized`.
+- Parallel strategy sweep API: `run_parallel_backtests`.
+- Multi-timeframe evaluation API: `run_multi_timeframe_backtest`.
+- Transaction cost overrides supported per run.
 
-# Sample historical data
-data = pd.DataFrame({
-    'price': [100, 110, 120, 115, 125],
-    'signal': ['buy', 'hold', 'buy', 'sell', 'buy']
-})
-
-# Simulate trading
-capital = 1000
-positions = []
-for i, row in data.iterrows():
-    if row['signal'] == 'buy':
-        capital += row['price'] * 0.01  # Example profit
-    elif row['signal'] == 'sell':
-        capital -= row['price'] * 0.01  # Example loss
-    positions.append(capital)
-
-print('Final capital:', capital)
-print('Positions:', positions)
-
----
-## Logging
-- Log simulation results and performance metrics
-- Update this file as simulator logic evolves
+## Validation
+- `tests/test_backtest.py`
+- Existing suite: `tests/test_backtesting_engine.py`

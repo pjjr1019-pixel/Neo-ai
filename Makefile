@@ -1,4 +1,4 @@
-.PHONY: help install dev lint format test test-full coverage security clean
+.PHONY: help install dev lint format test test-full test-parallel coverage security clean
 
 help:  ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -30,13 +30,16 @@ format:  ## Auto-format code (black + isort)
 # ── Testing ────────────────────────────────────────────────────
 
 test:  ## Run tests (stop on first failure)
-	python -m pytest python_ai/ --tb=short --maxfail=1
+	python -m pytest tests/ --tb=short --maxfail=1
 
 test-full:  ## Run full test suite with verbose output
-	python -m pytest python_ai/ -v --tb=short
+	python -m pytest tests/ -v --tb=short
+
+test-parallel:  ## Run tests in parallel when pytest-xdist is installed
+	python -m pytest tests/ -n auto --tb=short
 
 coverage:  ## Run tests with coverage report
-	python -m pytest python_ai/ --cov=python_ai --cov-report=term-missing
+	python -m pytest tests/ --cov=python_ai --cov-report=term-missing
 
 # ── Security ───────────────────────────────────────────────────
 

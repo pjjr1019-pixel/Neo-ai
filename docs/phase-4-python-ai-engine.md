@@ -1,32 +1,35 @@
-# NEO Hybrid AI — Phase 4: Python AI Engine
+# Phase 4: Python AI Engine
 
-## Step 17: Setup FastAPI Endpoints
-- Create endpoints: /predict, /learn
-- Test endpoints with sample requests
-- Log all actions and errors
+## Endpoints
+- `/predict`: model inference with confidence and signal output.
+- `/learn`: async buffered online learning with retrain threshold.
+- `/explain`: model feature importance (SHAP/gini fallback).
+- `/metrics` and `/metrics/prometheus`: runtime and model metrics.
 
-## Step 18: Define Input/Output JSON Schemas
-- Features, position, risk, action, confidence
-- Document schemas and validate
+## Schemas
+- Shared request/response schemas implemented in `python_ai/schemas.py`.
+- Input validators reject NaN/Inf and malformed payloads.
 
-## Step 19: Implement Feature Processing Pipeline
-- Normalize, windowing, handle missing values
-- Log processing steps and results
+## Optimizations
+- RandomForest parallelized with `n_jobs=-1`.
+- Prediction cache added in `MLModel.predict`.
+- Async model persistence: `save_async`, `load_async`.
+- Optional ONNX runtime inference hook with graceful fallback.
+- Default FastAPI response class uses ORJSON when available.
 
-## Step 20: Design Model Architecture for Advanced Pattern Recognition
-- Integrate Transformers (BERT, GPT, ViT), LSTM/GRU with attention, self-supervised/contrastive learning
-- Document model code, diagrams, and logic
+## Data/Feature Enhancements
+- `python_ai/feature_factory.py`:
+  - vectorized indicator usage
+  - memoized rolling feature calls
+  - optional numba-accelerated SMA path
+- `data/feature_cache.py`: per-symbol/per-timestamp feature cache.
+- `data/storage.py`: CSV/Parquet storage abstraction with fallback.
+- `data/io.py`: async batched candle writer.
 
-## Step 21: Add Automated Data/Model Lineage Tracking
-- Use MLflow/DVC for tracking
-- Ensure all model/data changes are reproducible
-
----
-## Rules of Engagement
-- Modular, explainable, and automated
-- Document APIs, schemas, and logic in /docs
-- Log all actions, errors, and test results
-- Verify each step with sample data and tests
-
----
-Update this file as Phase 4 progresses. Each step should be documented, tested, and logged.
+## Validation
+- Tests:
+  - `tests/test_feature_factory.py`
+  - `tests/test_data_storage_cache_io.py`
+  - `tests/test_schemas.py`
+  - `tests/test_fastapi_orjson.py`
+  - `tests/test_ml_model_phase4_optimizations.py`

@@ -17,12 +17,14 @@ REQUESTS = 200
 
 
 async def worker(client, n):
+    """Send ``n`` predict requests using shared async client."""
     for _ in range(n):
         response = await client.post(URL, json=PAYLOAD)
         assert response.status_code == 200
 
 
 async def main():
+    """Run benchmark workload and print throughput summary."""
     start = time.perf_counter()
     async with httpx.AsyncClient(timeout=10) as client:
         tasks = [

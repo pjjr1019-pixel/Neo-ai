@@ -1,59 +1,33 @@
-# API Usage Examples
+# API Usage
 
-## /predict Endpoint
+## Authentication
+- Endpoints are protected by JWT/API key middleware.
+- Use `Authorization: Bearer <token>` or configured API-key flow.
 
-**Request:**
-```
-POST /predict
-Content-Type: application/json
+## `POST /compute-features`
+Request:
+```json
 {
-  "price": 123.45,
-  "volume": 1000
+  "symbol": "BTC/USD",
+  "ohlcv_data": {"open": [1], "high": [1], "low": [1], "close": [1], "volume": [1]}
 }
 ```
 
-**Response:**
+## `POST /predict`
+Request:
+```json
+{"features": {"sma_14": 100.0, "rsi_14": 50.0}}
 ```
-{
-  "action": "buy",
-  "confidence": 0.95,
-  "risk": 0.1
-}
-```
-
-## /learn Endpoint
-
-**Request:**
-```
-POST /learn
-Content-Type: application/json
-{
-  "features": [1, 2, 3],
-  "target": 1.0
-}
+Response:
+```json
+{"prediction": 0.12, "confidence": 0.82, "signal": "BUY"}
 ```
 
-**Response:**
-```
-{
-  "status": "learning triggered",
-  "received": {"features": [1, 2, 3], "target": 1.0}
-}
+## `POST /learn`
+Request:
+```json
+{"features": [0.1, 0.2, 0.3], "target": 0.01}
 ```
 
-## /metrics Endpoint
-
-**Request:**
-```
-GET /metrics
-```
-
-**Response:**
-```
-{
-  "avg_latency": 0.002,
-  "throughput": 100.0,
-  "memory_mb": 50.0,
-  "cpu_percent": 2.5
-}
-```
+## `GET /explain`
+- Returns global feature importances and explanation method.

@@ -389,3 +389,15 @@ docker rmi neo-ai-service:latest
 - Configure backup strategy for PostgreSQL data
 - Implement log aggregation (ELK stack, Splunk, etc.)
 
+## Desktop Packaging and Updates
+
+- Installer planning utilities:
+  - `deployment/installer.py`
+- Update and rollback decision utilities:
+  - `deployment/updater.py`
+
+### Quick Validation
+```bash
+python -m pytest -q tests/test_installer_update.py
+```
+

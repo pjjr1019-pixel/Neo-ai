@@ -1,12 +1,7 @@
-"""
-Backtesting Engine for NEO Hybrid AI.
+"""Backtesting engine with single, vectorized, and parallel run modes."""
 
-Performs walk-forward historical simulation with transaction costs,
-calculates performance metrics (Sharpe ratio, max drawdown, win rate),
-and evaluates trading strategies for evolution engine feedback.
-"""
-
-from typing import Any, Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -111,6 +106,7 @@ class BacktestingEngine:
         stop_loss_pct: Optional[float] = None,
         take_profit_pct: Optional[float] = None,
         position_size_pct: float = 1.0,
+        transaction_cost_pct: Optional[float] = None,
     ) -> BacktestMetrics:
         """Run backtest simulation with given signals and risk controls.
 
@@ -129,6 +125,12 @@ class BacktestingEngine:
         """
         if not ohlcv_data.get("close") or not signals:
             return BacktestMetrics(0.0, 0.0, 0.0, 0.0, 0)
+
+        tx_cost = (
+            self.transaction_cost_pct
+            if transaction_cost_pct is None
+            else transaction_cost_pct
+        )
 
         close_prices = np.array(ohlcv_data["close"], dtype=float)
         num_bars = len(close_prices)
@@ -160,7 +162,7 @@ class BacktestingEngine:
                 if stop_loss_pct is not None and pnl_pct <= stop_loss_pct:
                     # Trigger stop-loss
                     proceeds = shares * current_price
-                    cost = proceeds * self.transaction_cost_pct
+                    cost = proceeds * tx_cost
                     net_proceeds = proceeds - cost
                     gain = net_proceeds - (shares * entry_price)
                     trades.append(gain)
@@ -174,7 +176,7 @@ class BacktestingEngine:
                 if take_profit_pct is not None and pnl_pct >= take_profit_pct:
                     # Trigger take-profit
                     proceeds = shares * current_price
-                    cost = proceeds * self.transaction_cost_pct
+                    cost = proceeds * tx_cost
                     net_proceeds = proceeds - cost
                     gain = net_proceeds - (shares * entry_price)
                     trades.append(gain)
@@ -188,7 +190,7 @@ class BacktestingEngine:
 
             if signal == "BUY" and position == 0:
                 alloc_cash = cash * position_size_pct
-                cost = alloc_cash * self.transaction_cost_pct
+                cost = alloc_cash * tx_cost
                 net_value = alloc_cash - cost
                 shares = net_value / current_price
                 cash -= alloc_cash
@@ -199,7 +201,7 @@ class BacktestingEngine:
                 portfolio_values[pv_idx] = cash + shares * current_price
             elif signal == "SELL" and position == 1:
                 proceeds = shares * current_price
-                cost = proceeds * self.transaction_cost_pct
+                cost = proceeds * tx_cost
                 net_proceeds = proceeds - cost
                 gain = net_proceeds - (shares * entry_price)
                 trades.append(gain)
@@ -233,6 +235,53 @@ class BacktestingEngine:
             win_rate=win_rate,
             num_trades=(num_trades),
         )
+
+    def run_backtest_vectorized(
+        self,
+        ohlcv_data: Dict[str, List[float]],
+        signals: List[str],
+        *,
+        position_size_pct: float = 1.0,
+    ) -> BacktestMetrics:
+        """Vectorized-friendly wrapper for parity and benchmark checks.
+
+        The core strategy-state transitions (position entry/exit) are
+        stateful and handled by ``run_backtest``. This method provides a
+        dedicated API entry for optimization and parity tests.
+        """
+        return self.run_backtest(
+            ohlcv_data=ohlcv_data,
+            signals=signals,
+            position_size_pct=position_size_pct,
+        )
+
+    def run_parallel_backtests(
+        self,
+        jobs: Sequence[Tuple[Dict[str, List[float]], List[str]]],
+        *,
+        max_workers: int = 4,
+    ) -> List[BacktestMetrics]:
+        """Run multiple backtests concurrently for strategy sweeps."""
+        if not jobs:
+            return []
+        with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
+            futures = [
+                pool.submit(self.run_backtest, ohlcv_data, signals)
+                for ohlcv_data, signals in jobs
+            ]
+            return [future.result() for future in futures]
+
+    def run_multi_timeframe_backtest(
+        self,
+        frames: Dict[str, Dict[str, List[float]]],
+        signals_by_frame: Dict[str, List[str]],
+    ) -> Dict[str, BacktestMetrics]:
+        """Evaluate strategy across multiple timeframes."""
+        output: Dict[str, BacktestMetrics] = {}
+        for frame, ohlcv_data in frames.items():
+            signals = signals_by_frame.get(frame, [])
+            output[frame] = self.run_backtest(ohlcv_data, signals)
+        return output
 
     def _calculate_sharpe(self, returns: np.ndarray) -> float:
         """Calculate Sharpe ratio from daily returns.

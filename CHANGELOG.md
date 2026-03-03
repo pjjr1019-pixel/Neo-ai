@@ -25,6 +25,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `tests/test_evolution_engine_phase7.py`,
   `tests/test_strategy_evaluation.py`,
   `tests/test_strategy_lifecycle.py`
+- Phase 0 governance/compliance modules:
+  `ci/model_validation.py`,
+  `ci/deployment_strategies.py`,
+  `security/compliance_audit.py`,
+  `security/regulation_monitor.py`,
+  `security/user_consent.py`
+- Phase 4 engineering modules:
+  `python_ai/schemas.py`,
+  `python_ai/feature_factory.py`,
+  `data/feature_cache.py`,
+  `data/storage.py`,
+  `data/io.py`
+- Phase 5 modules:
+  `python_ai/model_selection.py`,
+  `python_ai/model_export.py`,
+  `python_ai/distributed_hpo.py`,
+  `python_ai/robustness.py`,
+  `python_ai/synthetic_data.py`
+- GUI/deployment modules:
+  `python_ai/gui/*`,
+  `deployment/installer.py`,
+  `deployment/updater.py`
+- New docs:
+  `docs/phase-4-python-ai-engine.md`,
+  `docs/phase-5-*.md`,
+  `docs/phase-8-gui.md`,
+  `docs/phase-10-user-experience.md`,
+  `docs/phase-11-release-notes.md`
 
 ### Changed
 - Replaced `datetime.utcnow()` with `datetime.now(timezone.utc)` across
@@ -53,6 +81,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `StrategyLifecycleManager.family_tree` now uses a deque-based BFS queue
   to remove O(n) front-pop operations on long lineages
 - Bandit config migrated to YAML format for `bandit -c .bandit` compatibility
+- Makefile test targets now execute `tests/` and include `test-parallel`
+- MLModel optimizations: RF parallel training (`n_jobs=-1`), prediction cache,
+  async save/load, optional ONNX runtime path
+- Backtesting engine extended with vectorized parity, parallel jobs, and
+  multi-timeframe evaluation APIs
 
 ### Security
 - Removed hardcoded default secrets from `config/settings.py` and

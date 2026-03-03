@@ -196,6 +196,7 @@ def register_exception_handlers(application: FastAPI) -> None:
         request: Request,
         exc: NeoBaseError,
     ) -> JSONResponse:
+        """Handle domain-specific NEO exceptions with structured payload."""
         status = _status_for(exc)
         body = _build_error_body(exc, request)
         logger.error(

@@ -1,6 +1,7 @@
 pytest
 pytest-asyncio
 pytest-cov
+pytest-xdist
 httpx
 mypy
 types-psutil
@@ -13,3 +14,5 @@ prometheus_client==0.24.1
 optuna
 openlineage-python
 great_expectations
+Faker
+sdv
