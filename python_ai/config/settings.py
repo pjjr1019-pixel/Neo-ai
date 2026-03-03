@@ -4,7 +4,9 @@ import os
 if not os.environ.get("AUTH_SECRET_KEY"):
     env = os.environ.get("NEO_ENVIRONMENT", "development").lower()
     if env != "production":
-        os.environ["AUTH_SECRET_KEY"] = "test-secret-key"
+        import secrets
+
+        os.environ["AUTH_SECRET_KEY"] = secrets.token_urlsafe(32)
 
 """Application settings using Pydantic Settings.
 

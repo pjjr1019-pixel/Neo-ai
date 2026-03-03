@@ -19,8 +19,9 @@ class MockDispatcher:
 
 class TestDriftAlertIntegration(unittest.TestCase):
     def test_alert_triggered_on_drift(self):
-        baseline = np.random.normal(0, 1, 1000)
-        new_data = np.random.normal(2, 1, 1000)
+        rng = np.random.default_rng(42)
+        baseline = rng.normal(0, 1, 1000)
+        new_data = rng.normal(2, 1, 1000)
         dispatcher = MockDispatcher()
         result = detect_and_alert(baseline, new_data, dispatcher=dispatcher)
         self.assertTrue(result["drift"])
@@ -28,8 +29,9 @@ class TestDriftAlertIntegration(unittest.TestCase):
         self.assertIn("Drift Detected", dispatcher.alerts[0].title)
 
     def test_no_alert_when_no_drift(self):
-        baseline = np.random.normal(0, 1, 1000)
-        new_data = np.random.normal(0, 1, 1000)
+        rng = np.random.default_rng(42)
+        baseline = rng.normal(0, 1, 1000)
+        new_data = rng.normal(0, 1, 1000)
         dispatcher = MockDispatcher()
         result = detect_and_alert(baseline, new_data, dispatcher=dispatcher)
         self.assertFalse(result["drift"])

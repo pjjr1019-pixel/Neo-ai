@@ -302,24 +302,24 @@
 
 [R7-1] Neuroevolution & Architecture Search
     - [ ] Evolve neural network architectures alongside strategy parameters (NEAT/HyperNEAT)
-    - [ ] Implement multi-objective Pareto optimization (Sharpe vs drawdown vs win rate frontiers)
-    - [ ] Add novelty search (reward strategies that explore new behavior spaces, not just high fitness)
-    - [ ] Implement speciation (protect young innovations from premature elimination)
+    - [x] Implement multi-objective Pareto optimization (Sharpe vs drawdown vs win rate frontiers)
+    - [x] Add novelty search (reward strategies that explore new behavior spaces, not just high fitness)
+    - [x] Implement speciation (protect young innovations from premature elimination)
     - **Success:** Evolution discovers novel architectures and diverse strategy niches.
 
 [R7-2] Co-Evolution & Competition
     - [ ] Implement adversarial co-evolution (strategies compete against simulated market makers)
     - [ ] Add predator-prey dynamics (trend strategies vs mean-reversion strategies coexist)
-    - [ ] Build tournament selection with Elo-style rating system (replace round-robin O(n^2) tournament)
+    - [x] Build tournament selection with Elo-style rating system (replace round-robin O(n^2) tournament)
     - [ ] Implement island model (parallel sub-populations with migration)
     - **Success:** Evolution produces robust strategies via competitive pressure.
 
 [R7-3] Strategy Lifecycle Management
-    - [ ] Implement strategy aging (exponentially decay fitness of old strategies to encourage freshness)
-    - [ ] Add strategy lineage tracking (family tree of mutations, which parent produced best offspring)
-    - [ ] Build strategy museum (archive retired strategies with full performance history)
-    - [ ] Implement strategy warm-start (seed new populations with top-N historical strategies)
-    - [ ] Add strategy complexity penalty (prefer simpler strategies at similar fitness levels)
+    - [x] Implement strategy aging (exponentially decay fitness of old strategies to encourage freshness)
+    - [x] Add strategy lineage tracking (family tree of mutations, which parent produced best offspring)
+    - [x] Build strategy museum (archive retired strategies with full performance history)
+    - [x] Implement strategy warm-start (seed new populations with top-N historical strategies)
+    - [x] Add strategy complexity penalty (prefer simpler strategies at similar fitness levels)
     - **Success:** Strategy evolution has institutional memory and bias toward simplicity.
 
 

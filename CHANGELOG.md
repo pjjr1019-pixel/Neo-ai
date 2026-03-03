@@ -13,6 +13,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Pre-commit hooks: added isort, mypy alongside existing black/flake8/bandit
 - `_torch_optim_available()` guard for CI environments with broken triton
 - `tests/conftest.py` with shared project-root path setup
+- `python_ai/strategy_evaluation.py` for novelty, speciation, Pareto front,
+  and composite top-N strategy selection
+- `python_ai/strategy_lifecycle.py` for lineage, retirement archive, warm-start,
+  complexity penalties, and age-adjusted fitness
+- Phase 7 docs:
+  `docs/phase-7-evolution-engine.md`,
+  `docs/phase-7-strategy-evaluation.md`,
+  `docs/phase-7-strategy-lifecycle.md`
+- Phase 7 tests:
+  `tests/test_evolution_engine_phase7.py`,
+  `tests/test_strategy_evaluation.py`,
+  `tests/test_strategy_lifecycle.py`
 
 ### Changed
 - Replaced `datetime.utcnow()` with `datetime.now(timezone.utc)` across
@@ -31,6 +43,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Learn endpoint uses `asyncio.Lock` for buffer safety
 - Secret key validator auto-generates runtime key in dev/test,
   rejects insecure values in production
+- `EvolutionEngine` now supports parallel population evaluation and
+  generator-based mutation/population iteration to reduce memory overhead
+- `EvolutionEngine` self-play now avoids duplicate pair matches, adds
+  `elo_tournament_selection` for faster competitive ranking, and improves
+  `meta_learn` cross-validation efficiency/correctness for uneven fold counts
+- `strategy_evaluation.novelty_scores` now precomputes pairwise distances
+  once per population instead of recomputing each strategy pair twice
+- `StrategyLifecycleManager.family_tree` now uses a deque-based BFS queue
+  to remove O(n) front-pop operations on long lineages
+- Bandit config migrated to YAML format for `bandit -c .bandit` compatibility
 
 ### Security
 - Removed hardcoded default secrets from `config/settings.py` and

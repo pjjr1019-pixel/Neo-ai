@@ -60,8 +60,11 @@ def explain_prediction(
     if model.scaler is not None:
         try:
             arr = model.scaler.transform(arr)
-        except Exception:
-            pass  # use raw features
+        except Exception as exc:
+            logger.debug(
+                "Scaler transform failed; using raw features: %s",
+                exc,
+            )
 
     if _check_shap():
         return _explain_shap(model, arr, feature_names)

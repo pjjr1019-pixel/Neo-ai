@@ -9,7 +9,8 @@ Evolution Engine for Strategy Mutation and Meta-Learning
 import copy
 import logging
 import random
-from typing import Any, Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
 
 import optuna
 
@@ -84,6 +85,58 @@ class Strategy:
 
 class EvolutionEngine:
     """Engine for running evolutionary optimization of strategies."""
+
+    def __init__(
+        self,
+        base_strategies: Iterable[Strategy],
+        evaluation_workers: int = 1,
+    ) -> None:
+        """Initialize with a base population.
+
+        Args:
+            base_strategies: Initial population of strategies.
+            evaluation_workers: Number of worker threads used for
+                parallel strategy evaluation. ``1`` means sequential.
+        """
+        self.base_strategies: List[Strategy] = list(base_strategies)
+        self.population: List[Strategy] = list(self.base_strategies)
+        self.evaluation_workers = max(1, evaluation_workers)
+
+    def iter_population(self) -> Iterator[Strategy]:
+        """Yield strategies lazily for large populations."""
+        yield from self.population
+
+    def iter_mutations(self) -> Iterator[Strategy]:
+        """Yield mutated strategies lazily."""
+        for strat in self.population:
+            yield strat.mutate()
+
+    @staticmethod
+    def _evaluate_strategy(
+        payload: Tuple[Strategy, Optional[Dict[str, Any]]],
+    ) -> float:
+        """Evaluate one strategy payload."""
+        strat, data = payload
+        return strat.evaluate(data)
+
+    def evaluate_population(
+        self,
+        data: Optional[Dict[str, Any]],
+        workers: Optional[int] = None,
+    ) -> List[float]:
+        """Evaluate full population, optionally in parallel."""
+        if not self.population:
+            return []
+
+        n_workers = max(1, workers or self.evaluation_workers)
+        if n_workers == 1 or len(self.population) < 2:
+            return [s.evaluate(data) for s in self.population]
+
+        payloads = [(s, data) for s in self.population]
+        with ThreadPoolExecutor(
+            max_workers=min(n_workers, len(self.population))
+        ) as pool:
+            return list(pool.map(self._evaluate_strategy, payloads))
 
     def explainable_evolution_report(
         self, previous_population: Optional[List[Strategy]] = None
@@ -164,23 +217,23 @@ class EvolutionEngine:
             strat: 0.0 for strat in self.population
         }
         for _ in range(rounds):
-            for i, strat_a in enumerate(self.population):
-                for j, strat_b in enumerate(self.population):
-                    if i == j:
-                        continue
-                    perf_a: float = eval_cache[id(strat_a)]
-                    perf_b: float = eval_cache[id(strat_b)]
+            for i in range(n - 1):
+                strat_a = self.population[i]
+                perf_a = eval_cache[id(strat_a)]
+                for j in range(i + 1, n):
+                    strat_b = self.population[j]
+                    perf_b = eval_cache[id(strat_b)]
                     if perf_a > perf_b:
-                        scores[strat_a] += 1
+                        scores[strat_a] += 1.0
                     elif perf_b > perf_a:
-                        scores[strat_b] += 1
+                        scores[strat_b] += 1.0
                     else:
                         scores[strat_a] += 0.5
                         scores[strat_b] += 0.5
-        # Normalize scores by number of matches
-        matches: int = rounds * n * (n - 1)
+        # Normalize by per-strategy match count.
+        matches_per_strategy = max(1, rounds * (n - 1))
         avg_scores: Dict[Strategy, float] = {
-            strat: score / matches
+            strat: score / matches_per_strategy
             for strat, score in scores.items()
             if strat is not None
         }
@@ -188,6 +241,76 @@ class EvolutionEngine:
         for strat, avg in avg_scores.items():
             strat.performance = avg
         return avg_scores
+
+    def elo_tournament_selection(
+        self,
+        data: Optional[Dict[str, Any]],
+        rounds: int = 10,
+        k_factor: float = 32.0,
+    ) -> Dict[Strategy, float]:
+        """Run Elo-style tournaments with sub-quadratic match scheduling.
+
+        This replaces full round-robin O(n^2) pairings with random adjacent
+        pairings O(n) per round while still applying competitive pressure.
+
+        Args:
+            data: Input data for strategy evaluation.
+            rounds: Number of tournament rounds to run.
+            k_factor: Elo rating update factor.
+
+        Returns:
+            Dict mapping each strategy to normalized Elo score in [0, 1].
+        """
+        n = len(self.population)
+        if n < 2:
+            for strat in self.population:
+                strat.performance = 0.0
+            return {strat: 0.0 for strat in self.population}
+
+        eval_cache: Dict[int, float] = {
+            id(strat): strat.evaluate(data) for strat in self.population
+        }
+        ratings: Dict[Strategy, float] = {
+            strat: 1500.0 for strat in self.population
+        }
+        n_rounds = max(1, rounds)
+
+        for _ in range(n_rounds):
+            shuffled = list(self.population)
+            random.shuffle(shuffled)  # nosec: B311
+            for idx in range(0, len(shuffled) - 1, 2):
+                strat_a = shuffled[idx]
+                strat_b = shuffled[idx + 1]
+
+                rating_a = ratings[strat_a]
+                rating_b = ratings[strat_b]
+                expected_a = 1.0 / (
+                    1.0 + 10 ** ((rating_b - rating_a) / 400.0)
+                )
+                expected_b = 1.0 - expected_a
+
+                perf_a = eval_cache[id(strat_a)]
+                perf_b = eval_cache[id(strat_b)]
+                if perf_a > perf_b:
+                    score_a, score_b = 1.0, 0.0
+                elif perf_b > perf_a:
+                    score_a, score_b = 0.0, 1.0
+                else:
+                    score_a, score_b = 0.5, 0.5
+
+                ratings[strat_a] = rating_a + k_factor * (score_a - expected_a)
+                ratings[strat_b] = rating_b + k_factor * (score_b - expected_b)
+
+        min_rating = min(ratings.values())
+        max_rating = max(ratings.values())
+        denom = max(1e-12, max_rating - min_rating)
+        normalized: Dict[Strategy, float] = {
+            strat: (rating - min_rating) / denom
+            for strat, rating in ratings.items()
+        }
+        for strat, score in normalized.items():
+            strat.performance = score
+        return normalized
 
     def dynamic_resource_allocation(
         self, total_resource: float = 1.0, min_alloc: float = 0.0
@@ -251,9 +374,11 @@ class EvolutionEngine:
         Returns:
             Aggregated prediction for each data point.
         """
-        # Evaluate all strategies on the data
-        for strat in self.population:
-            strat.evaluate(data)
+        # Evaluate all strategies on the data (parallel when enabled).
+        eval_data: Optional[Dict[str, Any]] = (
+            data if isinstance(data, dict) else None
+        )
+        self.evaluate_population(eval_data)
         # Select top-N strategies by performance
         top_strats: List[Strategy] = self.select_top(top_n)
         # Each strategy makes a prediction for each data point
@@ -279,28 +404,15 @@ class EvolutionEngine:
             raise ValueError(f"Unknown aggregation method: {aggregation}")
         return list(agg.tolist())
 
-    def __init__(self, base_strategies: List[Strategy]) -> None:
-        """
-        Initialize the EvolutionEngine with a base population of strategies.
-        Args:
-            base_strategies: List of Strategy objects to start the population.
-        """
-        self.base_strategies: List[Strategy] = base_strategies
-        self.population: List[Strategy] = base_strategies
-
     def run_generation(self, data: Optional[Dict[str, Any]]) -> None:
         """
         Mutate and evaluate all strategies in the population.
         Args:
             data: Input data for evaluation.
         """
-        # Mutate and evaluate all strategies
-        new_population = []
-        for strat in self.population:
-            mutated: Strategy = strat.mutate()
-            mutated.evaluate(data)
-            new_population.append(mutated)
-        self.population = new_population
+        # Mutate lazily, then evaluate (parallel when configured).
+        self.population = list(self.iter_mutations())
+        self.evaluate_population(data)
 
     def select_top(self, n: int) -> List[Strategy]:
         """
@@ -334,26 +446,20 @@ class EvolutionEngine:
                     "Data must be a non-empty sequence for "
                     "cross-validation."
                 )
-            n: int = len(data)
+            samples: List[Any] = list(data)
+            n: int = len(samples)
             actual_k_folds: int = min(k_folds, n)
-            fold_size: int = max(1, n // actual_k_folds)
             results = []
+            base_fold_size: int = n // actual_k_folds
+            remainder: int = n % actual_k_folds
+            start = 0
             for i in range(actual_k_folds):
-                start: int = i * fold_size
-                end: int = start + fold_size if i < k_folds - 1 else n
-                val_idx: List[int] = list(range(start, end))
-                train_idx: List[int] = [
-                    j for j in range(n) if j not in val_idx
-                ]
-                train_data = [data[j] for j in train_idx]
-                val_data = [data[j] for j in val_idx]
+                fold_size: int = base_fold_size + (1 if i < remainder else 0)
+                end = start + fold_size
+                val_data = samples[start:end]
+                start = end
                 fold_scores = []
                 for strat in self.population:
-                    fold_eval_data: Dict[str, Any] = {
-                        "ohlcv_data": {"close": train_data},
-                        "signals": ["HOLD"] * len(train_data),
-                    }
-                    strat.evaluate(fold_eval_data)
                     val_eval_data: Dict[str, Any] = {
                         "ohlcv_data": {"close": val_data},
                         "signals": ["HOLD"] * len(val_data),
@@ -362,7 +468,7 @@ class EvolutionEngine:
                     fold_scores.append(val_score)
                 results.append(fold_scores)
             avg_scores: List[float] = [
-                sum(scores) / k_folds for scores in zip(*results)
+                sum(scores) / actual_k_folds for scores in zip(*results)
             ]
             for strat, avg in zip(self.population, avg_scores):
                 strat.performance = avg

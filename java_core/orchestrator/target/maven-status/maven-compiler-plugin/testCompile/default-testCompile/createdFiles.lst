@@ -1,0 +1,16 @@
+orchestrator\DataFeedClientTest$ThreadSafetyTests.class
+orchestrator\config\OrchestratorConfigTest.class
+orchestrator\DataFeedClientTest.class
+orchestrator\DatabaseLoggerTest$NoOpTests.class
+orchestrator\DatabaseLoggerTest$ApiContractTests.class
+orchestrator\DatabaseLoggerTest$DegradationTests.class
+orchestrator\config\OrchestratorConfigTest$CustomizationTests.class
+orchestrator\config\OrchestratorConfigTest$ToStringTests.class
+orchestrator\DatabaseLoggerTest.class
+orchestrator\DataFeedClientTest$OhlcvTests.class
+orchestrator\DataFeedClientTest$VolatilityTests.class
+orchestrator\DataFeedClientTest$StateTests.class
+orchestrator\config\OrchestratorConfigTest$DefaultsTests.class
+orchestrator\config\OrchestratorConfigTest$ValidationTests.class
+orchestrator\config\OrchestratorConfigTest$LoadTests.class
+orchestrator\DataFeedClientTest$DefaultConstructorTests.class

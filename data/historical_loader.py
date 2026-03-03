@@ -1,19 +1,5 @@
-import pandas as pd
+"""Compatibility wrapper for historical data loader utilities."""
 
-def load_csv(path: str) -> pd.DataFrame:
-    # In real use, would use pd.read_csv(path)
-    # For test, return a dummy DataFrame
-    return pd.DataFrame({
-        'date': ['2021-01-01', '2021-01-02'],
-        'price': [100, 110],
-        'volume': [200, 210]
-    })
+from data.historical.historical_loader import load_api, load_csv
 
-def load_api(endpoint: str) -> pd.DataFrame:
-    # In real use, would fetch from API
-    # For test, return a dummy DataFrame
-    return pd.DataFrame({
-        'date': ['2021-01-01', '2021-01-02'],
-        'price': [120, 130],
-        'volume': [220, 230]
-    })
+__all__ = ["load_api", "load_csv"]

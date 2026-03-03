@@ -5,11 +5,23 @@ import sys
 import pytest
 
 
+def _coverage_active() -> bool:
+    """Return True only when current pytest run is coverage-instrumented."""
+    return (
+        os.getenv("COVERAGE_RUN") == "true"
+        or "COV_CORE_SOURCE" in os.environ
+    )
+
+
 def test_coverage_threshold():
     """Require minimum test coverage for CI compliance.
 
     Skips if no coverage data file is present (e.g. mid-run or no --cov).
     """
+    if not _coverage_active():
+        pytest.skip(
+            "Coverage gate only runs when pytest is started with --cov."
+        )
     if not os.path.exists(".coverage"):
         pytest.skip("No .coverage data file found; skipping threshold check.")
     result = subprocess.run(
