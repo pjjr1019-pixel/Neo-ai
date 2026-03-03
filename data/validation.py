@@ -22,20 +22,27 @@ def validate_data(data):
     else:
         df = data
     # Use Great Expectations Validator API (v0.15+)
-    # Use Great Expectations PandasDataset for validation
+    # Try Great Expectations PandasDataset if available
     try:
-        ge_df = ge.dataset.PandasDataset(df)
+        if hasattr(ge, "dataset") and hasattr(ge.dataset, "PandasDataset"):
+            ge_df = ge.dataset.PandasDataset(df)
+            # At least 1 row
+            results = ge_df.expect_table_row_count_to_be_greater_than(0)
+            if not results.success:
+                return False
+            # Check no nulls in any column
+            for col in df.columns:
+                res = ge_df.expect_column_values_to_not_be_null(col)
+                if not res.success:
+                    return False
+            return True
     except Exception:
+        pass
+    # Fallback: basic DataFrame validation
+    if df.shape[0] == 0:
         return False
-    # At least 1 row
-    results = ge_df.expect_table_row_count_to_be_greater_than(0)
-    if not results.success:
+    if df.isnull().any().any():
         return False
-    # Check no nulls in any column
-    for col in df.columns:
-        res = ge_df.expect_column_values_to_not_be_null(col)
-        if not res.success:
-            return False
     return True
 
 if __name__ == "__main__":
