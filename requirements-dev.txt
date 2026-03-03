@@ -12,3 +12,4 @@ coverage
 prometheus_client==0.24.1
 optuna
 openlineage-python
+great_expectations
