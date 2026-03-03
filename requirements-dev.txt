@@ -10,3 +10,4 @@ isort
 bandit
 coverage
 prometheus_client==0.24.1
+optuna
